@@ -74,6 +74,8 @@ dirt_texture = pygame.image.load("dirt_texture.png").convert_alpha()
 broom_img = pygame.image.load("broom.png").convert_alpha()
 curtain_img = pygame.image.load("curtain.png").convert_alpha()
 alley_screen = pygame.image.load("alley.png")
+volume_on_img = pygame.image.load("volume_on.png")
+volume_off_img = pygame.image.load("volume_off.png")
 
 
 # Resize images
@@ -113,16 +115,22 @@ button_text_dinner = font.render("Dinner Time", True, button_text_color)
 button_rect_home_grooming = pygame.Rect(750, 160, 200, 60)
 button_text_grooming = font.render("Grooming", True, button_text_color)
 
-button_rect_home = pygame.Rect(650, 30, 325, 100)
+button_rect_home = pygame.Rect(700, 30, 250, 60)
 button_text_home = font.render("Return Home", True, button_text_color)
 
 button_hardfiskur = pygame.Rect(50, 20, 200, 60)
-button_kokosbollar = pygame.Rect(50, 120, 200, 60)
+button_kokosbollar = pygame.Rect(50, 100, 200, 60)
 button_text_hardfiskur = font.render("Harðfiskur", True, button_text_color)
 button_text_kokosbollar = font.render("Kokosbollar", True, button_text_color)
 
 reset_img = pygame.transform.scale(reset_img, (60, 60))
-button_reset = pygame.Rect(930, 630, 60, 60)
+button_reset = pygame.Rect(930, 530, 60, 60)
+
+volume_on_img = pygame.transform.scale(volume_on_img, (60,60))
+volume_off_img = pygame.transform.scale(volume_off_img, (60,60))
+button_volume = pygame.Rect(930, 630, 60, 60)
+
+volume_on = True
 
 button_rect_alley = pygame.Rect(50,20,100,50)
 button_text_alley = font.render('Break', True, button_text_color)
@@ -193,7 +201,7 @@ for i in range(len(color_options)):
     x = 20 + i * 50  # spacing
     y = 640
     color_buttons.append(pygame.Rect(x, y, 40, 40))
-
+nail_thank_you = False
 
 # Dinner stuff
 # gets the initial positions of fish
@@ -247,6 +255,15 @@ while running:
             running = False
 
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            if screen_mode not in ["title", "alley_transition"]:
+                if button_volume.collidepoint(mouse_pos):
+                    if volume_on == True:
+                        pygame.mixer.music.set_volume(0)
+                        volume_on = False
+                    elif volume_on == False:
+                        pygame.mixer.music.set_volume(0.5)
+                        volume_on = True
+
             # Navigates to different modes upon clicking buttons from home screen
             if screen_mode == "home":
                 if button_rect_home_paint.collidepoint(mouse_pos):
@@ -269,6 +286,7 @@ while running:
 
             elif screen_mode == "alley":
                 if button_rect_home.collidepoint(mouse_pos):
+                    pygame.mixer.music.fadeout(10)
                     screen_mode = "home"
                     pygame.mixer.music.load("background_music.mp3")
                     pygame.mixer.music.play(-1)
@@ -291,16 +309,19 @@ while running:
                 if button_rect_home.collidepoint(mouse_pos):
                     screen_mode = "home"
                 else:
-                    # Sets the nail polish color
-                    # for i, nail_rect in enumerate(nail_areas):
-                    #     if nail_rect.collidepoint(mouse_pos):
-                    #         nail_colors[i] = paint_color
                     for i, nail_rect in enumerate(nail_areas):
                         if nail_rect.collidepoint(mouse_pos):
-                            # Get seed point inside nail (e.g., nail_rect.center)
                             seed_x, seed_y = nail_rect.center
                             flood_fill(nails_screen, seed_x, seed_y, paint_color)
-                            nail_colors[i] = paint_color
+
+                            if nail_colors[i] is None:
+                                nail_colors[i] = paint_color
+                                print(nail_colors)
+                                if not nail_thank_you and all(c is not None for c in nail_colors[1:]):
+                                    nail_thank_you = True
+                                    thank_you_start_time = pygame.time.get_ticks()
+                            else:
+                                nail_colors[i]=paint_color
                         # Check if any color button was clicked
                         for i, rect in enumerate(color_buttons):
                             if rect.collidepoint(mouse_pos):
@@ -448,6 +469,11 @@ while running:
                 screen.blit(text, (bubble_rect.x + 20, bubble_rect.y + 15))
             else:
                 giggle_triggered = False  # reset after bubble disappears
+        #put volume button
+        if volume_on == True:
+            screen.blit(volume_on_img, (button_volume.x, button_volume.y))
+        elif volume_on == False:
+            screen.blit(volume_off_img, (button_volume.x, button_volume.y))
 
     if screen_mode == "title":
         # Draw background behind curtain (so it's already there as it pulls up)
@@ -471,6 +497,10 @@ while running:
             exit_sound_playing = False
 
     elif screen_mode == "alley":
+        if not pygame.mixer.music.get_busy() or current_music != "alley":
+            pygame.mixer.music.load("alley_music.mp3")
+            pygame.mixer.music.play(-1)
+            current_music = "alley"
         screen.blit(alley_screen, (0,0))
         pygame.draw.rect(screen, button_color, button_rect_home, border_radius=12)
         screen.blit(button_text_home, (button_rect_home.x + 10, button_rect_home.y + 5))
@@ -498,7 +528,7 @@ while running:
         # Draw shrink button
         pygame.draw.rect(screen, button_color, shrink_button_rect, border_radius=10)
         shrink_text = font.render("Sesh", True, button_text_color)
-        screen.blit(shrink_text, (shrink_button_rect.x + 20, shrink_button_rect.y + 10))
+        screen.blit(shrink_text, (shrink_button_rect.x + 30, shrink_button_rect.y))
         if show_fiend:
             # Bubble size and position
             bubble_width = 200
@@ -515,16 +545,36 @@ while running:
             screen.blit(speech_text, text_rect)
         # Draw reset button
         screen.blit(reset_img, (button_reset.x, button_reset.y))
+        # put volume button
+        if volume_on == True:
+            screen.blit(volume_on_img, (button_volume.x, button_volume.y))
+        elif volume_on == False:
+            screen.blit(volume_off_img, (button_volume.x, button_volume.y))
 
     elif screen_mode == "nails":
         screen.blit(nails_screen, (0, 0))
-        # for i, nail_rect in enumerate(nail_areas):
-        #     if nail_colors[i]:
-        #         pygame.draw.polygon(screen, nail_colors[i], [
-        #             (nail_rect.centerx, nail_rect.bottom),  # Tip at bottom
-        #             (nail_rect.right, nail_rect.top),  # Top right
-        #           (nail_rect.left, nail_rect.top)  # Top left
-        #         ])
+        # Show speech bubble if all fish eaten
+        current_time = pygame.time.get_ticks()
+        if nail_thank_you and (current_time - thank_you_start_time < thank_you_duration):
+            # Bubble background
+            bubble_rect = pygame.Rect(50, 150, 300, 80)
+            pygame.draw.rect(screen, (255, 255, 255), bubble_rect, border_radius=10)
+            pygame.draw.rect(screen, (0, 0, 0), bubble_rect, width=2, border_radius=10)
+            # Speech text
+            if all(c in ((255, 255, 0), (160, 32, 240)) for c in nail_colors[1:]):
+                text = font.render("Go Lakers!", True, (0,0,0))
+            else:
+                text = font.render("I feel so pretty!", True, (0, 0, 0))
+            screen.blit(text, (bubble_rect.x + 20, bubble_rect.y + 20))
+        else:
+            nail_thank_you = False
+
+        #put volume button
+        if volume_on == True:
+            screen.blit(volume_on_img, (button_volume.x, button_volume.y))
+        elif volume_on == False:
+            screen.blit(volume_off_img, (button_volume.x, button_volume.y))
+
         pygame.draw.rect(screen, button_color, button_rect_home, border_radius=12)
         screen.blit(button_text_home, (button_rect_home.x + 10, button_rect_home.y + 5))
 
@@ -584,6 +634,12 @@ while running:
         pygame.draw.rect(screen, button_color, button_kokosbollar, border_radius=12)
         screen.blit(button_text_kokosbollar, (button_kokosbollar.x + 20, button_kokosbollar.y + 10))
 
+        #put volume button
+        if volume_on == True:
+            screen.blit(volume_on_img, (button_volume.x, button_volume.y))
+        elif volume_on == False:
+            screen.blit(volume_off_img, (button_volume.x, button_volume.y))
+
     elif screen_mode == "grooming":
         screen.blit(scales_bg, (0, 0))
         # Draw dirt splotches
@@ -619,6 +675,12 @@ while running:
         pygame.draw.rect(screen, button_color, button_rect_home, border_radius=12)
         screen.blit(button_text_home, (button_rect_home.x + 10, button_rect_home.y + 5))
         screen.blit(reset_img, (button_reset.x, button_reset.y))
+
+        #put volume button
+        if volume_on == True:
+            screen.blit(volume_on_img, (button_volume.x, button_volume.y))
+        elif volume_on == False:
+            screen.blit(volume_off_img, (button_volume.x, button_volume.y))
 
     if screen_mode == "alley":
         # Compute total shrink duration (current hold + past holds)
