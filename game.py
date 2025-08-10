@@ -4,6 +4,10 @@ import sys
 import random
 from collections import deque
 
+# Currency stuff
+num_coins = 100
+
+# Functions
 def generate_dirt_splotches(num_splotches=20):
     splotches = []
     for _ in range(num_splotches):
@@ -27,8 +31,6 @@ def fade_to_black(screen, clock, background, speed=5):
         screen.blit(fade_surface, (0, 0))
         pygame.display.flip()
         clock.tick(60)
-
-from collections import deque
 
 def colors_equal(c1, c2):
     return c1[:3] == c2[:3]  # compare RGB only, ignore alpha
@@ -76,6 +78,14 @@ curtain_img = pygame.image.load("curtain.png").convert_alpha()
 alley_screen = pygame.image.load("alley.png")
 volume_on_img = pygame.image.load("volume_on.png")
 volume_off_img = pygame.image.load("volume_off.png")
+coin_img = pygame.image.load("coin.png")
+shop_screen = pygame.image.load("shop.png")
+bow_img = pygame.image.load("bow.png")
+check = pygame.image.load("check.png")
+necklace_img = pygame.image.load("necklace.png")
+necklace_home_img = pygame.image.load("necklace_home.png")
+backpack_img = pygame.image.load("backpack.png")
+prumpi_backpack = pygame.image.load("prumpi_backpack.png")
 
 
 # Resize images
@@ -84,6 +94,7 @@ background = pygame.transform.scale(background, (1000, 700))
 alley_screen = pygame.transform.scale(alley_screen, (1000, 700))
 scales_bg = pygame.transform.scale(scales_bg, (1000, 700))
 dino = pygame.transform.scale(dino, (300, 400))
+prumpi_backpack = pygame.transform.scale(prumpi_backpack, (300, 400))
 nails_screen = pygame.transform.scale(nails_screen, (1000, 700))
 original_nails_screen = nails_screen.copy()
 dino_eating = pygame.transform.scale(dino_eating, (1000, 700))
@@ -92,16 +103,14 @@ fish_img = pygame.transform.scale(fish_img, (80, 80)) #USED TO BE 40
 chocolate_img = pygame.transform.scale(chocolate_img, (80, 80))  # used to be same size as fish_img
 broom_img = pygame.transform.scale(broom_img, (120, 120))  # adjust size as needed
 curtain_img = pygame.transform.scale(curtain_img, (1000, 700))  # Adjust to your screen size
-
-
+coin_img = pygame.transform.scale(coin_img, (80,80))
+shop_screen = pygame.transform.scale(shop_screen, (1000,700))
+check = pygame.transform.scale(check, (50,50))
 
 # Font
 font = pygame.font.SysFont("comic_sansms", 32)
-# button_color = (255, 255, 150)
 button_color = (255, 225, 125)
 button_text_color = (24, 100, 24)
-
-
 
 # Buttons
 button_text_begin = font.render("Begin", True, button_text_color)
@@ -118,10 +127,13 @@ button_text_grooming = font.render("Grooming", True, button_text_color)
 button_rect_home = pygame.Rect(700, 30, 250, 60)
 button_text_home = font.render("Return Home", True, button_text_color)
 
-button_hardfiskur = pygame.Rect(50, 20, 200, 60)
-button_kokosbollar = pygame.Rect(50, 100, 200, 60)
+button_hardfiskur = pygame.Rect(25, 150, 200, 60)
+button_kokosbollar = pygame.Rect(25, 230, 200, 60)
 button_text_hardfiskur = font.render("Harðfiskur", True, button_text_color)
 button_text_kokosbollar = font.render("Kokosbollar", True, button_text_color)
+
+button_rect_be_naughty = pygame.Rect(675, 550, 300, 60)
+button_text_be_naughty = font.render("Be naughty... (15¢)", True, button_text_color)
 
 reset_img = pygame.transform.scale(reset_img, (60, 60))
 button_reset = pygame.Rect(930, 530, 60, 60)
@@ -135,6 +147,12 @@ volume_on = True
 button_rect_alley = pygame.Rect(50,20,100,50)
 button_text_alley = font.render('Break', True, button_text_color)
 
+coin_button_home = pygame.Rect(35, 600, 60, 60)
+coin_button_else = pygame.Rect(35,35,60,60)
+button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0,0,0))
+
+button_rect_shop = pygame.Rect(50,90,100,50)
+button_text_shop = font.render('Shop', True, button_text_color)
 
 #Opening Screen stuff
 screen_mode = "title"
@@ -166,6 +184,11 @@ total_shrink_time = 0  # accumulate total time held
 show_fiend = False
 fiend_start_time = 0
 fiend_duration = 3000  # milliseconds (3 seconds)
+cigarette = False
+
+exit_sound = pygame.mixer.Sound("exit_sequence.mp3")
+transition_start_time = None
+exit_sound_playing = False
 
 # Load smoke animation frames
 smoke_frames = []
@@ -173,7 +196,6 @@ for i in range(2):  # change if you have more or fewer frames
     img = pygame.image.load(f"smoke_{i+1}.png").convert_alpha()
     img = pygame.transform.scale(img, (50, 50))  # resize as needed
     smoke_frames.append(img)
-
 smoke_frame_index = 0
 smoke_frame_timer = 0
 smoke_frame_interval = 100  # milliseconds per frame
@@ -236,13 +258,23 @@ show_clean_message = False
 clean_message_start_time = 0
 clean_message_duration = 3000  # milliseconds (3 seconds)
 
+#shop stuff
+bow = False
+item_1_rect = pygame.Rect(200, 125, 100, 100)
+item_1_text = font.render('30¢', True, button_text_color)
+
+necklace = False
+item_2_rect = pygame.Rect(400, 125, 100, 100)
+item_2_text = font.render('50¢', True, button_text_color)
+
+backpack = False
+item_3_rect = pygame.Rect(600, 125, 100, 100)
+item_3_text = font.render('100¢', True, button_text_color)
+
+# Load main game music
 pygame.mixer.music.load("background_music.mp3")
 pygame.mixer.music.play(-1)  # -1 means loop indefinitely
 pygame.mixer.music.set_volume(0.5)  # 0.0 to 1.0
-
-exit_sound = pygame.mixer.Sound("exit_sequence.mp3")
-transition_start_time = None
-exit_sound_playing = False
 
 # Game loop
 running = True
@@ -279,6 +311,8 @@ while running:
                     screen_mode = "alley_transition"
                     exit_sound.play()
                     exit_sound_playing = True
+                elif button_rect_shop.collidepoint(mouse_pos):
+                    screen_mode = "shop"
 
             elif screen_mode == "title":
                 if button_rect.collidepoint(event.pos):
@@ -290,18 +324,25 @@ while running:
                     screen_mode = "home"
                     pygame.mixer.music.load("background_music.mp3")
                     pygame.mixer.music.play(-1)
-                if shrink_button_rect.collidepoint(mouse_pos):
+                if shrink_button_rect.collidepoint(mouse_pos) and cigarette:
                     if not shrinking:
                         shrinking = True
                         shrink_start_time = pygame.time.get_ticks()
-                if button_reset.collidepoint(mouse_pos):
-                    total_shrink_time = 0
-                    shrink_start_time = None
-                    shrinking = False
-                    cylinder_width = cylinder_max_width
-                    cylinder_pos = cylinder_orig_pos
-                    show_fiend = False  # Also hide "another one" bubble if shown
-                    fiend_start_time = None
+                if button_rect_be_naughty.collidepoint(mouse_pos):
+                    if num_coins >= 15:
+                        cigarette=True
+                        total_shrink_time = 0
+                        shrink_start_time = None
+                        shrinking = False
+                        cylinder_width = cylinder_max_width
+                        cylinder_pos = cylinder_orig_pos
+                        show_fiend = False  # Also hide "another one" bubble if shown
+                        fiend_start_time = None
+                        num_coins -= 15
+                        button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
+                    else:
+                        #Print that you need more coins for that...
+                        None
 
             elif screen_mode == "nails":
                 # Sets different click functions in the nail screen
@@ -316,9 +357,11 @@ while running:
 
                             if nail_colors[i] is None:
                                 nail_colors[i] = paint_color
-                                print(nail_colors)
+                                # print(nail_colors)
                                 if not nail_thank_you and all(c is not None for c in nail_colors[1:]):
                                     nail_thank_you = True
+                                    num_coins += 5
+                                    button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
                                     thank_you_start_time = pygame.time.get_ticks()
                             else:
                                 nail_colors[i]=paint_color
@@ -355,7 +398,7 @@ while running:
                         mouse_offset = (mouse_pos[0] - rect.x, mouse_pos[1] - rect.y)
                 # Resetting the screen button
                 if button_reset.collidepoint(mouse_pos):
-                    fish_rects = [pygame.Rect(x, y, 80, 40) for x, y in initial_fish_positions]
+                    fish_rects = [pygame.Rect(x, y, 80, 80) for x, y in initial_fish_positions]
 
             elif screen_mode == "grooming":
                 if button_rect_home.collidepoint(mouse_pos):
@@ -369,6 +412,22 @@ while running:
                 if button_reset.collidepoint(mouse_pos):
                     dirt_splotches = generate_dirt_splotches()
                     broom_rect = broom_img.get_rect(topleft=(20, 300))
+
+            elif screen_mode == "shop":
+                if button_rect_home.collidepoint(mouse_pos):
+                    screen_mode = "home"
+                if item_1_rect.collidepoint(mouse_pos) and num_coins >= 30 and bow==False:
+                    bow=True
+                    num_coins-=30
+                    button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
+                if item_2_rect.collidepoint(mouse_pos) and num_coins >= 50 and necklace==False:
+                    necklace=True
+                    num_coins-=50
+                    button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
+                if item_3_rect.collidepoint(mouse_pos) and num_coins >= 100 and backpack==False:
+                    backpack=True
+                    num_coins-=100
+                    button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
 
         elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
             if screen_mode == "grooming":
@@ -393,6 +452,8 @@ while running:
                 # Check if all fish are eaten and say thank you if yes
                 if all(f is None for f in fish_rects):
                     show_thank_you = True
+                    num_coins += 5
+                    button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
                     thank_you_start_time = pygame.time.get_ticks()
 
         elif event.type == pygame.MOUSEMOTION:
@@ -405,6 +466,8 @@ while running:
                     if (mouse_pos[0] - d["pos"][0]) ** 2 + (mouse_pos[1] - d["pos"][1]) ** 2 > d["radius"] ** 2
                 ]
                 if screen_mode == "grooming" and len(dirt_splotches) == 0 and not show_clean_message:
+                    num_coins += 5
+                    button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
                     show_clean_message = True
                     clean_message_start_time = pygame.time.get_ticks()
 
@@ -458,6 +521,8 @@ while running:
         screen.blit(button_text_grooming, (button_rect_home_grooming.x + 30, button_rect_home_grooming.y + 10))
         pygame.draw.rect(screen, button_color, button_rect_alley, border_radius=12)
         screen.blit(button_text_alley, (button_rect_alley.x, button_rect_alley.y))
+        pygame.draw.rect(screen, button_color, button_rect_shop, border_radius=12)
+        screen.blit(button_text_shop, (button_rect_shop.x, button_rect_shop.y))
         if giggle_triggered:
             elapsed_since_giggle = (pygame.time.get_ticks() - giggle_start_time) / 1000
             if elapsed_since_giggle <= GIGGLE_DURATION:
@@ -474,8 +539,18 @@ while running:
             screen.blit(volume_on_img, (button_volume.x, button_volume.y))
         elif volume_on == False:
             screen.blit(volume_off_img, (button_volume.x, button_volume.y))
+        if backpack:
+            screen.blit(prumpi_backpack, dino_pos)
+        if bow:
+            bow_img =pygame.transform.scale(bow_img, (40,40))
+            screen.blit(bow_img, (475, 175))
+        if necklace:
+            necklace_home_img = pygame.transform.scale(necklace_home_img, (75,75))
+            screen.blit(necklace_home_img, (455,280))
+        screen.blit(coin_img, (coin_button_home.x, coin_button_home.y))
+        screen.blit(button_text_coin, (coin_button_home.x + 100, coin_button_home.y + 20))
 
-    if screen_mode == "title":
+    elif screen_mode == "title":
         # Draw background behind curtain (so it's already there as it pulls up)
         screen.blit(background, (0, 0))  # or use a solid color for stage
         screen.blit(curtain_img, (0, curtain_y))  # 2. Then draw the curtain
@@ -488,7 +563,7 @@ while running:
         pygame.draw.rect(screen, button_color, button_rect, width=2, border_radius=10)
         screen.blit(button_text_begin, (button_rect.x + 60, button_rect.y + 5))
 
-    if screen_mode == "alley_transition":
+    elif screen_mode == "alley_transition":
         screen.fill((0, 0, 0))  # black screen
         # Check if exit_sequence.mp3 is done
         if exit_sound_playing and not pygame.mixer.get_busy():
@@ -505,56 +580,77 @@ while running:
         pygame.draw.rect(screen, button_color, button_rect_home, border_radius=12)
         screen.blit(button_text_home, (button_rect_home.x + 10, button_rect_home.y + 5))
         screen.blit(dino, dino_pos_alley)
-        # Draw cigarette
-        draw_y = cylinder_pos[1]
-        if shrinking:
-            draw_y -= 60  # move up 100 pixels
-        pygame.draw.rect(screen, (181, 101, 29), pygame.Rect(355, draw_y, 50, 40), border_radius=0)
-        if cylinder_width > 0:
-            cylinder_rect = pygame.Rect(
-                cylinder_pos[0] + (cylinder_max_width - cylinder_width),  # shift to the right as it shrinks
-                draw_y,
-                cylinder_width,
-                cylinder_height
-            )
-            pygame.draw.rect(screen, (180, 180, 200), cylinder_rect, border_radius=0)
-            pygame.draw.rect(screen, (100, 100, 120), cylinder_rect, width=2, border_radius=0)
-            # Draw smoke at right end while shrinking
+        if num_coins < 15:
+            this_button_color =(180, 170, 140)
+        else:
+            this_button_color = button_color
+        pygame.draw.rect(screen, this_button_color, button_rect_be_naughty, border_radius=12)
+        screen.blit(button_text_be_naughty, (button_rect_be_naughty.x, button_rect_be_naughty.y))
+
+        screen.blit(coin_img, (coin_button_else.x, coin_button_else.y))
+        screen.blit(button_text_coin, (coin_button_else.x + 100, coin_button_else.y + 20))
+
+        # Draw cylinder
+        if cigarette or shrinking:
+            draw_y = cylinder_pos[1]
             if shrinking:
-                smoke_img = smoke_frames[smoke_frame_index]
-                smoke_x = cylinder_rect.left - smoke_img.get_width() // 2
-                smoke_y = draw_y + 20 - smoke_img.get_height() // 2
-                screen.blit(smoke_img, (smoke_x, smoke_y))
-        # Draw shrink button
-        pygame.draw.rect(screen, button_color, shrink_button_rect, border_radius=10)
-        shrink_text = font.render("Sesh", True, button_text_color)
-        screen.blit(shrink_text, (shrink_button_rect.x + 30, shrink_button_rect.y))
+                draw_y -= 60  # move up 100 pixels
+            pygame.draw.rect(screen, (181, 101, 29), pygame.Rect(355, draw_y, 50, 40), border_radius=0)
+            if cylinder_width > 0:
+                cylinder_rect = pygame.Rect(
+                    cylinder_pos[0] + (cylinder_max_width - cylinder_width),  # shift to the right as it shrinks
+                    draw_y,
+                    cylinder_width,
+                    cylinder_height
+                )
+                pygame.draw.rect(screen, (180, 180, 200), cylinder_rect, border_radius=0)
+                pygame.draw.rect(screen, (100, 100, 120), cylinder_rect, width=2, border_radius=0)
+                # Draw smoke at right end while shrinking
+                if shrinking:
+                    smoke_img = smoke_frames[smoke_frame_index]
+                    smoke_x = cylinder_rect.left - smoke_img.get_width() // 2
+                    smoke_y = draw_y + 20 - smoke_img.get_height() // 2
+                    screen.blit(smoke_img, (smoke_x, smoke_y))
+            # Draw shrink button
+            pygame.draw.rect(screen, button_color, shrink_button_rect, border_radius=10)
+            shrink_text = font.render("Sesh", True, button_text_color)
+            screen.blit(shrink_text, (shrink_button_rect.x + 30, shrink_button_rect.y))
         if show_fiend:
             # Bubble size and position
             bubble_width = 200
             bubble_height = 80
             bubble_x = cylinder_pos[0] + 50
-            bubble_y = cylinder_pos[1] - 90  # above the cylinder
+            bubble_y = cylinder_pos[1] - 200  # above the cylinder
             bubble_rect = pygame.Rect(bubble_x, bubble_y, bubble_width, bubble_height)
             # Draw bubble background
             pygame.draw.rect(screen, (255, 255, 255), bubble_rect, border_radius=15)
             pygame.draw.rect(screen, (0, 0, 0), bubble_rect, width=2, border_radius=15)
             # Text
-            speech_text = font.render("another one!", True, (0, 0, 0))
+            speech_text = font.render("Another one!", True, (0, 0, 0))
             text_rect = speech_text.get_rect(center=bubble_rect.center)
             screen.blit(speech_text, text_rect)
-        # Draw reset button
-        screen.blit(reset_img, (button_reset.x, button_reset.y))
         # put volume button
         if volume_on == True:
             screen.blit(volume_on_img, (button_volume.x, button_volume.y))
         elif volume_on == False:
             screen.blit(volume_off_img, (button_volume.x, button_volume.y))
+        if backpack:
+            screen.blit(prumpi_backpack, dino_pos_alley)
+        if bow:
+            bow_img =pygame.transform.scale(bow_img, (40,40))
+            screen.blit(bow_img, (475, 300))
+        if necklace:
+            necklace_home_img = pygame.transform.scale(necklace_home_img, (75,75))
+            screen.blit(necklace_home_img, (455,405))
 
     elif screen_mode == "nails":
         screen.blit(nails_screen, (0, 0))
         # Show speech bubble if all fish eaten
         current_time = pygame.time.get_ticks()
+
+        screen.blit(coin_img, (coin_button_else.x, coin_button_else.y))
+        screen.blit(button_text_coin, (coin_button_else.x + 100, coin_button_else.y + 20))
+
         if nail_thank_you and (current_time - thank_you_start_time < thank_you_duration):
             # Bubble background
             bubble_rect = pygame.Rect(50, 150, 300, 80)
@@ -595,6 +691,10 @@ while running:
             screen.blit(dino_eating, (0, 0))
             chewing = False
         updated_fish_rects = []
+
+        screen.blit(coin_img, (coin_button_else.x, coin_button_else.y))
+        screen.blit(button_text_coin, (coin_button_else.x + 100, coin_button_else.y + 20))
+
         for rect in fish_rects:
             if rect is not None:
                 if active_food == "fish":
@@ -642,6 +742,10 @@ while running:
 
     elif screen_mode == "grooming":
         screen.blit(scales_bg, (0, 0))
+
+        screen.blit(coin_img, (coin_button_else.x, coin_button_else.y))
+        screen.blit(button_text_coin, (coin_button_else.x + 100, coin_button_else.y + 20))
+
         # Draw dirt splotches
         for d in dirt_splotches:
             size = d["radius"] * 2
@@ -682,6 +786,44 @@ while running:
         elif volume_on == False:
             screen.blit(volume_off_img, (button_volume.x, button_volume.y))
 
+    elif screen_mode == "shop":
+        screen.blit(shop_screen, (0, 0))
+
+        pygame.draw.rect(screen, button_color, button_rect_home, border_radius=12)
+        screen.blit(button_text_home, (button_rect_home.x + 10, button_rect_home.y + 5))
+
+        if volume_on == True:
+            screen.blit(volume_on_img, (button_volume.x, button_volume.y))
+        elif volume_on == False:
+            screen.blit(volume_off_img, (button_volume.x, button_volume.y))
+
+        bow_img = pygame.transform.scale(bow_img, (100,100))
+        screen.blit(bow_img, (item_1_rect.x, item_1_rect.y))
+        if bow==False:
+            screen.blit(item_1_text, (item_1_rect.x + 20, item_1_rect.y+80))
+        if bow==True:
+            screen.blit(check, (item_1_rect.x+30, item_1_rect.y+30))
+
+        necklace_img = pygame.transform.scale(necklace_img, (100, 100))
+        screen.blit(necklace_img, (item_2_rect.x, item_2_rect.y))
+        if necklace==False:
+            screen.blit(item_2_text, (item_2_rect.x + 20, item_2_rect.y+80))
+        if necklace==True:
+            screen.blit(check, (item_2_rect.x+30, item_2_rect.y+30))
+
+        backpack_img = pygame.transform.scale(backpack_img, (100, 100))
+        screen.blit(backpack_img, (item_3_rect.x, item_3_rect.y))
+        if backpack==False:
+            screen.blit(item_3_text, (item_3_rect.x + 20, item_3_rect.y+80))
+        if backpack==True:
+            screen.blit(check, (item_3_rect.x+30, item_3_rect.y+30))
+
+        screen.blit(coin_img, (coin_button_home.x, coin_button_home.y))
+        screen.blit(button_text_coin, (coin_button_home.x + 100, coin_button_home.y + 20))
+
+
+
+    # shrinking logic (move later)
     if screen_mode == "alley":
         # Compute total shrink duration (current hold + past holds)
         current_hold = 0
@@ -693,6 +835,7 @@ while running:
                 smoke_frame_index = (smoke_frame_index + 1) % len(smoke_frames)
         if cylinder_width == 0:
             show_fiend=True
+            cigarette = False
             fiend_start_time = pygame.time.get_ticks()
             if pygame.time.get_ticks() - fiend_start_time > fiend_duration:
                 show_fiend = False
