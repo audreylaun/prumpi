@@ -3,6 +3,8 @@ import pygame
 import sys
 import random
 from collections import deque
+from minigame import twerk_minigame_menu
+
 
 # Currency stuff
 num_coins = 100
@@ -82,8 +84,7 @@ coin_img = pygame.image.load("coin.png")
 shop_screen = pygame.image.load("shop.png")
 bow_img = pygame.image.load("bow.png")
 check = pygame.image.load("check.png")
-necklace_img = pygame.image.load("necklace.png")
-necklace_home_img = pygame.image.load("necklace_home.png")
+gem_img = pygame.image.load("gem.png")
 backpack_img = pygame.image.load("backpack.png")
 prumpi_backpack = pygame.image.load("prumpi_backpack.png")
 
@@ -123,6 +124,9 @@ button_text_dinner = font.render("Dinner Time", True, button_text_color)
 
 button_rect_home_grooming = pygame.Rect(750, 160, 200, 60)
 button_text_grooming = font.render("Grooming", True, button_text_color)
+
+button_rect_home_dance = pygame.Rect(750, 230, 200, 60)
+button_text_dance = font.render("Dance Time", True, button_text_color)
 
 button_rect_home = pygame.Rect(700, 30, 250, 60)
 button_text_home = font.render("Return Home", True, button_text_color)
@@ -242,7 +246,7 @@ chewing_duration = 250  # milliseconds
 # Thank you stuff
 show_thank_you = False
 thank_you_start_time = 0
-thank_you_duration = 3500  # milliseconds
+thank_you_duration = 2000  # milliseconds
 
 
 # Grooming stuff
@@ -256,20 +260,22 @@ dragging_broom = False
 mouse_offset = (0, 0)
 show_clean_message = False
 clean_message_start_time = 0
-clean_message_duration = 3000  # milliseconds (3 seconds)
+clean_message_duration = 2000  # milliseconds (3 seconds)
 
 #shop stuff
 bow = False
 item_1_rect = pygame.Rect(200, 125, 100, 100)
 item_1_text = font.render('30¢', True, button_text_color)
 
-necklace = False
+gem = False
 item_2_rect = pygame.Rect(400, 125, 100, 100)
 item_2_text = font.render('50¢', True, button_text_color)
 
 backpack = False
 item_3_rect = pygame.Rect(600, 125, 100, 100)
 item_3_text = font.render('100¢', True, button_text_color)
+
+#GAME STUFF
 
 # Load main game music
 pygame.mixer.music.load("background_music.mp3")
@@ -313,6 +319,8 @@ while running:
                     exit_sound_playing = True
                 elif button_rect_shop.collidepoint(mouse_pos):
                     screen_mode = "shop"
+                elif button_rect_home_dance.collidepoint(mouse_pos):
+                    screen_mode = "dance"
 
             elif screen_mode == "title":
                 if button_rect.collidepoint(event.pos):
@@ -349,6 +357,8 @@ while running:
                 # # Navigates to the home screen
                 if button_rect_home.collidepoint(mouse_pos):
                     screen_mode = "home"
+                    nail_colors = [None for _ in nail_colors]
+                    nails_screen = original_nails_screen.copy()
                 else:
                     for i, nail_rect in enumerate(nail_areas):
                         if nail_rect.collidepoint(mouse_pos):
@@ -381,6 +391,7 @@ while running:
                 # Navigates to the home screen
                 if button_rect_home.collidepoint(mouse_pos):
                     screen_mode = "home"
+                    fish_rects = [pygame.Rect(x, y, 80, 80) for x, y in initial_fish_positions]
                 # Sets the food to fish when clicking the hardfiskur button
                 if button_hardfiskur.collidepoint(mouse_pos):
                     active_food = "fish"
@@ -403,6 +414,8 @@ while running:
             elif screen_mode == "grooming":
                 if button_rect_home.collidepoint(mouse_pos):
                     screen_mode = "home"
+                    dirt_splotches = generate_dirt_splotches()
+                    broom_rect = broom_img.get_rect(topleft=(20, 300))
                 # erasing = True  # start erasing when mouse pressed down in grooming mode
                 if broom_rect.collidepoint(event.pos):
                     erasing = True
@@ -420,14 +433,15 @@ while running:
                     bow=True
                     num_coins-=30
                     button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
-                if item_2_rect.collidepoint(mouse_pos) and num_coins >= 50 and necklace==False:
-                    necklace=True
+                if item_2_rect.collidepoint(mouse_pos) and num_coins >= 50 and gem==False:
+                    gem=True
                     num_coins-=50
                     button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
                 if item_3_rect.collidepoint(mouse_pos) and num_coins >= 100 and backpack==False:
                     backpack=True
                     num_coins-=100
                     button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
+
 
         elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
             if screen_mode == "grooming":
@@ -523,6 +537,8 @@ while running:
         screen.blit(button_text_alley, (button_rect_alley.x, button_rect_alley.y))
         pygame.draw.rect(screen, button_color, button_rect_shop, border_radius=12)
         screen.blit(button_text_shop, (button_rect_shop.x, button_rect_shop.y))
+        pygame.draw.rect(screen, button_color, button_rect_home_dance, border_radius=12)
+        screen.blit(button_text_dance, (button_rect_home_dance.x + 20, button_rect_home_dance.y + 10))
         if giggle_triggered:
             elapsed_since_giggle = (pygame.time.get_ticks() - giggle_start_time) / 1000
             if elapsed_since_giggle <= GIGGLE_DURATION:
@@ -544,9 +560,9 @@ while running:
         if bow:
             bow_img =pygame.transform.scale(bow_img, (40,40))
             screen.blit(bow_img, (475, 175))
-        if necklace:
-            necklace_home_img = pygame.transform.scale(necklace_home_img, (75,75))
-            screen.blit(necklace_home_img, (455,280))
+        if gem:
+            gem_img = pygame.transform.scale(gem_img, (10,10))
+            screen.blit(gem_img, (397,274))
         screen.blit(coin_img, (coin_button_home.x, coin_button_home.y))
         screen.blit(button_text_coin, (coin_button_home.x + 100, coin_button_home.y + 20))
 
@@ -639,9 +655,9 @@ while running:
         if bow:
             bow_img =pygame.transform.scale(bow_img, (40,40))
             screen.blit(bow_img, (475, 300))
-        if necklace:
-            necklace_home_img = pygame.transform.scale(necklace_home_img, (75,75))
-            screen.blit(necklace_home_img, (455,405))
+        if gem:
+            gem_img = pygame.transform.scale(gem_img, (10,10))
+            screen.blit(gem_img, (397,399))
 
     elif screen_mode == "nails":
         screen.blit(nails_screen, (0, 0))
@@ -714,13 +730,6 @@ while running:
             # Speech text
             text = font.render("Thank you mamma!", True, (0, 0, 0))
             screen.blit(text, (bubble_rect.x + 20, bubble_rect.y + 20))
-            # Drawing tail for speech bubble
-            tail_base_right = (bubble_rect.right - 10, bubble_rect.bottom)
-            tail_base_left = (bubble_rect.right - 30, bubble_rect.bottom)
-            tail_tip = (bubble_rect.right - 20, bubble_rect.bottom + 20)
-            pygame.draw.polygon(screen, (255, 255, 255), [tail_base_left, tail_base_right, tail_tip])
-            pygame.draw.polygon(screen, (0, 0, 0), [tail_base_left, tail_base_right, tail_tip], width=2)
-
         else:
             show_thank_you = False
 
@@ -763,12 +772,6 @@ while running:
                 text = font.render("All clean! Takk!", True, (0, 0, 0))
                 screen.blit(text, (bubble_rect.x + 20, bubble_rect.y + 25))
 
-                # Speech bubble tail
-                tail_base_right = (bubble_rect.right - 30, bubble_rect.bottom)
-                tail_base_left = (bubble_rect.right - 50, bubble_rect.bottom)
-                tail_tip = (bubble_rect.right - 40, bubble_rect.bottom + 20)
-                pygame.draw.polygon(screen, (255, 255, 255), [tail_base_left, tail_base_right, tail_tip])
-                pygame.draw.polygon(screen, (0, 0, 0), [tail_base_left, tail_base_right, tail_tip], 2)
             else:
                 show_clean_message = False
 
@@ -804,11 +807,11 @@ while running:
         if bow==True:
             screen.blit(check, (item_1_rect.x+30, item_1_rect.y+30))
 
-        necklace_img = pygame.transform.scale(necklace_img, (100, 100))
-        screen.blit(necklace_img, (item_2_rect.x, item_2_rect.y))
-        if necklace==False:
+        gem_img = pygame.transform.scale(gem_img, (75, 75))
+        screen.blit(gem_img, (item_2_rect.x + 12.5, item_2_rect.y+12.5))
+        if gem==False:
             screen.blit(item_2_text, (item_2_rect.x + 20, item_2_rect.y+80))
-        if necklace==True:
+        if gem==True:
             screen.blit(check, (item_2_rect.x+30, item_2_rect.y+30))
 
         backpack_img = pygame.transform.scale(backpack_img, (100, 100))
@@ -821,7 +824,12 @@ while running:
         screen.blit(coin_img, (coin_button_home.x, coin_button_home.y))
         screen.blit(button_text_coin, (coin_button_home.x + 100, coin_button_home.y + 20))
 
-
+    elif screen_mode == "dance":
+        coins, back_to_game = twerk_minigame_menu()
+        num_coins += coins
+        button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
+        if back_to_game:
+            screen_mode = "home"  # or whatever you call your home screen
 
     # shrinking logic (move later)
     if screen_mode == "alley":
