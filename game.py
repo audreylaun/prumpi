@@ -11,6 +11,12 @@ num_coins = 100
 
 # Functions
 def generate_dirt_splotches(num_splotches=20):
+    '''
+    Generates dirt splotches to go on Prumpi's scales
+
+    :param num_splotches: number of dirt splotches on Prumpi's scales
+    :return: coordinates of the splotches
+    '''
     splotches = []
     for _ in range(num_splotches):
         x = random.randint(200, 800)  # adjust these to fit your scales area
@@ -21,8 +27,9 @@ def generate_dirt_splotches(num_splotches=20):
 
 def fade_to_black(screen, clock, background, speed=5):
     """
-    draw_scene_callback: function that draws the current frame
-    before fading starts, so we fade over the real image.
+    Fades the screen to black
+    par background: draws the current frame before fading starts to we fade over the real image .
+    par speed: customize the speed of the fading
     """
     fade_surface = pygame.Surface(screen.get_size()).convert()
     fade_surface.fill((0, 0, 0))
@@ -38,6 +45,13 @@ def colors_equal(c1, c2):
     return c1[:3] == c2[:3]  # compare RGB only, ignore alpha
 
 def flood_fill(surface, x, y, fill_color):
+    '''
+    flood fills Prumpi's nails
+    :param surface: background screen
+    :param x: click coordinate
+    :param y: click coordinate
+    :param fill_color: color selected from color bar for the nail to be filled with
+    '''
     target_color = surface.get_at((x, y))
     if colors_equal(target_color, fill_color):
         return
@@ -55,41 +69,42 @@ def flood_fill(surface, x, y, fill_color):
                 q.extend([(cx+1, cy), (cx-1, cy), (cx, cy+1), (cx, cy-1)])
 
 
+# --- Initialize Game ---
 pygame.init()
 screen = pygame.display.set_mode((1000, 700))
 pygame.display.set_caption("Dino Beauty Salon")
 clock = pygame.time.Clock()
 
-# Sets the default state to the home screen
+# --- Sets the default state to the home screen---
 screen_mode = "home"
 
-# Load images
-title_image = pygame.image.load("title.png").convert_alpha()
-background = pygame.image.load("salon.png")
-dino = pygame.image.load("prumpi.png")
-nails_screen = pygame.image.load("nails.png")
-dino_eating = pygame.image.load("open_mouth.png")
-dino_closed_mouth = pygame.image.load("closed_mouth.png")  # Add your closed mouth image
-fish_img = pygame.image.load("fish.png")
-reset_img = pygame.image.load("reset_icon.png").convert_alpha()
-chocolate_img = pygame.image.load("chocolate.png").convert_alpha()
-scales_bg = pygame.image.load("scales.png")
-dirt_texture = pygame.image.load("dirt_texture.png").convert_alpha()
-broom_img = pygame.image.load("broom.png").convert_alpha()
-curtain_img = pygame.image.load("curtain.png").convert_alpha()
-alley_screen = pygame.image.load("alley.png")
-volume_on_img = pygame.image.load("volume_on.png")
-volume_off_img = pygame.image.load("volume_off.png")
-coin_img = pygame.image.load("coin.png")
-shop_screen = pygame.image.load("shop.png")
-bow_img = pygame.image.load("bow.png")
-check = pygame.image.load("check.png")
-gem_img = pygame.image.load("gem.png")
-backpack_img = pygame.image.load("backpack.png")
-prumpi_backpack = pygame.image.load("prumpi_backpack.png")
+# --- Load images ---
+title_image = pygame.image.load("data/image/title.png").convert_alpha()
+background = pygame.image.load("data/image/salon.png")
+dino = pygame.image.load("data/image/prumpi.png")
+nails_screen = pygame.image.load("data/image/nails.png")
+dino_eating = pygame.image.load("data/image/open_mouth.png")
+dino_closed_mouth = pygame.image.load("data/image/closed_mouth.png")  # Add your closed mouth image
+fish_img = pygame.image.load("data/image/fish.png")
+reset_img = pygame.image.load("data/image/reset_icon.png").convert_alpha()
+chocolate_img = pygame.image.load("data/image/chocolate.png").convert_alpha()
+scales_bg = pygame.image.load("data/image/scales.png")
+dirt_texture = pygame.image.load("data/image/dirt_texture.png").convert_alpha()
+broom_img = pygame.image.load("data/image/broom.png").convert_alpha()
+curtain_img = pygame.image.load("data/image/curtain.png").convert_alpha()
+alley_screen = pygame.image.load("data/image/alley.png")
+volume_on_img = pygame.image.load("data/image/volume_on.png")
+volume_off_img = pygame.image.load("data/image/volume_off.png")
+coin_img = pygame.image.load("data/image/coin.png")
+shop_screen = pygame.image.load("data/image/shop.png")
+bow_img = pygame.image.load("data/image/bow.png")
+check = pygame.image.load("data/image/check.png")
+gem_img = pygame.image.load("data/image/gem.png")
+backpack_img = pygame.image.load("data/image/backpack.png")
+prumpi_backpack = pygame.image.load("data/image/prumpi_backpack.png")
 
 
-# Resize images
+# --- Resize images ---
 title_image = pygame.transform.scale(title_image, (500,300))
 background = pygame.transform.scale(background, (1000, 700))
 alley_screen = pygame.transform.scale(alley_screen, (1000, 700))
@@ -108,14 +123,15 @@ coin_img = pygame.transform.scale(coin_img, (80,80))
 shop_screen = pygame.transform.scale(shop_screen, (1000,700))
 check = pygame.transform.scale(check, (50,50))
 
-# Font
+# --- Set Font and Button Colors  ---
 font = pygame.font.SysFont("comic_sansms", 32)
 button_color = (255, 225, 125)
 button_text_color = (24, 100, 24)
 
-# Buttons
+# --- Create buttons ---
 button_text_begin = font.render("Begin", True, button_text_color)
 
+# Home screen
 button_rect_home_paint = pygame.Rect(750, 20, 200, 60)
 button_text_paint = font.render("Paint Nails", True, button_text_color)
 
@@ -128,16 +144,15 @@ button_text_grooming = font.render("Grooming", True, button_text_color)
 button_rect_home_dance = pygame.Rect(750, 230, 200, 60)
 button_text_dance = font.render("Dance Time", True, button_text_color)
 
+button_rect_alley = pygame.Rect(50,20,100,50)
+button_text_alley = font.render('Break', True, button_text_color)
+
+button_rect_shop = pygame.Rect(50,90,100,50)
+button_text_shop = font.render('Shop', True, button_text_color)
+
+# All screens
 button_rect_home = pygame.Rect(700, 30, 250, 60)
 button_text_home = font.render("Return Home", True, button_text_color)
-
-button_hardfiskur = pygame.Rect(25, 150, 200, 60)
-button_kokosbollar = pygame.Rect(25, 230, 200, 60)
-button_text_hardfiskur = font.render("Harðfiskur", True, button_text_color)
-button_text_kokosbollar = font.render("Kokosbollar", True, button_text_color)
-
-button_rect_be_naughty = pygame.Rect(675, 550, 300, 60)
-button_text_be_naughty = font.render("Be naughty... (15¢)", True, button_text_color)
 
 reset_img = pygame.transform.scale(reset_img, (60, 60))
 button_reset = pygame.Rect(930, 530, 60, 60)
@@ -145,19 +160,25 @@ button_reset = pygame.Rect(930, 530, 60, 60)
 volume_on_img = pygame.transform.scale(volume_on_img, (60,60))
 volume_off_img = pygame.transform.scale(volume_off_img, (60,60))
 button_volume = pygame.Rect(930, 630, 60, 60)
-
 volume_on = True
 
-button_rect_alley = pygame.Rect(50,20,100,50)
-button_text_alley = font.render('Break', True, button_text_color)
+# Dinner
+button_hardfiskur = pygame.Rect(25, 150, 200, 60)
+button_kokosbollar = pygame.Rect(25, 230, 200, 60)
+button_text_hardfiskur = font.render("Harðfiskur", True, button_text_color)
+button_text_kokosbollar = font.render("Kokosbollar", True, button_text_color)
+
+# Alley
+button_rect_be_naughty = pygame.Rect(675, 550, 300, 60)
+button_text_be_naughty = font.render("Be naughty... (15¢)", True, button_text_color)
+shrink_button_rect = pygame.Rect(30, 630, 140, 50)
+
 
 coin_button_home = pygame.Rect(35, 600, 60, 60)
 coin_button_else = pygame.Rect(35,35,60,60)
 button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0,0,0))
 
-button_rect_shop = pygame.Rect(50,90,100,50)
-button_text_shop = font.render('Shop', True, button_text_color)
-
+# --- Specific Screen Parameters ---
 #Opening Screen stuff
 screen_mode = "title"
 curtain_y = 0  # Start fully covering screen
@@ -173,15 +194,18 @@ giggle_triggered = False
 GIGGLE_DURATION = 2  # seconds the speech bubble stays
 giggle_start_time = None
 
+# Alley transition
+exit_sound = pygame.mixer.Sound("data/audio/exit_sequence.mp3")
+transition_start_time = None
+exit_sound_playing = False
 
-# Alley stuff
+# Alley
 dino_pos_alley = (315, 250)
 cylinder_max_width = 250 #used to be 300
 cylinder_height = 40
 cylinder_width = cylinder_max_width
 cylinder_orig_pos = (110,450)
 cylinder_pos = cylinder_orig_pos
-shrink_button_rect = pygame.Rect(30, 630, 140, 50)
 shrinking = False
 shrink_start_time = None
 total_shrink_time = 0  # accumulate total time held
@@ -190,14 +214,9 @@ fiend_start_time = 0
 fiend_duration = 3000  # milliseconds (3 seconds)
 cigarette = False
 
-exit_sound = pygame.mixer.Sound("exit_sequence.mp3")
-transition_start_time = None
-exit_sound_playing = False
-
-# Load smoke animation frames
 smoke_frames = []
 for i in range(2):  # change if you have more or fewer frames
-    img = pygame.image.load(f"smoke_{i+1}.png").convert_alpha()
+    img = pygame.image.load(f"data/image/smoke_{i+1}.png").convert_alpha()
     img = pygame.transform.scale(img, (50, 50))  # resize as needed
     smoke_frames.append(img)
 smoke_frame_index = 0
@@ -205,7 +224,7 @@ smoke_frame_timer = 0
 smoke_frame_interval = 100  # milliseconds per frame
 
 
-# Nail stuff
+# Nails
 nail_areas = [pygame.Rect(x-25, y-25, 50, 50) for x, y in [
     (850, 66), (115, 488), (212, 523), (330, 540),
     (450, 480), (550, 475), (675, 540), (790, 530), (880, 480)
@@ -229,40 +248,38 @@ for i in range(len(color_options)):
     color_buttons.append(pygame.Rect(x, y, 40, 40))
 nail_thank_you = False
 
-# Dinner stuff
-# gets the initial positions of fish
+# Dinner
 initial_fish_positions = [(50 + i * 90, 600) for i in range(5)]
 fish_rects = [pygame.Rect(x, y, 80, 80) for x, y in initial_fish_positions]
-# sets dragging parameters
+
 dragging_fish = None
 mouse_offset = (0, 0)
 mouth_rect = pygame.Rect(250, 300, 400, 250)  # approx dino mouth
-#Saves fish as the default food
+
 active_food = "fish"
-# Chewing stuff
+
 chewing = False
 chewing_start_time = 0
 chewing_duration = 250  # milliseconds
-# Thank you stuff
+
 show_thank_you = False
 thank_you_start_time = 0
 thank_you_duration = 2000  # milliseconds
 
-
-# Grooming stuff
-# Dirt splotches stored as list of dicts with position and radius
+# Grooming
 dirt_splotches = generate_dirt_splotches()
 erasing = False
-# Initial broom position (left side)
+
 broom_rect = broom_img.get_rect(topleft=(20, 300))
-# Track dragging state for broom
+
 dragging_broom = False
 mouse_offset = (0, 0)
+
 show_clean_message = False
 clean_message_start_time = 0
-clean_message_duration = 2000  # milliseconds (3 seconds)
+clean_message_duration = 2000  #ms
 
-#shop stuff
+# Shop
 bow = False
 item_1_rect = pygame.Rect(200, 125, 100, 100)
 item_1_text = font.render('30¢', True, button_text_color)
@@ -275,12 +292,12 @@ backpack = False
 item_3_rect = pygame.Rect(600, 125, 100, 100)
 item_3_text = font.render('100¢', True, button_text_color)
 
-#GAME STUFF
 
-# Load main game music
-pygame.mixer.music.load("background_music.mp3")
+# Music
+pygame.mixer.music.load("data/audio/background_music.mp3")
 pygame.mixer.music.play(-1)  # -1 means loop indefinitely
 pygame.mixer.music.set_volume(0.5)  # 0.0 to 1.0
+
 
 # Game loop
 running = True
@@ -330,7 +347,7 @@ while running:
                 if button_rect_home.collidepoint(mouse_pos):
                     pygame.mixer.music.fadeout(10)
                     screen_mode = "home"
-                    pygame.mixer.music.load("background_music.mp3")
+                    pygame.mixer.music.load("data/audio/background_music.mp3")
                     pygame.mixer.music.play(-1)
                 if shrink_button_rect.collidepoint(mouse_pos) and cigarette:
                     if not shrinking:
@@ -589,7 +606,7 @@ while running:
 
     elif screen_mode == "alley":
         if not pygame.mixer.music.get_busy() or current_music != "alley":
-            pygame.mixer.music.load("alley_music.mp3")
+            pygame.mixer.music.load("data/audio/alley_music.mp3")
             pygame.mixer.music.play(-1)
             current_music = "alley"
         screen.blit(alley_screen, (0,0))

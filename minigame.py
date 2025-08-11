@@ -33,32 +33,31 @@ KEYS = {
 }
 
 # background image
-background = pygame.image.load("stage.png")
+background = pygame.image.load("data/image/stage.png")
 background = pygame.transform.scale(background, (1000, 700))
 
 #prumpi stuff
-prumpi_standing = pygame.image.load("prumpi_standing.png")
+prumpi_standing = pygame.image.load("data/image/prumpi_standing.png")
 # prumpi_standing = pygame.image.load("prumpi.png")
-prumpi_squatting = pygame.image.load("prumpi_squatting.png")
+prumpi_squatting = pygame.image.load("data/image/prumpi_squatting.png")
 
 prumpi_standing = pygame.transform.scale(prumpi_standing, (300, 400))
 prumpi_squatting = pygame.transform.scale(prumpi_squatting, (300, 400))
 
 prumpi_position = dino_pos = (375, 300)
-# (screen.blit(dino, dino_pos))
 
 # --- Load arrow images ---
 arrow_images = {
-    "left": pygame.image.load("arrow_left.png").convert_alpha(),
-    "right": pygame.image.load("arrow_right.png").convert_alpha(),
-    "up": pygame.image.load("arrow_up.png").convert_alpha(),
-    "down": pygame.image.load("arrow_down.png").convert_alpha()
+    "left": pygame.image.load("data/image/arrow_left.png").convert_alpha(),
+    "right": pygame.image.load("data/image/arrow_right.png").convert_alpha(),
+    "up": pygame.image.load("data/image/arrow_up.png").convert_alpha(),
+    "down": pygame.image.load("data/image/arrow_down.png").convert_alpha()
 }
 font = pygame.font.SysFont("comic_sansms", 32)
 button_color = (255, 225, 125)
 button_text_color = (24, 100, 24)
 
-coin_img = pygame.image.load("coin.png")
+coin_img = pygame.image.load("data/image/coin.png")
 coin_img = pygame.transform.scale(coin_img, (80,80))
 coin_button_home = pygame.Rect(35, 600, 60, 60)
 
@@ -210,7 +209,3 @@ def twerk_minigame_menu():
 
         pygame.display.flip()
         clock.tick(60)
-
-# --- Run the menu (for testing) ---
-# if __name__ == "__main__":
-#     coins, back_to_game = twerk_minigame_menu()
