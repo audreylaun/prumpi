@@ -7,7 +7,7 @@ from minigame import twerk_minigame_menu
 
 
 # Currency stuff
-num_coins = 100
+num_coins = 0
 
 # Functions
 def generate_dirt_splotches(num_splotches=20):
@@ -623,6 +623,15 @@ while running:
         screen.blit(coin_img, (coin_button_else.x, coin_button_else.y))
         screen.blit(button_text_coin, (coin_button_else.x + 100, coin_button_else.y + 20))
 
+        if backpack:
+            screen.blit(prumpi_backpack, dino_pos_alley)
+        if bow:
+            bow_img =pygame.transform.scale(bow_img, (40,40))
+            screen.blit(bow_img, (475, 300))
+        if gem:
+            gem_img = pygame.transform.scale(gem_img, (10,10))
+            screen.blit(gem_img, (397,399))
+
         # Draw cylinder
         if cigarette or shrinking:
             draw_y = cylinder_pos[1]
@@ -667,14 +676,6 @@ while running:
             screen.blit(volume_on_img, (button_volume.x, button_volume.y))
         elif volume_on == False:
             screen.blit(volume_off_img, (button_volume.x, button_volume.y))
-        if backpack:
-            screen.blit(prumpi_backpack, dino_pos_alley)
-        if bow:
-            bow_img =pygame.transform.scale(bow_img, (40,40))
-            screen.blit(bow_img, (475, 300))
-        if gem:
-            gem_img = pygame.transform.scale(gem_img, (10,10))
-            screen.blit(gem_img, (397,399))
 
     elif screen_mode == "nails":
         screen.blit(nails_screen, (0, 0))
