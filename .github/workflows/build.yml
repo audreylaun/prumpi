@@ -28,11 +28,7 @@ jobs:
 
       - name: Build executable
         run: |
-          pyinstaller --onefile --windowed \
-            --add-data "data:data" \
-            --add-data "*.py:." \
-            --name "Prumpi-World" \
-            full_game.py
+          pyinstaller Prumpi-World.spec
 
       - name: Upload executable artifact
         uses: actions/upload-artifact@v4
