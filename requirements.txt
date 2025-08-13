@@ -1,1 +1,1 @@
-Required packages: pygame
+pygame
