@@ -122,7 +122,7 @@ def rhythm_game():
                             break
                     if hit_note:
                         notes.remove(hit_note)
-                        button_text_coin = font.render(str(score) + " Prumpi Coins", True, (0, 0, 0))
+                        button_text_coin = font.render(str(score) + " Prumpi Coins Earned", True, (0, 0, 0))
                         score += 1
                         prumpi_image = prumpi_squatting  # change to squat pose
                         pose_timer = pygame.time.get_ticks()  # record when we changed
@@ -172,6 +172,7 @@ def twerk_minigame_menu():
     clock = pygame.time.Clock()
     mode = "start"
     earned_coins = 0
+    total_earned_coins = 0
 
     while True:
         screen.blit(background, (0,0))
@@ -182,12 +183,14 @@ def twerk_minigame_menu():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if mode == "start" and start_btn.collidepoint(mouse_pos):
                     earned_coins = rhythm_game()
+                    total_earned_coins += earned_coins
                     mode = "end"
                 elif mode == "end":
                     if yes_btn.collidepoint(mouse_pos):
                         earned_coins = rhythm_game()
+                        total_earned_coins += earned_coins
                     elif no_btn.collidepoint(mouse_pos):
-                        return earned_coins, True
+                        return total_earned_coins, True
 
         screen.blit(background, (0,0))
 
