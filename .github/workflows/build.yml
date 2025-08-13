@@ -1,10 +1,6 @@
 name: Build macOS Executable
 
 on:
-  push:
-    branches: [master, main, installation-and-gitignore]
-  pull_request:
-    branches: [master, main]
   release:
     types: [published]
 
@@ -34,6 +30,10 @@ jobs:
         run: |
           codesign --force --deep --sign - dist/Prumpi-World.app
 
+      - name: Create zip for release
+        run: |
+          cd dist && zip -r Prumpi-World-macOS.zip Prumpi-World.app
+
       - name: Upload executable artifact
         uses: actions/upload-artifact@v4
         with:
@@ -42,13 +42,13 @@ jobs:
             dist/Prumpi-World*
             dist/*.dmg
 
-      - name: Upload to release (if release)
+      - name: Upload to release
         if: github.event_name == 'release'
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: dist/Prumpi-World-macOS.dmg
-          asset_name: Prumpi-World-macOS.dmg
-          asset_content_type: application/octet-stream
+          asset_path: dist/Prumpi-World-macOS.zip
+          asset_name: Prumpi-World-macOS.zip
+          asset_content_type: application/zip
