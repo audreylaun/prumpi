@@ -31,7 +31,6 @@ jobs:
           pyinstaller --onefile --windowed \
             --add-data "data:data" \
             --name "Prumpi-World" \
-            --icon "data/image/prumpi.png" \
             full_game.py
 
       - name: Upload executable artifact
