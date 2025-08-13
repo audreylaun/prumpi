@@ -2,7 +2,8 @@ import pygame
 import sys
 import random
 from collections import deque
-from minigame import twerk_minigame_menu
+from dance_minigame import twerk_minigame_menu
+from karaoke_minigame import karaoke
 
 def fade_to_black(screen, clock, background, speed=5):
     """
@@ -83,6 +84,9 @@ def run_saloon_game(num_coins):
     button_rect_world = pygame.Rect(50, 20, 275, 50)
     button_text_world = font.render('Return to World', True, button_text_color)
 
+    button_rect_karaoke = pygame.Rect(750, 20, 200, 60)
+    button_text_karaoke = font.render("Karaoke", True, button_text_color)
+
     # --- Variables ---
     screen_mode = "title"
     dino_pos = (640, 165)
@@ -149,6 +153,9 @@ def run_saloon_game(num_coins):
                         screen_mode = "alley_transition"
                         exit_sound.play()
                         exit_sound_playing = True
+                    elif button_rect_karaoke.collidepoint(mouse_pos):
+                        num_coins += karaoke()
+                        button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
 
                     elif button_rect_world.collidepoint(mouse_pos):
                         mode = "exit"
@@ -207,6 +214,7 @@ def run_saloon_game(num_coins):
             pygame.draw.rect(screen, button_color, button_rect_begin, border_radius=10)
             pygame.draw.rect(screen, (0, 0, 0), button_rect_begin, width=2, border_radius=10)
             screen.blit(button_text_begin, (button_rect_begin.x + 60, button_rect_begin.y + 5))
+
 
         elif screen_mode == "alley_transition":
             screen.fill((0, 0, 0))  # black screen
@@ -321,6 +329,9 @@ def run_saloon_game(num_coins):
 
             pygame.draw.rect(screen, button_color, button_rect_alley, border_radius=12)
             screen.blit(button_text_alley, (button_rect_alley.x, button_rect_alley.y))
+
+            pygame.draw.rect(screen, button_color, button_rect_karaoke, border_radius=12)
+            screen.blit(button_text_karaoke, (button_rect_karaoke.x + 20, button_rect_karaoke.y + 10))
 
             if volume_on == True:
                 screen.blit(volume_on_img, (button_volume.x, button_volume.y))

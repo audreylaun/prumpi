@@ -3,7 +3,7 @@ import pygame
 import sys
 import random
 from collections import deque
-from minigame import twerk_minigame_menu
+from dance_minigame import twerk_minigame_menu
 
 
 

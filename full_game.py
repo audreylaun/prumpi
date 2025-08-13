@@ -53,9 +53,9 @@ button_rect_saloon = pygame.Rect(500, 350, 100, 100)
 button_rect_title = title_image.get_rect(center=(screen.get_width() // 2, 300))
 
 # Music
-pygame.mixer.music.load("data/audio/background_music.mp3")
-pygame.mixer.music.play(-1)  # -1 means loop indefinitely
-pygame.mixer.music.set_volume(0.5)  # 0.0 to 1.0
+# pygame.mixer.music.load("data/audio/background_music.mp3")
+# pygame.mixer.music.play(-1)  # -1 means loop indefinitely
+# pygame.mixer.music.set_volume(0.5)  # 0.0 to 1.0
 
 num_coins = 1000
 
