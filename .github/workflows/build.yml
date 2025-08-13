@@ -30,6 +30,7 @@ jobs:
         run: |
           pyinstaller --onefile --windowed \
             --add-data "data:data" \
+            --add-data "*.py:." \
             --name "Prumpi-World" \
             full_game.py
 
