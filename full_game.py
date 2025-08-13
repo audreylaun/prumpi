@@ -57,7 +57,10 @@ button_rect_title = title_image.get_rect(center=(screen.get_width() // 2, 300))
 # pygame.mixer.music.play(-1)  # -1 means loop indefinitely
 # pygame.mixer.music.set_volume(0.5)  # 0.0 to 1.0
 
-num_coins = 1000
+num_coins = 0
+bow = False
+gem = False
+backpack = False
 
 screen_mode = "title"
 running = True
@@ -76,9 +79,9 @@ while running:
                     screen_mode = "home"
             if screen_mode == "home":
                 if button_rect_salon.collidepoint(mouse_pos):
-                    num_coins = run_salon_game(num_coins)
+                    num_coins, bow, gem, backpack = run_salon_game(num_coins, bow, gem, backpack)
                 if button_rect_saloon.collidepoint(mouse_pos):
-                    num_coins = run_saloon_game(num_coins)
+                    num_coins = run_saloon_game(num_coins, bow, gem, backpack)
 
                #display pins, which will tell you the names of the worlds if you hover over them
 

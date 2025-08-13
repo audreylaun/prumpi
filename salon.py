@@ -51,7 +51,7 @@ def flood_fill(surface, x, y, fill_color):
                 q.extend([(cx+1, cy), (cx-1, cy), (cx, cy+1), (cx, cy-1)])
 
 
-def run_salon_game(num_coins):
+def run_salon_game(num_coins, bow, gem, backpack):
     # num_coins = 200
     gamemode = "salon"
 
@@ -230,15 +230,15 @@ def run_salon_game(num_coins):
     clean_message_duration = 2000  #ms
 
     # Shop
-    bow = False
+    # bow = False
     item_1_rect = pygame.Rect(200, 125, 100, 100)
     item_1_text = font.render('30¢', True, button_text_color)
 
-    gem = False
+    # gem = False
     item_2_rect = pygame.Rect(400, 125, 100, 100)
     item_2_text = font.render('50¢', True, button_text_color)
 
-    backpack = False
+    # backpack = False
     item_3_rect = pygame.Rect(600, 125, 100, 100)
     item_3_text = font.render('100¢', True, button_text_color)
 
@@ -284,7 +284,7 @@ def run_salon_game(num_coins):
                         screen_mode = "dance"
                     elif button_rect_world.collidepoint(mouse_pos):
                         mode = "exit"
-                        return num_coins
+                        return num_coins, bow, gem, backpack
 
                 elif screen_mode == "title":
                     if button_rect.collidepoint(event.pos):

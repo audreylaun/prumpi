@@ -52,8 +52,8 @@ def karaoke():
 
     # Buttons
     begin_button = pygame.Rect(400, 500, 200, 60)
-    restart_button = pygame.Rect(780, 75, 180, 60)
-    exit_game_button = pygame.Rect(780, 150, 180, 60)
+    restart_button = pygame.Rect(780, 20, 180, 60)
+    exit_game_button = pygame.Rect(780, 95, 180, 60)
     results_restart_button = pygame.Rect(400, 500, 200, 60)
     end_button = pygame.Rect(400, 600, 200, 60)
 
@@ -161,7 +161,7 @@ def karaoke():
             correct_so_far = lyrics_no_newlines.startswith(input_text)
             if not correct_so_far:
                 error_msg = font.render("Typing error! Fix it.", True, (255, 0, 0))
-                screen.blit(error_msg, (20, 510))
+                screen.blit(error_msg, (20, 450))
 
             # Restart button on the right side of input box
             draw_button("Restart", restart_button, mouse_pos)
@@ -171,7 +171,7 @@ def karaoke():
             if start_time is not None:
                 elapsed = time.time() - start_time
                 timer_surf = font.render(f"Time: {elapsed:.2f}s", True, (0, 0, 0))
-                screen.blit(timer_surf, (screen.get_width() - timer_surf.get_width() - 20, 20))
+                screen.blit(timer_surf, (screen.get_width() - timer_surf.get_width() - 20, 175))
 
         elif mode == "results":
             result_title = big_font.render("Results", True, (0,0,0))

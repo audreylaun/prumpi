@@ -21,7 +21,7 @@ def fade_to_black(screen, clock, background, speed=5):
         pygame.display.flip()
         clock.tick(60)
 
-def run_saloon_game(num_coins):
+def run_saloon_game(num_coins, bow, gem, backpack):
     pygame.init()
     screen = pygame.display.set_mode((1000, 700))
     pygame.display.set_caption("Dino Rugged Saloon")
@@ -38,6 +38,10 @@ def run_saloon_game(num_coins):
     coin_img = pygame.image.load("data/image/coin.png")
     volume_on_img = pygame.image.load("data/image/volume_on.png")
     volume_off_img = pygame.image.load("data/image/volume_off.png")
+    bow_img = pygame.image.load("data/image/bow.png")
+    gem_img = pygame.image.load("data/image/gem.png")
+    backpack_img = pygame.image.load("data/image/backpack.png")
+    prumpi_backpack = pygame.image.load("data/image/prumpi_backpack.png")
 
 
     # --- Resize images ---
@@ -53,6 +57,7 @@ def run_saloon_game(num_coins):
     volume_off_img = pygame.transform.scale(volume_off_img, (60, 60))
     button_volume = pygame.Rect(930, 630, 60, 60)
     volume_on = True
+    prumpi_backpack = pygame.transform.scale(prumpi_backpack, (300, 400))
 
     # --- Set Font and Button Colors  ---
     font = pygame.font.SysFont("comic_sansms", 32)
@@ -233,6 +238,14 @@ def run_saloon_game(num_coins):
             pygame.draw.rect(screen, button_color, button_rect_home, border_radius=12)
             screen.blit(button_text_home, (button_rect_home.x + 10, button_rect_home.y + 5))
             screen.blit(dino, dino_pos_alley)
+            if backpack:
+                screen.blit(prumpi_backpack, dino_pos)
+            if bow:
+                bow_img =pygame.transform.scale(bow_img, (40,40))
+                screen.blit(bow_img, (475, 175))
+            if gem:
+                gem_img = pygame.transform.scale(gem_img, (10,10))
+                screen.blit(gem_img, (397,274))
             if num_coins < 15:
                 this_button_color = (180, 170, 140)
             else:
@@ -340,6 +353,15 @@ def run_saloon_game(num_coins):
 
             screen.blit(coin_img, (coin_button_home.x, coin_button_home.y))
             screen.blit(button_text_coin, (coin_button_home.x + 100, coin_button_home.y + 20))
+
+            if backpack:
+                screen.blit(prumpi_backpack, dino_pos)
+            if bow:
+                bow_img =pygame.transform.scale(bow_img, (40,40))
+                screen.blit(bow_img, (800, 215))
+            if gem:
+                gem_img = pygame.transform.scale(gem_img, (10,10))
+                screen.blit(gem_img, (722,314))
 
         # shrinking logic (move later)
         if screen_mode == "alley":
