@@ -30,6 +30,10 @@ jobs:
         run: |
           pyinstaller Prumpi-World.spec
 
+      - name: Sign app bundle (ad-hoc)
+        run: |
+          codesign --force --deep --sign - dist/Prumpi-World.app
+
       - name: Upload executable artifact
         uses: actions/upload-artifact@v4
         with:
