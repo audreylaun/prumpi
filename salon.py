@@ -243,12 +243,6 @@ def run_salon_game(num_coins, bow, gem, backpack):
     item_3_text = font.render('100¢', True, button_text_color)
 
 
-    # Music
-    pygame.mixer.music.load("data/audio/background_music.mp3")
-    pygame.mixer.music.play(-1)  # -1 means loop indefinitely
-    pygame.mixer.music.set_volume(0.5)  # 0.0 to 1.0
-
-
     # Game loop
     running = True
     while running:

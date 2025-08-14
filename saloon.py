@@ -131,9 +131,9 @@ def run_saloon_game(num_coins, bow, gem, backpack):
     smoke_frame_interval = 100  # milliseconds per frame
 
     # Music
-    pygame.mixer.music.load("data/audio/background_music.mp3")
-    pygame.mixer.music.play(-1)  # -1 means loop indefinitely
-    pygame.mixer.music.set_volume(0.5)  # 0.0 to 1.0
+    # pygame.mixer.music.load("data/audio/background_music.mp3")
+    # pygame.mixer.music.play(-1)  # -1 means loop indefinitely
+    # pygame.mixer.music.set_volume(0.5)  # 0.0 to 1.0
 
     while running:
         mouse_pos = pygame.mouse.get_pos()
