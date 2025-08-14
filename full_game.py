@@ -26,6 +26,13 @@ pygame.init()
 screen = pygame.display.set_mode((1000, 700))
 pygame.display.set_caption("Prumpi World")
 clock = pygame.time.Clock()
+num_coins = 0
+bow = False
+gem = False
+backpack = False
+
+screen_mode = "title"
+running = True
 
 # --- Set Font and Button Colors  ---
 font = pygame.font.SysFont("comic_sansms", 32)
@@ -37,11 +44,15 @@ button_text_color = (24, 100, 24)
 background = pygame.image.load("data/image/prumpi_world.png")
 title_image = pygame.image.load('data/image/world_title.png')
 pin = pygame.image.load('data/image/pin.png')
+volume_on_img = pygame.image.load("data/image/volume_on.png")
+volume_off_img = pygame.image.load("data/image/volume_off.png")
+coin_img = pygame.image.load("data/image/coin.png")
 
 #Rescale images
 background = pygame.transform.scale(background, (1000, 700))
 title_image = pygame.transform.scale(title_image, (500, 300))
 pin = pygame.transform.scale(pin, (100,100))
+coin_img = pygame.transform.scale(coin_img, (80, 80))
 
 # --- Create buttons ---
 button_rect_begin = pygame.Rect(400, 500, 200, 60)
@@ -52,18 +63,20 @@ button_rect_saloon = pygame.Rect(500, 350, 100, 100)
 
 button_rect_title = title_image.get_rect(center=(screen.get_width() // 2, 300))
 
+coin_button_home = pygame.Rect(35, 600, 60, 60)
+coin_button_else = pygame.Rect(35, 35, 60, 60)
+button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
+
+volume_on_img = pygame.transform.scale(volume_on_img, (60,60))
+volume_off_img = pygame.transform.scale(volume_off_img, (60,60))
+button_volume = pygame.Rect(930, 630, 60, 60)
+volume_on = True
+
+
 # Music
-# pygame.mixer.music.load("data/audio/background_music.mp3")
-# pygame.mixer.music.play(-1)  # -1 means loop indefinitely
-# pygame.mixer.music.set_volume(0.5)  # 0.0 to 1.0
-
-num_coins = 0
-bow = False
-gem = False
-backpack = False
-
-screen_mode = "title"
-running = True
+pygame.mixer.music.load("data/audio/background_music.mp3")
+pygame.mixer.music.play(-1)  # -1 means loop indefinitely
+pygame.mixer.music.set_volume(0.5)  # 0.0 to 1.0
 
 while running:
     screen.fill((255, 255, 255))
@@ -80,8 +93,18 @@ while running:
             if screen_mode == "home":
                 if button_rect_salon.collidepoint(mouse_pos):
                     num_coins, bow, gem, backpack = run_salon_game(num_coins, bow, gem, backpack)
-                if button_rect_saloon.collidepoint(mouse_pos):
+                    button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
+                elif button_rect_saloon.collidepoint(mouse_pos):
                     num_coins = run_saloon_game(num_coins, bow, gem, backpack)
+                    button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
+
+                elif button_volume.collidepoint(mouse_pos):
+                    if volume_on == True:
+                        pygame.mixer.music.set_volume(0)
+                        volume_on = False
+                    elif volume_on == False:
+                        pygame.mixer.music.set_volume(0.5)
+                        volume_on = True
 
                #display pins, which will tell you the names of the worlds if you hover over them
 
@@ -99,6 +122,14 @@ while running:
         screen.blit(background, (0,0))
         screen.blit(pin, button_rect_salon)
         screen.blit(pin, button_rect_saloon)
+
+        screen.blit(coin_img, (coin_button_home.x, coin_button_home.y))
+        screen.blit(button_text_coin, (coin_button_home.x + 100, coin_button_home.y + 20))
+
+        if volume_on == True:
+            screen.blit(volume_on_img, (button_volume.x, button_volume.y))
+        elif volume_on == False:
+            screen.blit(volume_off_img, (button_volume.x, button_volume.y))
 
         # Tooltip list
         pin_tooltips = [

@@ -68,6 +68,9 @@ def karaoke():
         screen.blit(text_surf, (rect.x + (rect.width - text_surf.get_width()) // 2,
                                 rect.y + (rect.height - text_surf.get_height()) // 2))
 
+    pygame.mixer.music.load('data/audio/whatitis.mp3')
+    pygame.mixer.music.play(-1)
+
     running = True
     while running:
         mouse_pos = pygame.mouse.get_pos()
@@ -76,6 +79,8 @@ def karaoke():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+                pygame.mixer.music.load('data/audio/background_music.mp3')
+                pygame.mixer.music.play(-1)
                 return 0  # No coins if quit
 
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
@@ -102,6 +107,8 @@ def karaoke():
                         start_time = None
                     elif end_button.collidepoint(mouse_pos):
                         total_coins += coins_earned
+                        pygame.mixer.music.load('data/audio/background_music.mp3')
+                        pygame.mixer.music.play(-1)
                         return total_coins
 
             elif event.type == pygame.KEYDOWN and mode == "typing":
