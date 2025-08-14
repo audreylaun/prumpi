@@ -1,0 +1,54 @@
+name: Build macOS Executable
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Build executable
+        run: |
+          pyinstaller Prumpi-World.spec
+
+      - name: Sign app bundle (ad-hoc)
+        run: |
+          codesign --force --deep --sign - dist/Prumpi-World.app
+
+      - name: Create zip for release
+        run: |
+          cd dist && zip -r Prumpi-World-macOS.zip Prumpi-World.app
+
+      - name: Upload executable artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: prumpi-world-macos
+          path: |
+            dist/Prumpi-World*
+            dist/*.dmg
+
+      - name: Upload to release
+        if: github.event_name == 'release'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: dist/Prumpi-World-macOS.zip
+          asset_name: Prumpi-World-macOS.zip
+          asset_content_type: application/zip
