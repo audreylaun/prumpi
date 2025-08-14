@@ -1,5 +1,6 @@
 import pygame
 import time
+import math
 
 def render_multiline_text(text, font, color, max_width):
     words = text.split(' ')
@@ -17,6 +18,14 @@ def render_multiline_text(text, font, color, max_width):
         lines.append(current_line)
 
     return lines
+
+def calculate_coins_earned(time, mistakes):
+    coins = math.exp(-0.06*time + 5) + 10
+    coins -= mistakes*5
+    if coins < 0:
+        return 0
+    else:
+        return int(coins)
 
 def karaoke():
     total_coins = 0
@@ -43,12 +52,27 @@ def karaoke():
               "If you put it down, I'ma pick it up, up, up")
 
     lyrics_no_newlines = lyrics.replace("\n", " ")
-
+    # -- Variables --
     input_text = ""
     mode = "start"
     start_time = None
     coins_earned = 0
     elapsed_time = 0
+    mistakes = 0
+    mistake_active = False
+
+    # -- Screen stuff
+    # Begin
+    title = big_font.render("Karaoke Minigame", True, (0, 0, 0))
+    title_bg = pygame.Surface((title.get_width() + 20, title.get_height() + 10), pygame.SRCALPHA)
+    title_bg.fill((255, 225, 125, 180))
+    title_x = screen.get_width() // 2 - title.get_width() // 2
+    title_y = 250
+    instructions = font.render("Type the lyrics as quickly and accurately as you can for coins!", True, (50, 50, 50))
+    inst_bg = pygame.Surface((instructions.get_width() + 20, instructions.get_height() + 10), pygame.SRCALPHA)
+    inst_bg.fill((255, 225, 125, 180))
+    inst_x = screen.get_width() // 2 - instructions.get_width() // 2
+    inst_y = 320
 
     # Buttons
     begin_button = pygame.Rect(400, 500, 200, 60)
@@ -91,7 +115,6 @@ def karaoke():
 
                 elif mode == "typing":
                     if restart_button.collidepoint(mouse_pos):
-                        # Restart typing mode
                         input_text = ""
                         start_time = time.time()
                     elif exit_game_button.collidepoint(mouse_pos):
@@ -104,7 +127,9 @@ def karaoke():
                         input_text = ""
                         coins_earned = 0
                         elapsed_time = 0
+                        mistakes=0
                         start_time = None
+                        pygame.mixer.music.play(-1,0)
                     elif end_button.collidepoint(mouse_pos):
                         total_coins += coins_earned
                         pygame.mixer.music.load('data/audio/background_music.mp3')
@@ -115,28 +140,30 @@ def karaoke():
                 if event.key == pygame.K_BACKSPACE:
                     input_text = input_text[:-1]
                 elif event.key == pygame.K_RETURN:
-                    pass  # Ignore Enter key
+                    pass
                 else:
                     input_text += event.unicode
 
                 # Check if finished
                 if input_text == lyrics_no_newlines:
                     elapsed_time = time.time() - start_time
+                    coins_earned = calculate_coins_earned(elapsed_time,mistakes)
                     #CREATE AN ALGORITHM FOR CALCULATING HOW MANY COINS TO GIVE THE USER
-                    if elapsed_time <= 30:
-                        coins_earned = 100
-                    elif elapsed_time >= 120:
-                        coins_earned = 10
-                    else:
-                        coins_earned = int(100 - ((elapsed_time - 30) / 90) * 90)
+                    # if elapsed_time <= 30:
+                    #     coins_earned = 100
+                    # elif elapsed_time >= 120:
+                    #     coins_earned = 10
+                    # else:
+                    #     coins_earned = int(100 - ((elapsed_time - 30) / 90) * 90)
                     mode = "results"
 
         if mode == "start":
-            title = big_font.render("Karaoke Minigame", True, (0,0,0))
             screen.blit(background, (0, 0))
-            screen.blit(title, (screen.get_width()//2 - title.get_width()//2, 150))
-            instructions = font.render("Type the lyrics as quickly and accurately as you can for coins!", True, (50,50,50))
-            screen.blit(instructions, (screen.get_width()//2 - instructions.get_width()//2, 220))
+            screen.blit(title_bg, (title_x - 10, title_y - 5))
+            screen.blit(title, (title_x, title_y))
+            screen.blit(title, (screen.get_width()//2 - title.get_width()//2, 250))
+            screen.blit(inst_bg, (inst_x - 10, inst_y - 5))
+            screen.blit(instructions, (inst_x, inst_y))
             draw_button("Begin", begin_button, mouse_pos)
 
         elif mode == "typing":
@@ -167,8 +194,13 @@ def karaoke():
             # Show correctness feedback
             correct_so_far = lyrics_no_newlines.startswith(input_text)
             if not correct_so_far:
+                if not mistake_active:
+                    mistakes+=1
+                    mistake_active=True
                 error_msg = font.render("Typing error! Fix it.", True, (255, 0, 0))
                 screen.blit(error_msg, (20, 450))
+            else:
+                mistake_active=False
 
             # Restart button on the right side of input box
             draw_button("Restart", restart_button, mouse_pos)
@@ -181,16 +213,20 @@ def karaoke():
                 screen.blit(timer_surf, (screen.get_width() - timer_surf.get_width() - 20, 175))
 
         elif mode == "results":
+            screen.blit(background, (0,0))
             result_title = big_font.render("Results", True, (0,0,0))
             screen.blit(result_title, (screen.get_width()//2 - result_title.get_width()//2, 150))
 
             time_msg = font.render(f"Your time: {elapsed_time:.2f} seconds", True, (0,0,0))
-            coins_msg = font.render(f"Coins earned: {coins_earned}", True, (0,0,0))
+            coins_msg = font.render(f"Coins earned: {int(coins_earned)}", True, (0,0,0))
+            mistakes_msg = font.render(f"Mistakes: {mistakes}", True, (0,0,0))
             screen.blit(time_msg, (screen.get_width()//2 - time_msg.get_width()//2, 250))
             screen.blit(coins_msg, (screen.get_width()//2 - coins_msg.get_width()//2, 300))
+            screen.blit(mistakes_msg, (screen.get_width()//2 - mistakes_msg.get_width()//2 - 20, 350))
 
             draw_button("Restart", results_restart_button, mouse_pos)
             draw_button("Back to Saloon", end_button, mouse_pos)
 
         pygame.display.flip()
         clock.tick(60)
+    return None

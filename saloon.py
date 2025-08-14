@@ -42,6 +42,13 @@ def run_saloon_game(num_coins, bow, gem, backpack):
     gem_img = pygame.image.load("data/image/gem.png")
     backpack_img = pygame.image.load("data/image/backpack.png")
     prumpi_backpack = pygame.image.load("data/image/prumpi_backpack.png")
+    duck_face = pygame.image.load("data/image/duck_face.png")
+    smile_face = pygame.image.load("data/image/smile.png")
+    tongue_face = pygame.image.load("data/image/tongue.png")
+    phone_background = pygame.image.load("data/image/phone.png")
+    straight_face = pygame.image.load("data/image/straight_face.png")
+    flash = pygame.image.load("data/image/flash.png")
+
 
 
     # --- Resize images ---
@@ -58,6 +65,12 @@ def run_saloon_game(num_coins, bow, gem, backpack):
     button_volume = pygame.Rect(930, 630, 60, 60)
     volume_on = True
     prumpi_backpack = pygame.transform.scale(prumpi_backpack, (300, 400))
+    duck_face = pygame.transform.scale(duck_face, (151,202))
+    smile_face = pygame.transform.scale(smile_face, (151,202))
+    tongue_face = pygame.transform.scale(tongue_face, (151,202))
+    straight_face = pygame.transform.scale(straight_face, (151,202))
+    phone_background = pygame.transform.scale(phone_background, (1000,700))
+    flash = pygame.transform.scale(flash, (100,100))
 
     # --- Set Font and Button Colors  ---
     font = pygame.font.SysFont("comic_sansms", 32)
@@ -91,6 +104,21 @@ def run_saloon_game(num_coins, bow, gem, backpack):
 
     button_rect_karaoke = pygame.Rect(750, 20, 200, 60)
     button_text_karaoke = font.render("Karaoke", True, button_text_color)
+
+    button_rect_selfie = pygame.Rect(750, 90, 200, 60)
+    button_text_selfie = font.render("Selfie Time", True, button_text_color)
+
+    button_rect_smile = pygame.Rect(750, 120, 200, 60)
+    button_text_smile = font.render("Smile", True, button_text_color)
+
+    button_rect_duck = pygame.Rect(750, 190, 200, 60)
+    button_text_duck = font.render("Duck Face", True, button_text_color)
+
+    button_rect_tongue = pygame.Rect(750, 260, 200, 60)
+    button_text_tongue = font.render("Tongue Out", True, button_text_color)
+
+
+    face_rect = pygame.Rect(427,85,151,202)
 
     # --- Variables ---
     screen_mode = "title"
@@ -130,6 +158,15 @@ def run_saloon_game(num_coins, bow, gem, backpack):
     smoke_frame_timer = 0
     smoke_frame_interval = 100  # milliseconds per frame
 
+    #Selfie stuff
+    current_face = None
+    face_start_time = None
+    FACE_DISPLAY_TIME = 1500  # milliseconds
+
+    flash_active = False
+    flash_start_time = None
+    FLASH_DISPLAY_TIME = 500
+
     # Music
     # pygame.mixer.music.load("data/audio/background_music.mp3")
     # pygame.mixer.music.play(-1)  # -1 means loop indefinitely
@@ -161,10 +198,30 @@ def run_saloon_game(num_coins, bow, gem, backpack):
                     elif button_rect_karaoke.collidepoint(mouse_pos):
                         num_coins += karaoke()
                         button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
+                    elif button_rect_selfie.collidepoint(mouse_pos):
+                        screen_mode = "selfie"
 
                     elif button_rect_world.collidepoint(mouse_pos):
                         mode = "exit"
                         return num_coins
+                elif screen_mode == "selfie":
+                    if button_rect_home.collidepoint(mouse_pos):
+                        screen_mode = "home"
+                    elif button_rect_smile.collidepoint(event.pos):
+                        current_face = smile_face
+                        face_start_time = pygame.time.get_ticks()
+                        flash_active = True
+                        flash_start_time = pygame.time.get_ticks()
+                    elif button_rect_duck.collidepoint(event.pos):
+                        current_face = duck_face
+                        face_start_time = pygame.time.get_ticks()
+                        flash_active = True
+                        flash_start_time = pygame.time.get_ticks()
+                    elif button_rect_tongue.collidepoint(event.pos):
+                        current_face = tongue_face
+                        face_start_time = pygame.time.get_ticks()
+                        flash_active = True
+                        flash_start_time = pygame.time.get_ticks()
 
                 elif screen_mode == "title" and button_rect_begin.collidepoint(mouse_pos):
                     screen_mode = "door_animation"
@@ -256,15 +313,6 @@ def run_saloon_game(num_coins, bow, gem, backpack):
             screen.blit(coin_img, (coin_button_else.x, coin_button_else.y))
             screen.blit(button_text_coin, (coin_button_else.x + 100, coin_button_else.y + 20))
 
-            # if backpack:
-            #     screen.blit(prumpi_backpack, dino_pos_alley)
-            # if bow:
-            #     bow_img = pygame.transform.scale(bow_img, (40, 40))
-            #     screen.blit(bow_img, (475, 300))
-            # if gem:
-            #     gem_img = pygame.transform.scale(gem_img, (10, 10))
-            #     screen.blit(gem_img, (397, 399))
-
             # Draw cylinder
             if cigarette or shrinking:
                 draw_y = cylinder_pos[1]
@@ -310,6 +358,43 @@ def run_saloon_game(num_coins, bow, gem, backpack):
             elif volume_on == False:
                 screen.blit(volume_off_img, (button_volume.x, button_volume.y))
 
+        elif screen_mode == "selfie":
+            screen.blit(phone_background, (0,0))
+            pygame.draw.rect(screen, button_color, button_rect_home, border_radius=12)
+            screen.blit(button_text_home, (button_rect_home.x + 10, button_rect_home.y + 5))
+
+            pygame.draw.rect(screen, button_color, button_rect_smile, border_radius=12)
+            screen.blit(button_text_smile, (button_rect_smile.x + 10, button_rect_smile.y + 5))
+
+            pygame.draw.rect(screen, button_color, button_rect_duck, border_radius=12)
+            screen.blit(button_text_duck, (button_rect_duck.x + 10, button_rect_duck.y + 5))
+
+            pygame.draw.rect(screen, button_color, button_rect_tongue, border_radius=12)
+            screen.blit(button_text_tongue, (button_rect_tongue.x + 10, button_rect_tongue.y + 5))
+
+            # pygame.draw.rect(screen, button_color, face_rect)
+
+            screen.blit(coin_img, (coin_button_else.x, coin_button_else.y))
+            screen.blit(button_text_coin, (coin_button_else.x + 100, coin_button_else.y + 20))
+
+            if volume_on == True:
+                screen.blit(volume_on_img, (button_volume.x, button_volume.y))
+            elif volume_on == False:
+                screen.blit(volume_off_img, (button_volume.x, button_volume.y))
+
+            # If there is a current face, show it for FACE_DISPLAY_TIME
+            if current_face is not None:
+                screen.blit(current_face, face_rect)
+                if pygame.time.get_ticks() - face_start_time >= FACE_DISPLAY_TIME:
+                    current_face = None  # remove face after 3 seconds
+            else:
+                screen.blit(straight_face, face_rect)
+            if flash_active:
+                screen.blit(flash, (face_rect.x + 30, face_rect.y-100))
+                if pygame.time.get_ticks() - flash_start_time >= FLASH_DISPLAY_TIME:
+                    flash_active=False
+
+
 
         elif screen_mode == "door_animation":
 
@@ -345,6 +430,9 @@ def run_saloon_game(num_coins, bow, gem, backpack):
 
             pygame.draw.rect(screen, button_color, button_rect_karaoke, border_radius=12)
             screen.blit(button_text_karaoke, (button_rect_karaoke.x + 20, button_rect_karaoke.y + 10))
+
+            pygame.draw.rect(screen, button_color, button_rect_selfie, border_radius=12)
+            screen.blit(button_text_selfie, (button_rect_selfie.x + 20, button_rect_selfie.y +10))
 
             if volume_on == True:
                 screen.blit(volume_on_img, (button_volume.x, button_volume.y))
