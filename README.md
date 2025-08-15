@@ -1,3 +1,3 @@
-Prumpi, the last living dinosaur, takes a trip to the salon. Be sure to take good care of her! 
+This is Prumpi's world and we're just living in it 
 
 Run full_game.py
