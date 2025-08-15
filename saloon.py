@@ -1,9 +1,6 @@
 import pygame
-import sys
-import random
-from collections import deque
-from dance_minigame import twerk_minigame_menu
 from karaoke_minigame import karaoke
+from happiness import draw_happiness_meter, happiness_minigame
 
 def fade_to_black(screen, clock, background, speed=5):
     """
@@ -21,7 +18,7 @@ def fade_to_black(screen, clock, background, speed=5):
         pygame.display.flip()
         clock.tick(60)
 
-def run_saloon_game(num_coins, bow, gem, backpack):
+def run_saloon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX):
     pygame.init()
     screen = pygame.display.set_mode((1000, 700))
     pygame.display.set_caption("Dino Rugged Saloon")
@@ -203,7 +200,7 @@ def run_saloon_game(num_coins, bow, gem, backpack):
 
                     elif button_rect_world.collidepoint(mouse_pos):
                         mode = "exit"
-                        return num_coins
+                        return num_coins, happiness
                 elif screen_mode == "selfie":
                     if button_rect_home.collidepoint(mouse_pos):
                         screen_mode = "home"
@@ -212,16 +209,19 @@ def run_saloon_game(num_coins, bow, gem, backpack):
                         face_start_time = pygame.time.get_ticks()
                         flash_active = True
                         flash_start_time = pygame.time.get_ticks()
+                        happiness += 1
                     elif button_rect_duck.collidepoint(event.pos):
                         current_face = duck_face
                         face_start_time = pygame.time.get_ticks()
                         flash_active = True
                         flash_start_time = pygame.time.get_ticks()
+                        happiness +=1
                     elif button_rect_tongue.collidepoint(event.pos):
                         current_face = tongue_face
                         face_start_time = pygame.time.get_ticks()
                         flash_active = True
                         flash_start_time = pygame.time.get_ticks()
+                        happiness +=1
 
                 elif screen_mode == "title" and button_rect_begin.collidepoint(mouse_pos):
                     screen_mode = "door_animation"
@@ -276,7 +276,6 @@ def run_saloon_game(num_coins, bow, gem, backpack):
             pygame.draw.rect(screen, button_color, button_rect_begin, border_radius=10)
             pygame.draw.rect(screen, (0, 0, 0), button_rect_begin, width=2, border_radius=10)
             screen.blit(button_text_begin, (button_rect_begin.x + 60, button_rect_begin.y + 5))
-
 
         elif screen_mode == "alley_transition":
             screen.fill((0, 0, 0))  # black screen
@@ -360,6 +359,8 @@ def run_saloon_game(num_coins, bow, gem, backpack):
 
         elif screen_mode == "selfie":
             screen.blit(phone_background, (0,0))
+
+            draw_happiness_meter(screen, happiness, HAPPINESS_MAX)
             pygame.draw.rect(screen, button_color, button_rect_home, border_radius=12)
             screen.blit(button_text_home, (button_rect_home.x + 10, button_rect_home.y + 5))
 
@@ -394,8 +395,6 @@ def run_saloon_game(num_coins, bow, gem, backpack):
                 if pygame.time.get_ticks() - flash_start_time >= FLASH_DISPLAY_TIME:
                     flash_active=False
 
-
-
         elif screen_mode == "door_animation":
 
             # Move doors apart horizontally
@@ -421,6 +420,8 @@ def run_saloon_game(num_coins, bow, gem, backpack):
         elif screen_mode == "home":
             screen.blit(dino, dino_pos)
             screen.blit(sloth_bar, sloth_bar_pos)
+
+            draw_happiness_meter(screen, happiness, HAPPINESS_MAX)
 
             pygame.draw.rect(screen, button_color, button_rect_world, border_radius=12)
             screen.blit(button_text_world, (button_rect_world.x, button_rect_world.y))
@@ -471,11 +472,11 @@ def run_saloon_game(num_coins, bow, gem, backpack):
             shrink_fraction = min((total_shrink_time + current_hold) / 7500, 1)  # 7.5 seconds to fully shrink
             cylinder_width = max(cylinder_max_width * (1 - shrink_fraction), 0)
 
+        if happiness == HAPPINESS_MAX:
+            happiness=0
+            coins_added = happiness_minigame()
+            num_coins += coins_added
+            button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
+
         pygame.display.flip()
         clock.tick(60)
-
-    # return "minigame_finished"
-
-# If you want to run it standalone
-if __name__ == "__main__":
-    run_saloon_game(100)

@@ -1,9 +1,8 @@
 from saloon import run_saloon_game
 from salon import run_salon_game
+from happiness import draw_happiness_meter, happiness_minigame
 import pygame
-import sys
-import random
-from collections import deque
+
 
 def fade_to_black(screen, clock, background, speed=5):
     """
@@ -72,6 +71,9 @@ volume_off_img = pygame.transform.scale(volume_off_img, (60,60))
 button_volume = pygame.Rect(930, 630, 60, 60)
 volume_on = True
 
+happiness = 29
+HAPPINESS_MAX = 30
+
 
 # Music
 pygame.mixer.music.load("data/audio/background_music.mp3")
@@ -92,10 +94,10 @@ while running:
                     screen_mode = "home"
             if screen_mode == "home":
                 if button_rect_salon.collidepoint(mouse_pos):
-                    num_coins, bow, gem, backpack = run_salon_game(num_coins, bow, gem, backpack)
+                    num_coins, bow, gem, backpack, happiness = run_salon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX)
                     button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
                 elif button_rect_saloon.collidepoint(mouse_pos):
-                    num_coins = run_saloon_game(num_coins, bow, gem, backpack)
+                    num_coins, happiness = run_saloon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX)
                     button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
 
                 elif button_volume.collidepoint(mouse_pos):
@@ -137,7 +139,7 @@ while running:
             (button_rect_saloon, "Go to the Saloon")
         ]
 
-        mouse_pos = pygame.mouse.get_pos()
+        draw_happiness_meter(screen, happiness, HAPPINESS_MAX)
 
         for rect, tooltip in pin_tooltips:
             if rect.collidepoint(mouse_pos):

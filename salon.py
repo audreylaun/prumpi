@@ -4,8 +4,7 @@ import sys
 import random
 from collections import deque
 from dance_minigame import twerk_minigame_menu
-
-
+from happiness import draw_happiness_meter, happiness_minigame
 
 # Functions
 def generate_dirt_splotches(num_splotches=20):
@@ -51,7 +50,7 @@ def flood_fill(surface, x, y, fill_color):
                 q.extend([(cx+1, cy), (cx-1, cy), (cx, cy+1), (cx, cy-1)])
 
 
-def run_salon_game(num_coins, bow, gem, backpack):
+def run_salon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX):
     # num_coins = 200
     gamemode = "salon"
 
@@ -149,8 +148,8 @@ def run_salon_game(num_coins, bow, gem, backpack):
     volume_on = True
 
     # Dinner
-    button_hardfiskur = pygame.Rect(25, 150, 200, 60)
-    button_kokosbollar = pygame.Rect(25, 230, 200, 60)
+    button_hardfiskur = pygame.Rect(700, 150, 200, 60)
+    button_kokosbollar = pygame.Rect(700, 230, 200, 60)
     button_text_hardfiskur = font.render("Harðfiskur", True, button_text_color)
     button_text_kokosbollar = font.render("Kokosbollar", True, button_text_color)
 
@@ -278,7 +277,7 @@ def run_salon_game(num_coins, bow, gem, backpack):
                         screen_mode = "dance"
                     elif button_rect_world.collidepoint(mouse_pos):
                         mode = "exit"
-                        return num_coins, bow, gem, backpack
+                        return num_coins, bow, gem, backpack, happiness
 
                 elif screen_mode == "title":
                     if button_rect.collidepoint(event.pos):
@@ -302,8 +301,9 @@ def run_salon_game(num_coins, bow, gem, backpack):
                                     # print(nail_colors)
                                     if not nail_thank_you and all(c is not None for c in nail_colors[1:]):
                                         nail_thank_you = True
-                                        num_coins += 5
-                                        button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
+                                        happiness+=1
+                                        # num_coins += 5
+                                        # button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
                                         thank_you_start_time = pygame.time.get_ticks()
                                 else:
                                     nail_colors[i]=paint_color
@@ -390,8 +390,9 @@ def run_salon_game(num_coins, bow, gem, backpack):
                     # Check if all fish are eaten and say thank you if yes
                     if all(f is None for f in fish_rects):
                         show_thank_you = True
-                        num_coins += 5
-                        button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
+                        # num_coins += 5
+                        happiness += 1
+                        # button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
                         thank_you_start_time = pygame.time.get_ticks()
 
             elif event.type == pygame.MOUSEMOTION:
@@ -404,8 +405,9 @@ def run_salon_game(num_coins, bow, gem, backpack):
                         if (mouse_pos[0] - d["pos"][0]) ** 2 + (mouse_pos[1] - d["pos"][1]) ** 2 > d["radius"] ** 2
                     ]
                     if screen_mode == "grooming" and len(dirt_splotches) == 0 and not show_clean_message:
-                        num_coins += 5
-                        button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
+                        # num_coins += 5
+                        happiness += 1
+                        # button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
                         show_clean_message = True
                         clean_message_start_time = pygame.time.get_ticks()
 
@@ -451,6 +453,7 @@ def run_salon_game(num_coins, bow, gem, backpack):
         if screen_mode == "home":
             screen.blit(background, (0, 0))
             screen.blit(dino, dino_pos)
+            draw_happiness_meter(screen, happiness, HAPPINESS_MAX)
             pygame.draw.rect(screen, button_color, button_rect_home_paint, border_radius=12)
             screen.blit(button_text_paint, (button_rect_home_paint.x + 20, button_rect_home_paint.y + 10))
             pygame.draw.rect(screen, button_color, button_rect_home_dinner, border_radius=12)
@@ -465,6 +468,8 @@ def run_salon_game(num_coins, bow, gem, backpack):
             screen.blit(button_text_dance, (button_rect_home_dance.x + 20, button_rect_home_dance.y + 10))
             if giggle_triggered:
                 elapsed_since_giggle = (pygame.time.get_ticks() - giggle_start_time) / 1000
+                happiness += 1
+                draw_happiness_meter(screen, happiness, HAPPINESS_MAX)
                 if elapsed_since_giggle <= GIGGLE_DURATION:
                     # Draw the "That tickles!" bubble
                     bubble_rect = pygame.Rect(75, 200, 250, 80)
@@ -511,6 +516,8 @@ def run_salon_game(num_coins, bow, gem, backpack):
             screen.blit(coin_img, (coin_button_else.x, coin_button_else.y))
             screen.blit(button_text_coin, (coin_button_else.x + 100, coin_button_else.y + 20))
 
+            draw_happiness_meter(screen, happiness, HAPPINESS_MAX)
+
             if nail_thank_you and (current_time - thank_you_start_time < thank_you_duration):
                 # Bubble background
                 bubble_rect = pygame.Rect(50, 150, 300, 80)
@@ -555,6 +562,8 @@ def run_salon_game(num_coins, bow, gem, backpack):
             screen.blit(coin_img, (coin_button_else.x, coin_button_else.y))
             screen.blit(button_text_coin, (coin_button_else.x + 100, coin_button_else.y + 20))
 
+            draw_happiness_meter(screen, happiness, HAPPINESS_MAX)
+
             for rect in fish_rects:
                 if rect is not None:
                     if active_food == "fish":
@@ -598,6 +607,8 @@ def run_salon_game(num_coins, bow, gem, backpack):
 
             screen.blit(coin_img, (coin_button_else.x, coin_button_else.y))
             screen.blit(button_text_coin, (coin_button_else.x + 100, coin_button_else.y + 20))
+
+            draw_happiness_meter(screen, happiness, HAPPINESS_MAX)
 
             # Draw dirt splotches
             for d in dirt_splotches:
@@ -644,6 +655,8 @@ def run_salon_game(num_coins, bow, gem, backpack):
             elif volume_on == False:
                 screen.blit(volume_off_img, (button_volume.x, button_volume.y))
 
+            draw_happiness_meter(screen, happiness, HAPPINESS_MAX)
+
             bow_img = pygame.transform.scale(bow_img, (100,100))
             screen.blit(bow_img, (item_1_rect.x, item_1_rect.y))
             if bow==False:
@@ -674,6 +687,14 @@ def run_salon_game(num_coins, bow, gem, backpack):
             button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
             if back_to_game:
                 screen_mode = "home"  # or whatever you call your home screen
+
+
+        if happiness == HAPPINESS_MAX:
+            happiness=0
+            coins_added = happiness_minigame()
+            num_coins += coins_added
+            button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
+
 
         pygame.display.flip()
         clock.tick(60)
