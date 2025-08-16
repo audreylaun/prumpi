@@ -2,6 +2,7 @@ from saloon import run_saloon_game
 from salon import run_salon_game
 from happiness import draw_happiness_meter, happiness_minigame
 import pygame
+from store import run_store
 
 
 def fade_to_black(screen, clock, background, speed=5):
@@ -25,7 +26,7 @@ pygame.init()
 screen = pygame.display.set_mode((1000, 700))
 pygame.display.set_caption("Prumpi World")
 clock = pygame.time.Clock()
-num_coins = 0
+num_coins = 100
 bow = False
 gem = False
 backpack = False
@@ -59,6 +60,7 @@ button_text_begin = font.render("Begin", True, button_text_color)
 
 button_rect_salon = pygame.Rect(100, 400, 100, 100)
 button_rect_saloon = pygame.Rect(500, 350, 100, 100)
+button_rect_shop = pygame.Rect(700, 500, 100, 100)
 
 button_rect_title = title_image.get_rect(center=(screen.get_width() // 2, 300))
 
@@ -71,9 +73,8 @@ volume_off_img = pygame.transform.scale(volume_off_img, (60,60))
 button_volume = pygame.Rect(930, 630, 60, 60)
 volume_on = True
 
-happiness = 29
+happiness = 0
 HAPPINESS_MAX = 30
-
 
 # Music
 pygame.mixer.music.load("data/audio/background_music.mp3")
@@ -99,6 +100,10 @@ while running:
                 elif button_rect_saloon.collidepoint(mouse_pos):
                     num_coins, happiness = run_saloon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX)
                     button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
+                elif button_rect_shop.collidepoint(mouse_pos):
+                    num_coins, bow, gem, backpack = run_store(num_coins, happiness, bow, gem, backpack, HAPPINESS_MAX)
+                    button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
+
 
                 elif button_volume.collidepoint(mouse_pos):
                     if volume_on == True:
@@ -124,6 +129,7 @@ while running:
         screen.blit(background, (0,0))
         screen.blit(pin, button_rect_salon)
         screen.blit(pin, button_rect_saloon)
+        screen.blit(pin, button_rect_shop)
 
         screen.blit(coin_img, (coin_button_home.x, coin_button_home.y))
         screen.blit(button_text_coin, (coin_button_home.x + 100, coin_button_home.y + 20))
@@ -136,7 +142,8 @@ while running:
         # Tooltip list
         pin_tooltips = [
             (button_rect_salon, "Go to the Salon"),
-            (button_rect_saloon, "Go to the Saloon")
+            (button_rect_saloon, "Go to the Saloon"),
+            (button_rect_shop, "Go to Shop")
         ]
 
         draw_happiness_meter(screen, happiness, HAPPINESS_MAX)

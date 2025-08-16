@@ -271,8 +271,8 @@ def run_salon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX):
                         screen_mode = "dinner"
                     elif button_rect_home_grooming.collidepoint(mouse_pos):
                         screen_mode = "grooming"
-                    elif button_rect_shop.collidepoint(mouse_pos):
-                        screen_mode = "shop"
+                    # elif button_rect_shop.collidepoint(mouse_pos):
+                    #     screen_mode = "shop"
                     elif button_rect_home_dance.collidepoint(mouse_pos):
                         screen_mode = "dance"
                     elif button_rect_world.collidepoint(mouse_pos):
@@ -462,8 +462,8 @@ def run_salon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX):
             screen.blit(button_text_grooming, (button_rect_home_grooming.x + 30, button_rect_home_grooming.y + 10))
             pygame.draw.rect(screen, button_color, button_rect_world, border_radius=12)
             screen.blit(button_text_world, (button_rect_world.x, button_rect_world.y))
-            pygame.draw.rect(screen, button_color, button_rect_shop, border_radius=12)
-            screen.blit(button_text_shop, (button_rect_shop.x, button_rect_shop.y))
+            # pygame.draw.rect(screen, button_color, button_rect_shop, border_radius=12)
+            # screen.blit(button_text_shop, (button_rect_shop.x, button_rect_shop.y))
             pygame.draw.rect(screen, button_color, button_rect_home_dance, border_radius=12)
             screen.blit(button_text_dance, (button_rect_home_dance.x + 20, button_rect_home_dance.y + 10))
             if giggle_triggered:
