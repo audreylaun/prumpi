@@ -1,7 +1,7 @@
 import pygame
 from happiness import draw_happiness_meter
 
-def run_store(num_coins, happiness, bow, gem, backpack, HAPPINESS_MAX):
+def run_store(num_coins, happiness, bow, gem, backpack, HAPPINESS_MAX, volume_on):
     pygame.init()
     screen = pygame.display.set_mode((1000, 700))
     pygame.display.set_caption("Dino Shop")
@@ -41,7 +41,6 @@ def run_store(num_coins, happiness, bow, gem, backpack, HAPPINESS_MAX):
     volume_on_img = pygame.transform.scale(volume_on_img, (60,60))
     volume_off_img = pygame.transform.scale(volume_off_img, (60,60))
     button_volume = pygame.Rect(930, 630, 60, 60)
-    volume_on = True
 
     # Shop
     # bow = False
@@ -70,7 +69,14 @@ def run_store(num_coins, happiness, bow, gem, backpack, HAPPINESS_MAX):
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if screen_mode == "home":
                     if button_rect_world.collidepoint(mouse_pos):
-                        return num_coins, bow, gem, backpack
+                        return num_coins, bow, gem, backpack, volume_on
+                    if button_volume.collidepoint(mouse_pos):
+                        if volume_on == True:
+                            pygame.mixer.music.set_volume(0)
+                            volume_on = False
+                        elif volume_on == False:
+                            pygame.mixer.music.set_volume(0.5)
+                            volume_on = True
                     if item_1_rect.collidepoint(mouse_pos) and num_coins >= 30 and bow==False:
                         bow=True
                         num_coins-=30
@@ -121,5 +127,3 @@ def run_store(num_coins, happiness, bow, gem, backpack, HAPPINESS_MAX):
             screen.blit(button_text_coin, (coin_button_home.x + 100, coin_button_home.y + 20))
 
         pygame.display.flip()
-
-    # return num_coins

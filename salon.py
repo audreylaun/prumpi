@@ -50,7 +50,7 @@ def flood_fill(surface, x, y, fill_color):
                 q.extend([(cx+1, cy), (cx-1, cy), (cx, cy+1), (cx, cy-1)])
 
 
-def run_salon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX):
+def run_salon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX, volume_on):
     # num_coins = 200
     gamemode = "salon"
 
@@ -145,7 +145,6 @@ def run_salon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX):
     volume_on_img = pygame.transform.scale(volume_on_img, (60,60))
     volume_off_img = pygame.transform.scale(volume_off_img, (60,60))
     button_volume = pygame.Rect(930, 630, 60, 60)
-    volume_on = True
 
     # Dinner
     button_hardfiskur = pygame.Rect(700, 150, 200, 60)
@@ -277,7 +276,7 @@ def run_salon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX):
                         screen_mode = "dance"
                     elif button_rect_world.collidepoint(mouse_pos):
                         mode = "exit"
-                        return num_coins, bow, gem, backpack, happiness
+                        return num_coins, bow, gem, backpack, happiness, volume_on
 
                 elif screen_mode == "title":
                     if button_rect.collidepoint(event.pos):

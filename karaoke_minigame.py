@@ -93,6 +93,7 @@ def karaoke():
                                 rect.y + (rect.height - text_surf.get_height()) // 2))
 
     pygame.mixer.music.load('data/audio/whatitis.mp3')
+    pygame.mixer.music.set_volume(0.5)
     pygame.mixer.music.play(-1)
 
     running = True
@@ -105,6 +106,7 @@ def karaoke():
                 running = False
                 pygame.mixer.music.load('data/audio/background_music.mp3')
                 pygame.mixer.music.play(-1)
+
                 return 0  # No coins if quit
 
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:

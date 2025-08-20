@@ -31,8 +31,8 @@ bow = False
 gem = False
 backpack = False
 
-screen_mode = "title"
-running = True
+happiness = 0
+HAPPINESS_MAX = 30
 
 # --- Set Font and Button Colors  ---
 font = pygame.font.SysFont("comic_sansms", 32)
@@ -40,7 +40,7 @@ button_color = (255, 225, 125)
 button_text_color = (24, 100, 24)
 
 
-#Load images
+# --- Load images ---
 background = pygame.image.load("data/image/prumpi_world.png")
 title_image = pygame.image.load('data/image/world_title.png')
 pin = pygame.image.load('data/image/pin.png')
@@ -48,7 +48,7 @@ volume_on_img = pygame.image.load("data/image/volume_on.png")
 volume_off_img = pygame.image.load("data/image/volume_off.png")
 coin_img = pygame.image.load("data/image/coin.png")
 
-#Rescale images
+# --- Rescale images ---
 background = pygame.transform.scale(background, (1000, 700))
 title_image = pygame.transform.scale(title_image, (500, 300))
 pin = pygame.transform.scale(pin, (100,100))
@@ -73,13 +73,13 @@ volume_off_img = pygame.transform.scale(volume_off_img, (60,60))
 button_volume = pygame.Rect(930, 630, 60, 60)
 volume_on = True
 
-happiness = 0
-HAPPINESS_MAX = 30
-
-# Music
+# --- Set music ---
 pygame.mixer.music.load("data/audio/background_music.mp3")
 pygame.mixer.music.play(-1)  # -1 means loop indefinitely
 pygame.mixer.music.set_volume(0.5)  # 0.0 to 1.0
+
+screen_mode = "title"
+running = True
 
 while running:
     screen.fill((255, 255, 255))
@@ -95,13 +95,13 @@ while running:
                     screen_mode = "home"
             if screen_mode == "home":
                 if button_rect_salon.collidepoint(mouse_pos):
-                    num_coins, bow, gem, backpack, happiness = run_salon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX)
+                    num_coins, bow, gem, backpack, happiness, volume_on = run_salon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX, volume_on)
                     button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
                 elif button_rect_saloon.collidepoint(mouse_pos):
-                    num_coins, happiness = run_saloon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX)
+                    num_coins, happiness, volume_on = run_saloon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX, volume_on)
                     button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
                 elif button_rect_shop.collidepoint(mouse_pos):
-                    num_coins, bow, gem, backpack = run_store(num_coins, happiness, bow, gem, backpack, HAPPINESS_MAX)
+                    num_coins, bow, gem, backpack, volume_on = run_store(num_coins, happiness, bow, gem, backpack, HAPPINESS_MAX, volume_on)
                     button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
 
 
