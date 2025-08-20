@@ -18,6 +18,22 @@ def fade_to_black(screen, clock, background, speed=5):
         pygame.display.flip()
         clock.tick(60)
 
+def tallies(beer_count):
+    tally_string = ""
+    tally_string_unit = ""
+    for i in range(beer_count):
+        if (i+1) % 5 == 0:
+            tally_string_unit = '卌'
+            tally_string += tally_string_unit
+            tally_string_unit = ''
+        else:
+            tally_string_unit += '|'
+    tally_string += tally_string_unit
+
+    return tally_string
+
+
+
 def run_saloon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX):
     pygame.init()
     screen = pygame.display.set_mode((1000, 700))
@@ -45,6 +61,7 @@ def run_saloon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX):
     phone_background = pygame.image.load("data/image/phone.png")
     straight_face = pygame.image.load("data/image/straight_face.png")
     flash = pygame.image.load("data/image/flash.png")
+    speech_bubble = pygame.image.load("data/image/speech_bubble_right.png")
 
 
 
@@ -68,6 +85,7 @@ def run_saloon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX):
     straight_face = pygame.transform.scale(straight_face, (151,202))
     phone_background = pygame.transform.scale(phone_background, (1000,700))
     flash = pygame.transform.scale(flash, (100,100))
+    speech_bubble = pygame.transform.scale(speech_bubble, (300,150))
 
     # --- Set Font and Button Colors  ---
     font = pygame.font.SysFont("comic_sansms", 32)
@@ -96,6 +114,8 @@ def run_saloon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX):
     coin_button_else = pygame.Rect(35, 35, 60, 60)
     button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
 
+    beer_button_home = pygame.Rect(400,200,50,50)
+
     button_rect_world = pygame.Rect(50, 20, 275, 50)
     button_text_world = font.render('Return to World', True, button_text_color)
 
@@ -114,13 +134,17 @@ def run_saloon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX):
     button_rect_tongue = pygame.Rect(750, 260, 200, 60)
     button_text_tongue = font.render("Tongue Out", True, button_text_color)
 
+    speech_bubble_rect = pygame.Rect(300,200,300,150)
+    sloth_text_1 = font.render("Let me know if", True, (0,0,0))
+    sloth_text_2 = font.render("you want a drink", True, (0,0,0))
+
 
     face_rect = pygame.Rect(427,85,151,202)
 
     # --- Variables ---
     screen_mode = "title"
     dino_pos = (640, 165)
-    sloth_bar_pos = (400,175)
+    sloth_bar_pos = (150,175)
     running = True
     door_angle = 0  # For swinging animation
     door_animation_speed = 3  # Degrees per frame
@@ -164,10 +188,39 @@ def run_saloon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX):
     flash_start_time = None
     FLASH_DISPLAY_TIME = 500
 
-    # Music
-    # pygame.mixer.music.load("data/audio/background_music.mp3")
-    # pygame.mixer.music.play(-1)  # -1 means loop indefinitely
-    # pygame.mixer.music.set_volume(0.5)  # 0.0 to 1.0
+    # Beer stuff
+    first_load = True
+    first_load_start_time = None
+    first_load_duration = 3000
+
+    sloth_rect = pygame.Rect(*sloth_bar_pos, 200,200)
+    beer_count = 0
+    beer_header_font = pygame.font.SysFont("comic_sansms", 20)
+    beer_text_header = beer_header_font.render(" Beers Crushed:", True, (255,255,255))
+    beer_font = pygame.font.Font("data/STHeiti.ttc", 25)
+    beer_text_number = beer_font.render(tallies(beer_count), True, (255,255,255))
+    # Drink states
+    drink_active = False
+    drink_pos = None
+    drink_speed = 5
+    liquid_height = 30  # starting liquid level
+    draining = False
+
+    # Colors
+    BROWN = (139, 69, 19)  # cup
+    BLUE = (100, 149, 237)  # liquid
+
+    def draw_drink(x,y, liquid_height):
+        pygame.draw.rect(screen, BLUE, (x,y,20,40))
+        if liquid_height > 0:
+            pygame.draw.rect(screen, BROWN, (x + 2, y + (40 - liquid_height), 16, liquid_height))
+
+    def draw_volume(volume_on):
+        if volume_on == True:
+            screen.blit(volume_on_img, (button_volume.x, button_volume.y))
+        elif volume_on == False:
+            screen.blit(volume_off_img, (button_volume.x, button_volume.y))
+
 
     while running:
         mouse_pos = pygame.mouse.get_pos()
@@ -192,12 +245,17 @@ def run_saloon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX):
                         screen_mode = "alley_transition"
                         exit_sound.play()
                         exit_sound_playing = True
+                    elif sloth_rect.collidepoint(mouse_pos):
+                        if not drink_active and num_coins >=5:
+                            drink_active = True
+                            drink_pos = [sloth_bar_pos[0] + 50, 350]
+                            liquid_height = 30
+                            draining = False
                     elif button_rect_karaoke.collidepoint(mouse_pos):
                         num_coins += karaoke()
                         button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
                     elif button_rect_selfie.collidepoint(mouse_pos):
                         screen_mode = "selfie"
-
                     elif button_rect_world.collidepoint(mouse_pos):
                         mode = "exit"
                         return num_coins, happiness
@@ -261,6 +319,24 @@ def run_saloon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX):
                         shrinking = False
                         shrink_start_time = None
 
+        if drink_active and drink_pos:
+            if drink_pos[0] < dino_pos[0] + 20 and not draining:
+                # move cup across bar
+                drink_pos[0] += drink_speed
+            else:
+                # start draining
+                draining = True
+                if liquid_height > 0:
+                    liquid_height -= 1  # shrink liquid
+                else:
+                    # cup is empty -> reset
+                    beer_count += 1
+                    beer_text_number = beer_font.render(tallies(beer_count), True, (255, 255, 255))
+                    num_coins -= 5
+                    button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
+                    happiness += 1
+                    drink_active = False
+                    drink_pos = None
         # --- Drawing ---
         screen.blit(background, (0, 0))
 
@@ -351,11 +427,8 @@ def run_saloon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX):
                 speech_text = font.render("Another one!", True, (0, 0, 0))
                 text_rect = speech_text.get_rect(center=bubble_rect.center)
                 screen.blit(speech_text, text_rect)
-            # put volume button
-            if volume_on == True:
-                screen.blit(volume_on_img, (button_volume.x, button_volume.y))
-            elif volume_on == False:
-                screen.blit(volume_off_img, (button_volume.x, button_volume.y))
+
+            draw_volume(volume_on)
 
         elif screen_mode == "selfie":
             screen.blit(phone_background, (0,0))
@@ -423,6 +496,9 @@ def run_saloon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX):
 
             draw_happiness_meter(screen, happiness, HAPPINESS_MAX)
 
+            screen.blit(beer_text_header, (15 + beer_button_home.x, beer_button_home.y))
+            screen.blit(beer_text_number, (beer_button_home.x + 45, beer_button_home.y + 50))
+
             pygame.draw.rect(screen, button_color, button_rect_world, border_radius=12)
             screen.blit(button_text_world, (button_rect_world.x, button_rect_world.y))
 
@@ -435,10 +511,7 @@ def run_saloon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX):
             pygame.draw.rect(screen, button_color, button_rect_selfie, border_radius=12)
             screen.blit(button_text_selfie, (button_rect_selfie.x + 20, button_rect_selfie.y +10))
 
-            if volume_on == True:
-                screen.blit(volume_on_img, (button_volume.x, button_volume.y))
-            elif volume_on == False:
-                screen.blit(volume_off_img, (button_volume.x, button_volume.y))
+            draw_volume(volume_on)
 
             screen.blit(coin_img, (coin_button_home.x, coin_button_home.y))
             screen.blit(button_text_coin, (coin_button_home.x + 100, coin_button_home.y + 20))
@@ -451,6 +524,24 @@ def run_saloon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX):
             if gem:
                 gem_img = pygame.transform.scale(gem_img, (10,10))
                 screen.blit(gem_img, (722,314))
+
+            if drink_active and drink_pos:
+                draw_drink(drink_pos[0], drink_pos[1], liquid_height)
+
+            if first_load:
+                if first_load_start_time is None:
+                    first_load_start_time = pygame.time.get_ticks()  # start timer
+
+                    # Draw the speech bubble and text
+                screen.blit(speech_bubble, (speech_bubble_rect.x, speech_bubble_rect.y))
+                screen.blit(sloth_text_1, (speech_bubble_rect.x+20, speech_bubble_rect.y+10))
+                screen.blit(sloth_text_2, (speech_bubble_rect.x+20, speech_bubble_rect.y+50))
+
+                # Check if 3 seconds have passed
+                current_time = pygame.time.get_ticks()
+                if current_time - first_load_start_time >= first_load_duration:
+                    first_load = False
+
 
         # shrinking logic (move later)
         if screen_mode == "alley":
@@ -479,4 +570,5 @@ def run_saloon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX):
             button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
 
         pygame.display.flip()
+
         clock.tick(60)

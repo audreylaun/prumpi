@@ -26,7 +26,7 @@ pygame.init()
 screen = pygame.display.set_mode((1000, 700))
 pygame.display.set_caption("Prumpi World")
 clock = pygame.time.Clock()
-num_coins = 100
+num_coins = 0
 bow = False
 gem = False
 backpack = False
