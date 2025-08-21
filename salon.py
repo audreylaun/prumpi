@@ -266,7 +266,7 @@ def run_salon_game(num_coins, happiness, bow, gem, backpack, labubu, HAPPINESS_M
                         screen_mode = "dance"
                     elif button_rect_world.collidepoint(mouse_pos):
                         mode = "exit"
-                        return num_coins, bow, gem, backpack, happiness, volume_on
+                        return num_coins, happiness, volume_on
 
                 elif screen_mode == "title":
                     if button_rect.collidepoint(event.pos):

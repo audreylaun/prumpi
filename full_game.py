@@ -96,7 +96,7 @@ while running:
                     screen_mode = "home"
             if screen_mode == "home":
                 if button_rect_salon.collidepoint(mouse_pos):
-                    num_coins, bow, gem, backpack, labubu, happiness, volume_on = run_salon_game(num_coins, happiness, bow, gem, backpack, labubu, HAPPINESS_MAX, volume_on)
+                    num_coins, happiness, volume_on = run_salon_game(num_coins, happiness, bow, gem, backpack, labubu, HAPPINESS_MAX, volume_on)
                     button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
                 elif button_rect_saloon.collidepoint(mouse_pos):
                     num_coins, happiness, volume_on = run_saloon_game(num_coins, bow, gem, backpack, labubu, happiness, HAPPINESS_MAX, volume_on)
