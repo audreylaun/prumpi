@@ -50,7 +50,7 @@ def flood_fill(surface, x, y, fill_color):
                 q.extend([(cx+1, cy), (cx-1, cy), (cx, cy+1), (cx, cy-1)])
 
 
-def run_salon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX, volume_on):
+def run_salon_game(num_coins, happiness, bow, gem, backpack, labubu, HAPPINESS_MAX, volume_on):
     # num_coins = 200
     gamemode = "salon"
 
@@ -89,6 +89,7 @@ def run_salon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX, volu
     prumpi_backpack = pygame.image.load("data/image/prumpi_backpack.png")
     speech_left = pygame.image.load("data/image/speech_bubble_left.png")
     speech_right = pygame.image.load("data/image/speech_bubble_right.png")
+    labubu_img = pygame.image.load("data/image/labubu.png")
 
 
     # --- Resize images ---
@@ -229,19 +230,6 @@ def run_salon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX, volu
     clean_message_start_time = 0
     clean_message_duration = 2000  #ms
 
-    # Shop
-    # bow = False
-    item_1_rect = pygame.Rect(200, 125, 100, 100)
-    item_1_text = font.render('30¢', True, button_text_color)
-
-    # gem = False
-    item_2_rect = pygame.Rect(400, 125, 100, 100)
-    item_2_text = font.render('50¢', True, button_text_color)
-
-    # backpack = False
-    item_3_rect = pygame.Rect(600, 125, 100, 100)
-    item_3_text = font.render('100¢', True, button_text_color)
-
 
     # Game loop
     running = True
@@ -359,23 +347,6 @@ def run_salon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX, volu
                         dirt_splotches = generate_dirt_splotches()
                         broom_rect = broom_img.get_rect(topleft=(20, 300))
 
-                elif screen_mode == "shop":
-                    if button_rect_home.collidepoint(mouse_pos):
-                        screen_mode = "home"
-                    if item_1_rect.collidepoint(mouse_pos) and num_coins >= 30 and bow==False:
-                        bow=True
-                        num_coins-=30
-                        button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
-                    if item_2_rect.collidepoint(mouse_pos) and num_coins >= 50 and gem==False:
-                        gem=True
-                        num_coins-=50
-                        button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
-                    if item_3_rect.collidepoint(mouse_pos) and num_coins >= 100 and backpack==False:
-                        backpack=True
-                        num_coins-=100
-                        button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
-
-
             elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 if screen_mode == "grooming":
                     erasing = False  # stop erasing on mouse up
@@ -484,6 +455,9 @@ def run_salon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX, volu
                 screen.blit(volume_off_img, (button_volume.x, button_volume.y))
             if backpack:
                 screen.blit(prumpi_backpack, dino_pos)
+                if labubu:
+                    labubu_img = pygame.transform.scale(labubu_img, (50, 50))
+                    screen.blit(labubu_img, (dino_pos[0] + 260, dino_pos[1] + 200))
             if bow:
                 bow_img =pygame.transform.scale(bow_img, (40,40))
                 screen.blit(bow_img, (475, 175))

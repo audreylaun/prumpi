@@ -1,7 +1,7 @@
 import pygame
 from happiness import draw_happiness_meter
 
-def run_store(num_coins, happiness, bow, gem, backpack, HAPPINESS_MAX, volume_on):
+def run_store(num_coins, happiness, bow, gem, backpack, labubu, HAPPINESS_MAX, volume_on):
     pygame.init()
     screen = pygame.display.set_mode((1000, 700))
     pygame.display.set_caption("Dino Shop")
@@ -17,12 +17,15 @@ def run_store(num_coins, happiness, bow, gem, backpack, HAPPINESS_MAX, volume_on
     gem_img = pygame.image.load("data/image/gem.png")
     backpack_img = pygame.image.load("data/image/backpack.png")
     prumpi_backpack = pygame.image.load("data/image/prumpi_backpack.png")
+    labubu_img = pygame.image.load("data/image/labubu.png")
+    lock = pygame.image.load("data/image/lock.png")
 
     #resize pictures
     prumpi_backpack = pygame.transform.scale(prumpi_backpack, (300, 400))
     coin_img = pygame.transform.scale(coin_img, (80, 80))
     shop_screen = pygame.transform.scale(shop_screen, (1000, 700))
     check = pygame.transform.scale(check, (50, 50))
+    lock = pygame.transform.scale(lock, (50, 50))
 
     # --- Set Font and Button Colors  ---
     font = pygame.font.SysFont("comic_sansms", 32)
@@ -55,6 +58,15 @@ def run_store(num_coins, happiness, bow, gem, backpack, HAPPINESS_MAX, volume_on
     item_3_rect = pygame.Rect(600, 125, 100, 100)
     item_3_text = font.render('100¢', True, button_text_color)
 
+    item_4_rect = pygame.Rect(200, 275, 100, 100)
+    item_4_text = font.render('150¢', True, button_text_color)
+
+    item_5_rect = pygame.Rect(400, 275, 100, 100)
+    item_5_text = font.render('150¢', True, button_text_color)
+
+    item_6_rect = pygame.Rect(600, 275, 100, 100)
+    item_6_text = font.render('150¢', True, button_text_color)
+
     screen_mode = "home"
 
     running = True
@@ -69,8 +81,8 @@ def run_store(num_coins, happiness, bow, gem, backpack, HAPPINESS_MAX, volume_on
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if screen_mode == "home":
                     if button_rect_world.collidepoint(mouse_pos):
-                        return num_coins, bow, gem, backpack, volume_on
-                    if button_volume.collidepoint(mouse_pos):
+                        return num_coins, happiness, bow, gem, backpack, labubu, volume_on
+                    elif button_volume.collidepoint(mouse_pos):
                         if volume_on == True:
                             pygame.mixer.music.set_volume(0)
                             volume_on = False
@@ -80,15 +92,24 @@ def run_store(num_coins, happiness, bow, gem, backpack, HAPPINESS_MAX, volume_on
                     if item_1_rect.collidepoint(mouse_pos) and num_coins >= 30 and bow==False:
                         bow=True
                         num_coins-=30
+                        happiness +=1
                         button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
                     if item_2_rect.collidepoint(mouse_pos) and num_coins >= 50 and gem==False:
                         gem=True
                         num_coins-=50
+                        happiness += 2
                         button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
                     if item_3_rect.collidepoint(mouse_pos) and num_coins >= 100 and backpack==False:
                         backpack=True
                         num_coins-=100
+                        happiness +=3
                         button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
+                    if item_6_rect.collidepoint(mouse_pos) and num_coins >= 150 and backpack:
+                        labubu=True
+                        num_coins-=150
+                        happiness +=6
+                        button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
+
 
         if screen_mode == "home":
             screen.blit(shop_screen, (0, 0))
@@ -116,10 +137,18 @@ def run_store(num_coins, happiness, bow, gem, backpack, HAPPINESS_MAX, volume_on
             if gem == True:
                 screen.blit(check, (item_2_rect.x + 30, item_2_rect.y + 30))
 
+            labubu_img = pygame.transform.scale(labubu_img, (100,100))
+            screen.blit(labubu_img, (item_6_rect.x, item_6_rect.y))
+            if labubu == False:
+                screen.blit(item_6_text, (item_6_rect.x + 20, item_6_rect.y + 80))
+            if labubu == True:
+                screen.blit(check, (item_6_rect.x + 30, item_6_rect.y + 30))
+
             backpack_img = pygame.transform.scale(backpack_img, (100, 100))
             screen.blit(backpack_img, (item_3_rect.x, item_3_rect.y))
             if backpack == False:
                 screen.blit(item_3_text, (item_3_rect.x + 20, item_3_rect.y + 80))
+                screen.blit(lock, (item_6_rect.x + 30, item_6_rect.y + 30))
             if backpack == True:
                 screen.blit(check, (item_3_rect.x + 30, item_3_rect.y + 30))
 

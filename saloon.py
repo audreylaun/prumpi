@@ -34,7 +34,7 @@ def tallies(beer_count):
 
     return tally_string
 
-def run_saloon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX, volume_on):
+def run_saloon_game(num_coins, bow, gem, backpack, labubu, happiness, HAPPINESS_MAX, volume_on):
     pygame.init()
     screen = pygame.display.set_mode((1000, 700))
     pygame.display.set_caption("Dino Rugged Saloon")
@@ -73,6 +73,8 @@ def run_saloon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX, vol
     boyfriend = pygame.image.load("data/image/boyfriend.png")
     speech_left = pygame.image.load("data/image/speech_bubble_left.png")
     bubbles = pygame.image.load("data/image/bubbles.png")
+    labubu_img = pygame.image.load("data/image/labubu.png")
+
 
 
 
@@ -97,7 +99,6 @@ def run_saloon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX, vol
     flash = pygame.transform.scale(flash, (100,100))
     speech_bubble = pygame.transform.scale(speech_bubble, (300,150))
     bubbles = pygame.transform.scale(bubbles, (200, 50))
-
     blush = pygame.transform.scale(blush, (200,100))
     boyfriend = pygame.transform.scale(boyfriend, (300, 400))
 
@@ -396,7 +397,10 @@ def run_saloon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX, vol
             screen.blit(button_text_home, (button_rect_home.x + 10, button_rect_home.y + 5))
             screen.blit(dino, dino_pos_alley)
             if backpack:
-                screen.blit(prumpi_backpack, dino_pos)
+                screen.blit(prumpi_backpack, dino_pos_alley)
+                if labubu:
+                    labubu_img = pygame.transform.scale(labubu_img, (50, 50))
+                    screen.blit(labubu_img, (dino_pos_alley[0] + 260, dino_pos_alley[1] + 200))
             if bow:
                 bow_img =pygame.transform.scale(bow_img, (40,40))
                 screen.blit(bow_img, (475, 175))
@@ -544,6 +548,10 @@ def run_saloon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX, vol
 
             if backpack:
                 screen.blit(prumpi_backpack, dino_pos)
+                if labubu:
+                    labubu_img = pygame.transform.scale(labubu_img, (50, 50))
+                    screen.blit(labubu_img, (dino_pos[0] + 260, dino_pos[1] + 200))
+
             if bow:
                 bow_img =pygame.transform.scale(bow_img, (40,40))
                 screen.blit(bow_img, (800, 215))
