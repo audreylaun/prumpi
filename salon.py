@@ -87,6 +87,8 @@ def run_salon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX, volu
     gem_img = pygame.image.load("data/image/gem.png")
     backpack_img = pygame.image.load("data/image/backpack.png")
     prumpi_backpack = pygame.image.load("data/image/prumpi_backpack.png")
+    speech_left = pygame.image.load("data/image/speech_bubble_left.png")
+    speech_right = pygame.image.load("data/image/speech_bubble_right.png")
 
 
     # --- Resize images ---
@@ -461,23 +463,20 @@ def run_salon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX, volu
             screen.blit(button_text_grooming, (button_rect_home_grooming.x + 30, button_rect_home_grooming.y + 10))
             pygame.draw.rect(screen, button_color, button_rect_world, border_radius=12)
             screen.blit(button_text_world, (button_rect_world.x, button_rect_world.y))
-            # pygame.draw.rect(screen, button_color, button_rect_shop, border_radius=12)
-            # screen.blit(button_text_shop, (button_rect_shop.x, button_rect_shop.y))
             pygame.draw.rect(screen, button_color, button_rect_home_dance, border_radius=12)
             screen.blit(button_text_dance, (button_rect_home_dance.x + 20, button_rect_home_dance.y + 10))
             if giggle_triggered:
                 elapsed_since_giggle = (pygame.time.get_ticks() - giggle_start_time) / 1000
-                happiness += 1
                 draw_happiness_meter(screen, happiness, HAPPINESS_MAX)
                 if elapsed_since_giggle <= GIGGLE_DURATION:
-                    # Draw the "That tickles!" bubble
-                    bubble_rect = pygame.Rect(75, 200, 250, 80)
-                    pygame.draw.rect(screen, (255, 255, 255), bubble_rect, border_radius=15)
-                    pygame.draw.rect(screen, (0, 0, 0), bubble_rect, 2, border_radius=15)
+                    speech_pos = (150, 150)
+                    speech_left = pygame.transform.scale(speech_left, (250, 100))
+                    screen.blit(speech_left, speech_pos)
                     text = font.render("That tickles!", True, (0,0,0))
-                    screen.blit(text, (bubble_rect.x + 20, bubble_rect.y + 15))
+                    screen.blit(text, (speech_pos[0] + 20, speech_pos[1] + 20))
                 else:
                     giggle_triggered = False  # reset after bubble disappears
+                    happiness += 5
             #put volume button
             if volume_on == True:
                 screen.blit(volume_on_img, (button_volume.x, button_volume.y))
@@ -519,15 +518,15 @@ def run_salon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX, volu
 
             if nail_thank_you and (current_time - thank_you_start_time < thank_you_duration):
                 # Bubble background
-                bubble_rect = pygame.Rect(50, 150, 300, 80)
-                pygame.draw.rect(screen, (255, 255, 255), bubble_rect, border_radius=10)
-                pygame.draw.rect(screen, (0, 0, 0), bubble_rect, width=2, border_radius=10)
+                speech_pos = (300, 80)
+                speech_left = pygame.transform.scale(speech_left, (300,100))
+                screen.blit(speech_left, speech_pos)
                 # Speech text
                 if all(c in ((255, 255, 0), (160, 32, 240)) for c in nail_colors[1:]):
                     text = font.render("Go Lakers!", True, (0,0,0))
                 else:
                     text = font.render("I feel so pretty!", True, (0, 0, 0))
-                screen.blit(text, (bubble_rect.x + 20, bubble_rect.y + 20))
+                screen.blit(text, (speech_pos[0]+ 20, speech_pos[1] + 20))
             else:
                 nail_thank_you = False
 
@@ -575,13 +574,11 @@ def run_salon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX, volu
             # Show speech bubble if all fish eaten
             current_time = pygame.time.get_ticks()
             if show_thank_you and (current_time - thank_you_start_time < thank_you_duration):
-                # Bubble background
-                bubble_rect = pygame.Rect(50, 300, 300, 80)
-                pygame.draw.rect(screen, (255, 255, 255), bubble_rect, border_radius=10)
-                pygame.draw.rect(screen, (0, 0, 0), bubble_rect, width=2, border_radius=10)
-                # Speech text
+                speech_pos = (50, 250)
+                speech_left = pygame.transform.scale(speech_left, (350, 100))
+                screen.blit(speech_left, speech_pos)
                 text = font.render("Thank you mamma!", True, (0, 0, 0))
-                screen.blit(text, (bubble_rect.x + 20, bubble_rect.y + 20))
+                screen.blit(text, (speech_pos[0] + 20, speech_pos[1] + 20))
             else:
                 show_thank_you = False
 
@@ -619,12 +616,11 @@ def run_salon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX, volu
             if show_clean_message:
                 current_time = pygame.time.get_ticks()
                 if current_time - clean_message_start_time < clean_message_duration:
-                    # Draw speech bubble
-                    bubble_rect = pygame.Rect(200, 100, 300, 80)
-                    pygame.draw.rect(screen, (255, 255, 255), bubble_rect, border_radius=12)
-                    pygame.draw.rect(screen, (0, 0, 0), bubble_rect, 3, border_radius=12)
+                    speech_pos = (50, 250)
+                    speech_left = pygame.transform.scale(speech_left, (300, 100))
+                    screen.blit(speech_left, speech_pos)
                     text = font.render("All clean! Takk!", True, (0, 0, 0))
-                    screen.blit(text, (bubble_rect.x + 20, bubble_rect.y + 25))
+                    screen.blit(text, (speech_pos[0] + 20, speech_pos[1] + 20))
 
                 else:
                     show_clean_message = False
@@ -642,43 +638,6 @@ def run_salon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX, volu
                 screen.blit(volume_on_img, (button_volume.x, button_volume.y))
             elif volume_on == False:
                 screen.blit(volume_off_img, (button_volume.x, button_volume.y))
-
-        elif screen_mode == "shop":
-            screen.blit(shop_screen, (0, 0))
-
-            pygame.draw.rect(screen, button_color, button_rect_home, border_radius=12)
-            screen.blit(button_text_home, (button_rect_home.x + 10, button_rect_home.y + 5))
-
-            if volume_on == True:
-                screen.blit(volume_on_img, (button_volume.x, button_volume.y))
-            elif volume_on == False:
-                screen.blit(volume_off_img, (button_volume.x, button_volume.y))
-
-            draw_happiness_meter(screen, happiness, HAPPINESS_MAX)
-
-            bow_img = pygame.transform.scale(bow_img, (100,100))
-            screen.blit(bow_img, (item_1_rect.x, item_1_rect.y))
-            if bow==False:
-                screen.blit(item_1_text, (item_1_rect.x + 20, item_1_rect.y+80))
-            if bow==True:
-                screen.blit(check, (item_1_rect.x+30, item_1_rect.y+30))
-
-            gem_img = pygame.transform.scale(gem_img, (75, 75))
-            screen.blit(gem_img, (item_2_rect.x + 12.5, item_2_rect.y+12.5))
-            if gem==False:
-                screen.blit(item_2_text, (item_2_rect.x + 20, item_2_rect.y+80))
-            if gem==True:
-                screen.blit(check, (item_2_rect.x+30, item_2_rect.y+30))
-
-            backpack_img = pygame.transform.scale(backpack_img, (100, 100))
-            screen.blit(backpack_img, (item_3_rect.x, item_3_rect.y))
-            if backpack==False:
-                screen.blit(item_3_text, (item_3_rect.x + 20, item_3_rect.y+80))
-            if backpack==True:
-                screen.blit(check, (item_3_rect.x+30, item_3_rect.y+30))
-
-            screen.blit(coin_img, (coin_button_home.x, coin_button_home.y))
-            screen.blit(button_text_coin, (coin_button_home.x + 100, coin_button_home.y + 20))
 
         elif screen_mode == "dance":
             coins, back_to_game = twerk_minigame_menu()

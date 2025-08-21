@@ -71,6 +71,8 @@ def run_saloon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX, vol
     speech_bubble = pygame.image.load("data/image/speech_bubble_right.png")
     blush = pygame.image.load("data/image/blush.png")
     boyfriend = pygame.image.load("data/image/boyfriend.png")
+    speech_left = pygame.image.load("data/image/speech_bubble_left.png")
+    bubbles = pygame.image.load("data/image/bubbles.png")
 
 
 
@@ -94,6 +96,7 @@ def run_saloon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX, vol
     phone_background = pygame.transform.scale(phone_background, (1000,700))
     flash = pygame.transform.scale(flash, (100,100))
     speech_bubble = pygame.transform.scale(speech_bubble, (300,150))
+    bubbles = pygame.transform.scale(bubbles, (200, 50))
 
     blush = pygame.transform.scale(blush, (200,100))
     boyfriend = pygame.transform.scale(boyfriend, (300, 400))
@@ -152,6 +155,11 @@ def run_saloon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX, vol
 
     # --- Variables ---
     dino_pos = (640, 165)
+    stomach_hitbox = pygame.Rect(675, 265, 200, 200)
+    burp_triggered = False
+    burp_duration = 2  # seconds the speech bubble stays
+    burp_start_time = None
+
     sloth_bar_pos = (150,175)
     sloth_rect = pygame.Rect(*sloth_bar_pos, 200,200)
 
@@ -197,6 +205,8 @@ def run_saloon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX, vol
     sent = False
 
     # Beer stuff
+    sorry = False
+    sorry_duration = 2
     beer_count = 0
     first_load = True
     first_load_start_time = None
@@ -256,11 +266,17 @@ def run_saloon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX, vol
                             drink_pos = [sloth_bar_pos[0] + 50, 350]
                             liquid_height = 30
                             draining = False
+                        elif num_coins < 5:
+                            sorry_start_time = pygame.time.get_ticks()
+                            sorry = True
                     elif button_rect_karaoke.collidepoint(mouse_pos):
                         num_coins += karaoke()
                         if not volume_on:
                             pygame.mixer.music.set_volume(0)
                         button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
+                    elif stomach_hitbox.collidepoint(mouse_pos) and beer_count >= 5:
+                            burp_start_time = pygame.time.get_ticks()
+                            burp_triggered = True
                     elif button_rect_selfie.collidepoint(mouse_pos):
                         screen_mode = "selfie"
                     elif button_rect_world.collidepoint(mouse_pos):
@@ -429,13 +445,12 @@ def run_saloon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX, vol
                 bubble_x = cylinder_pos[0] + 50
                 bubble_y = cylinder_pos[1] - 200  # above the cylinder
                 bubble_rect = pygame.Rect(bubble_x, bubble_y, bubble_width, bubble_height)
-                # Draw bubble background
-                pygame.draw.rect(screen, (255, 255, 255), bubble_rect, border_radius=15)
-                pygame.draw.rect(screen, (0, 0, 0), bubble_rect, width=2, border_radius=15)
-                # Text
-                speech_text = font.render("Another one!", True, (0, 0, 0))
-                text_rect = speech_text.get_rect(center=bubble_rect.center)
-                screen.blit(speech_text, text_rect)
+                # Speak
+                speech_pos = (125, 250)
+                speech_left = pygame.transform.scale(speech_left, (250, 100))
+                screen.blit(speech_left, speech_pos)
+                text = font.render("Another one!", True, (0, 0, 0))
+                screen.blit(text, (speech_pos[0] + 20, speech_pos[1] + 20))
 
             draw_volume(volume_on)
 
@@ -555,6 +570,30 @@ def run_saloon_game(num_coins, bow, gem, backpack, happiness, HAPPINESS_MAX, vol
                 current_time = pygame.time.get_ticks()
                 if current_time - first_load_start_time >= first_load_duration:
                     first_load = False
+
+            if beer_count >= 5:
+                screen.blit(bubbles, (dino_pos[0]+25, dino_pos[1] + 25))
+
+            if burp_triggered:
+                elapsed_since_burp = (pygame.time.get_ticks() - burp_start_time) / 1000
+                if elapsed_since_burp <= burp_duration:
+                    speech_pos = (500, 150)
+                    speech_left = pygame.transform.scale(speech_left, (250, 100))
+                    screen.blit(speech_left, speech_pos)
+                    text = font.render("*Burp*", True, (0, 0, 0))
+                    screen.blit(text, (speech_pos[0] + 20, speech_pos[1] + 20))
+                else:
+                    burp_triggered = False  # reset after bubble disappears
+            if sorry:
+                elapsed_since_sorry = (pygame.time.get_ticks() - sorry_start_time) / 1000
+                if elapsed_since_sorry <= sorry_duration:
+                    text_1 = font.render("You need 5 Prumpi",True, (0, 0, 0))
+                    text_2 = font.render("Coins for that", True, (0, 0, 0))
+                    screen.blit(speech_bubble, (speech_bubble_rect.x, speech_bubble_rect.y))
+                    screen.blit(text_1, (speech_bubble_rect.x+13, speech_bubble_rect.y+10))
+                    screen.blit(text_2, (speech_bubble_rect.x+20, speech_bubble_rect.y+50))
+
+
 
 
         # shrinking logic (move later)
