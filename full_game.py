@@ -1,5 +1,6 @@
 from saloon import run_saloon_game
 from salon import run_salon_game
+from work import run_work_game
 from happiness import draw_happiness_meter, happiness_minigame
 import pygame
 from store import run_store
@@ -62,6 +63,7 @@ button_text_begin = font.render("Begin", True, button_text_color)
 button_rect_salon = pygame.Rect(100, 400, 100, 100)
 button_rect_saloon = pygame.Rect(500, 350, 100, 100)
 button_rect_shop = pygame.Rect(700, 500, 100, 100)
+button_rect_work = pygame.Rect(800, 375, 100, 100)
 
 button_rect_title = title_image.get_rect(center=(screen.get_width() // 2, 300))
 
@@ -104,6 +106,10 @@ while running:
                 elif button_rect_shop.collidepoint(mouse_pos):
                     num_coins, happiness, bow, gem, backpack, labubu, volume_on = run_store(num_coins, happiness, bow, gem, backpack, labubu, HAPPINESS_MAX, volume_on)
                     button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
+                elif button_rect_work.collidepoint(mouse_pos):
+                    num_coins, happiness, volume_on = run_work_game(num_coins, bow, gem, backpack, labubu, happiness,HAPPINESS_MAX, volume_on)
+                    button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
+
 
 
                 elif button_volume.collidepoint(mouse_pos):
@@ -131,6 +137,7 @@ while running:
         screen.blit(pin, button_rect_salon)
         screen.blit(pin, button_rect_saloon)
         screen.blit(pin, button_rect_shop)
+        screen.blit(pin, button_rect_work)
 
         screen.blit(coin_img, (coin_button_home.x, coin_button_home.y))
         screen.blit(button_text_coin, (coin_button_home.x + 100, coin_button_home.y + 20))
@@ -144,7 +151,8 @@ while running:
         pin_tooltips = [
             (button_rect_salon, "Go to the Salon"),
             (button_rect_saloon, "Go to the Saloon"),
-            (button_rect_shop, "Go to Shop")
+            (button_rect_shop, "Go to Shop"),
+            (button_rect_work, "Go to Work"),
         ]
 
         draw_happiness_meter(screen, happiness, HAPPINESS_MAX)

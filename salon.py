@@ -51,9 +51,6 @@ def flood_fill(surface, x, y, fill_color):
 
 
 def run_salon_game(num_coins, happiness, bow, gem, backpack, labubu, HAPPINESS_MAX, volume_on):
-    # num_coins = 200
-    gamemode = "salon"
-
     # --- Initialize Game ---
     pygame.init()
     screen = pygame.display.set_mode((1000, 700))
