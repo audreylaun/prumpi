@@ -18,7 +18,8 @@ COLORS = [
     (143, 156, 191), #light blue
     (237, 187, 211), #light pink
     (196, 177, 159), #tan
-    (164, 143, 191) #purple
+    (164, 143, 191), #purple
+    (230, 183, 156)
 ]
 
 CELL_SIZE = 32
@@ -61,7 +62,7 @@ def clear_lines(grid):
         new_grid.insert(0, [0 for _ in range(GRID_WIDTH)])
     return new_grid, lines_cleared
 
-def run_tetris_minigame():
+def run_tetris_minigame(total_coins):
     pygame.init()
     screen = pygame.display.set_mode((1000, 700))
     pygame.display.set_caption("Dino Work")
@@ -80,16 +81,20 @@ def run_tetris_minigame():
     # GAME STUFF
     grid = [[0 for _ in range(GRID_WIDTH)] for _ in range(GRID_HEIGHT)]
 
-    current_piece = random.choice(SHAPES)
-    current_color = random.randrange(len(COLORS))
+    # current_piece = random.choice(SHAPES)
+    current_piece_index = random.randrange(len(SHAPES))
+    current_piece = SHAPES[current_piece_index]
+    # current_color = random.randrange(len(COLORS))
+    current_color = current_piece_index
     piece_x, piece_y = GRID_WIDTH // 2 - len(current_piece[0]) // 2, 0
 
-    next_piece = random.choice(SHAPES)
-    next_color = random.randrange(len(COLORS))
-
-
+    next_piece_index = random.randrange(len(SHAPES))
+    # next_piece = random.choice(SHAPES)
+    next_piece = SHAPES[next_piece_index]
+    # next_color = random.randrange(len(COLORS))
+    next_color = next_piece_index
     #Title screen stuff
-    title = big_font.render("Box Stack Minigame", True, (0, 0, 0))
+    title = big_font.render("Box Stacking", True, (0, 0, 0))
     title_bg = pygame.Surface((title.get_width() + 20, title.get_height() + 10), pygame.SRCALPHA)
     title_bg.fill((255, 225, 125, 180))
     title_x = screen.get_width() // 2 - title.get_width() // 2
@@ -120,7 +125,7 @@ def run_tetris_minigame():
 
 
     drop_time, drop_speed = 0, 500
-    score = 0
+    coins = 0
     running = True
 
     screen_mode = 'title'
@@ -152,17 +157,18 @@ def run_tetris_minigame():
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if screen_mode == "title" and begin_button.collidepoint(mouse_pos):
                     screen_mode = "game"
-                    start_time = time.time()
                 elif screen_mode == "game":
                     if restart_button.collidepoint(mouse_pos):
-                        return run_tetris_minigame() #need to change this so it resets within the same call
+                        return run_tetris_minigame(total_coins) #need to change this so it resets within the same call
                     elif exit_game_button.collidepoint(mouse_pos):
                         screen_mode = "results"
                 elif screen_mode == "results":
                     if end_button.collidepoint(mouse_pos):
-                        return score
+                        total_coins += coins
+                        return total_coins
                     elif results_restart_button.collidepoint(mouse_pos):
-                        return run_tetris_minigame() #need to change this so it resets within the same call
+                        total_coins += coins
+                        return run_tetris_minigame(total_coins) #need to change this so it resets within the same call
 
         if drop_time > drop_speed:
             drop_time = 0
@@ -171,7 +177,8 @@ def run_tetris_minigame():
             else:
                 join_shape(grid, current_piece, (piece_x, piece_y), current_color)
                 grid, lines = clear_lines(grid)
-                score += lines * 5
+                coins += lines * 5
+
 
                 # Instead of picking random again, use the "next piece"
                 current_piece = next_piece
@@ -179,8 +186,9 @@ def run_tetris_minigame():
                 piece_x, piece_y = GRID_WIDTH // 2 - len(current_piece[0]) // 2, 0
 
                 # Roll a new next piece
-                next_piece = random.choice(SHAPES)
-                next_color = random.randrange(len(COLORS))
+                next_piece_index = random.randrange(len(SHAPES))
+                next_piece = SHAPES[next_piece_index]
+                next_color = next_piece_index
 
                 if not valid_position(grid, current_piece, (piece_x, piece_y)):
                     screen_mode = "results"
@@ -203,7 +211,7 @@ def run_tetris_minigame():
                 )
 
             label = font.render("Next:", True, (255, 255, 255))
-            screen.blit(label, (PLAYFIELD_X + PLAYFIELD_WIDTH + 40, PLAYFIELD_Y))
+            screen.blit(label, (PLAYFIELD_X + PLAYFIELD_WIDTH + 80, PLAYFIELD_Y-35))
 
             # Draw the next piece
             for y, row in enumerate(next_piece):
@@ -251,7 +259,7 @@ def run_tetris_minigame():
             result_title = big_font.render("Results", True, (0, 0, 0))
             screen.blit(result_title, (screen.get_width() // 2 - result_title.get_width() // 2, 150))
 
-            coins_msg = font.render(f"Coins earned: {int(score)}", True, (0, 0, 0))
+            coins_msg = font.render(f"Coins earned: {int(coins)}", True, (0, 0, 0))
             screen.blit(coins_msg, (screen.get_width() // 2 - coins_msg.get_width() // 2, 300))
 
             draw_button("Restart", results_restart_button, mouse_pos)
