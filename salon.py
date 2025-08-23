@@ -132,9 +132,6 @@ def run_salon_game(num_coins, happiness, bow, gem, backpack, labubu, HAPPINESS_M
     button_rect_world = pygame.Rect(50, 20, 275, 50)
     button_text_world = font.render('Return to World', True, button_text_color)
 
-    button_rect_shop = pygame.Rect(50,100,100,50)
-    button_text_shop = font.render('Shop', True, button_text_color)
-
     # All screens
     button_rect_home = pygame.Rect(700, 30, 250, 60)
     button_text_home = font.render("Return Home", True, button_text_color)
