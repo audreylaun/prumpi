@@ -1,5 +1,6 @@
 import pygame
 from happiness import draw_happiness_meter
+from box_minigame import run_tetris_minigame
 
 def run_work_game(num_coins, bow, gem, backpack, labubu, happiness, HAPPINESS_MAX, volume_on):
     pygame.init()
@@ -34,6 +35,9 @@ def run_work_game(num_coins, bow, gem, backpack, labubu, happiness, HAPPINESS_MA
     button_text_color = (24, 100, 24)
     button_rect_begin = pygame.Rect(screen.get_width() // 2 - 100, 600, 200, 60)
     button_text_begin = font.render("Begin", True, button_text_color)
+
+    button_rect_boxes = pygame.Rect(750, 20, 200, 60)
+    button_text_boxes = font.render("Stack boxes", True, button_text_color)
 
     button_rect_world = pygame.Rect(50, 20, 275, 50)
     button_text_world = font.render('Return to World', True, button_text_color)
@@ -73,6 +77,10 @@ def run_work_game(num_coins, bow, gem, backpack, labubu, happiness, HAPPINESS_MA
                     if button_rect_world.collidepoint(mouse_pos):
                         mode = "exit"
                         return num_coins, happiness, volume_on
+                    elif button_rect_boxes.collidepoint(mouse_pos):
+                        num_coins += run_tetris_minigame()
+                        button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
+
 
         if screen_mode == "title" and title_sequence:
             # move dinosaur toward door
@@ -110,6 +118,9 @@ def run_work_game(num_coins, bow, gem, backpack, labubu, happiness, HAPPINESS_MA
 
             pygame.draw.rect(screen, button_color, button_rect_world, border_radius=12)
             screen.blit(button_text_world, (button_rect_world.x, button_rect_world.y))
+
+            pygame.draw.rect(screen, button_color, button_rect_boxes, border_radius=12)
+            screen.blit(button_text_boxes, (button_rect_boxes.x, button_rect_boxes.y))
 
             draw_happiness_meter(screen, happiness, HAPPINESS_MAX)
 
