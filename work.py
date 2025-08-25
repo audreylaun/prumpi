@@ -19,9 +19,19 @@ def run_work_game(num_coins, bow, gem, backpack, labubu, happiness, HAPPINESS_MA
     title_image = pygame.image.load("data/image/gift_shop_title.png")
     work_background = pygame.image.load("data/image/work.png")
     prumpi_work = pygame.image.load("data/image/prumpi_work.png")
+    speech_right = pygame.image.load("data/image/speech_bubble_right.png")
+
+    #Customers
     penguin_front = pygame.image.load("data/image/penguin_front.png")
     penguin_back = pygame.image.load("data/image/penguin_back.png")
-    speech_right = pygame.image.load("data/image/speech_bubble_right.png")
+    sundae_front = pygame.image.load("data/image/sundae_front.png")
+    sundae_back = pygame.image.load("data/image/sundae_back.png")
+    polly_front = pygame.image.load("data/image/polly_front.png")
+    polly_back = pygame.image.load("data/image/polly_back.png")
+    boyfriend_front = pygame.image.load("data/image/boyfriend_front.png")
+    boyfriend_back = pygame.image.load("data/image/boyfriend_back.png")
+    blush = pygame.image.load("data/image/blush.png")
+
 
     # --- Resize ---
     coin_img = pygame.transform.scale(coin_img, (80,80))
@@ -32,9 +42,20 @@ def run_work_game(num_coins, bow, gem, backpack, labubu, happiness, HAPPINESS_MA
     volume_on_img = pygame.transform.scale(volume_on_img, (60, 60))
     volume_off_img = pygame.transform.scale(volume_off_img, (60, 60))
     prumpi_work = pygame.transform.scale(prumpi_work, (150, 150))
+    speech_right = pygame.transform.scale(speech_right, (500,100))
+    blush = pygame.transform.scale(blush, (200,100))
+
+
+    #Customers
     penguin_front = pygame.transform.scale(penguin_front, (200,300))
     penguin_back = pygame.transform.scale(penguin_back, (200,300))
-    speech_right = pygame.transform.scale(speech_right, (500,100))
+    sundae_front = pygame.transform.scale(sundae_front, (200,300))
+    sundae_back = pygame.transform.scale(sundae_back, (200,300))
+    polly_front = pygame.transform.scale(polly_front, (200,300))
+    polly_back = pygame.transform.scale(polly_back, (200,300))
+    boyfriend_front = pygame.transform.scale(boyfriend_front, (200,300))
+    boyfriend_back = pygame.transform.scale(boyfriend_back, (200,300))
+
 
     # --- Buttons ---
     font = pygame.font.SysFont("comic_sansms", 32)
@@ -55,8 +76,6 @@ def run_work_game(num_coins, bow, gem, backpack, labubu, happiness, HAPPINESS_MA
     button_volume = pygame.Rect(930, 630, 60, 60)
 
     #Backpacks on wall
-
-
     backpack_1 = pygame.image.load("data/image/backpack.png")
     backpack_2 = pygame.image.load("data/image/backpack_purple.png")
     backpack_3 = pygame.image.load("data/image/backpack_green.png")
@@ -105,9 +124,17 @@ def run_work_game(num_coins, bow, gem, backpack, labubu, happiness, HAPPINESS_MA
     drag_offset = (0, 0)
     customer_request = None
     message_text = None
+    current_customer = None  # persists across frames
 
-    customer_interval = 30000
+    customer_interval = 15000
     last_customer_time = 0
+
+    customer_list  = ["sundae", "polly", "penguin", "boyfriend"]
+
+    customers = {"sundae": [sundae_front, sundae_back],
+                 "polly": [polly_front, polly_back],
+                 "penguin": [penguin_front, penguin_back],
+                 "boyfriend": [boyfriend_front, boyfriend_back],}
 
     running = True
     while running:
@@ -207,6 +234,8 @@ def run_work_game(num_coins, bow, gem, backpack, labubu, happiness, HAPPINESS_MA
                 request = False
                 last_customer_time = current_time
 
+                current_customer = random.choice(customer_list)
+
         # --- Drawing ---
         if screen_mode == "title":
             screen.blit(title_background, (0, 0))
@@ -244,10 +273,12 @@ def run_work_game(num_coins, bow, gem, backpack, labubu, happiness, HAPPINESS_MA
 
             if customer_present:
                 if walk_in:
-                    customer = penguin_back
+                    customer = customers[current_customer][1]
                 if walk_out:
-                    customer = penguin_front
+                    customer = customers[current_customer][0]
                 screen.blit(customer, customer_pos_active)
+                if current_customer == "boyfriend":
+                    screen.blit(blush, (300, 375))
 
             # Draw dragging backpack on top
             if dragging_backpack:
@@ -256,7 +287,7 @@ def run_work_game(num_coins, bow, gem, backpack, labubu, happiness, HAPPINESS_MA
 
             # Draw penguin message
             if message_text:
-                speech_pos = (300, 400)
+                speech_pos = (300, 275)
                 screen.blit(speech_right, speech_pos)
                 text = font.render(message_text, True, (0, 0, 0))
                 screen.blit(text, (speech_pos[0] + 40, speech_pos[1] + 20))

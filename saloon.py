@@ -564,7 +564,7 @@ def run_saloon_game(num_coins, bow, gem, backpack, labubu, happiness, HAPPINESS_
 
             if sent:
                 screen.blit(boyfriend, (200, dino_pos[1]))
-                screen.blit(blush, (660, 250) )
+                screen.blit(blush, (660, 250))
             if first_load:
                 if first_load_start_time is None:
                     first_load_start_time = pygame.time.get_ticks()  # start timer
