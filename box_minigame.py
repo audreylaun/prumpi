@@ -223,6 +223,12 @@ def run_tetris_minigame(total_coins):
                              PLAYFIELD_Y + 40 + y * CELL_SIZE,
                              CELL_SIZE, CELL_SIZE)
                         )
+                        pygame.draw.rect(
+                            screen, (0,0,0),
+                            (PLAYFIELD_X + PLAYFIELD_WIDTH + 100 + x * CELL_SIZE,
+                             PLAYFIELD_Y + 40 + y * CELL_SIZE,
+                             CELL_SIZE, CELL_SIZE), 2
+                        )
 
             for y in range(GRID_HEIGHT):
                 for x in range(GRID_WIDTH):
@@ -232,6 +238,11 @@ def run_tetris_minigame(total_coins):
                             screen, color,
                             (PLAYFIELD_X + x * CELL_SIZE, PLAYFIELD_Y + y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
                         )
+                        pygame.draw.rect(
+                            screen, (0,0,0),
+                            (PLAYFIELD_X + x * CELL_SIZE, PLAYFIELD_Y + y * CELL_SIZE, CELL_SIZE, CELL_SIZE),
+                            2
+                        )
             # Draw current piece
             for y, row in enumerate(current_piece):
                 for x, cell in enumerate(row):
@@ -239,6 +250,12 @@ def run_tetris_minigame(total_coins):
                         pygame.draw.rect(
                             screen, COLORS[current_color],
                             (PLAYFIELD_X + (piece_x + x) * CELL_SIZE, PLAYFIELD_Y + (piece_y + y) * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+                        )
+                        pygame.draw.rect(
+                            screen, (0,0,0),
+                            (PLAYFIELD_X + (piece_x + x) * CELL_SIZE, PLAYFIELD_Y + (piece_y + y) * CELL_SIZE,
+                             CELL_SIZE, CELL_SIZE),
+                            2
                         )
 
             draw_button("Restart", restart_button, mouse_pos)
@@ -275,4 +292,4 @@ def run_tetris_minigame(total_coins):
 
 
 if __name__ == "__main__":
-    run_tetris_minigame()
+    run_tetris_minigame(0)
