@@ -108,7 +108,7 @@ def run_saloon_game(num_coins, bow, gem, backpack, labubu, happiness, HAPPINESS_
     button_text_begin = font.render("Begin", True, button_text_color)
 
     button_rect_home = pygame.Rect(700, 30, 250, 60)
-    button_text_home = font.render("Return Home", True, button_text_color)
+    button_text_home = font.render("Return to Bar", True, button_text_color)
 
     button_rect_title = title_image.get_rect(center=(screen.get_width() // 2, 300))
     button_rect_alley = pygame.Rect(50, 100, 100, 50)
@@ -238,6 +238,8 @@ def run_saloon_game(num_coins, bow, gem, backpack, labubu, happiness, HAPPINESS_
 
     running = True
     screen_mode = "title"
+    pygame.mixer.music.load("data/audio/bar_music.wav")
+    pygame.mixer.music.play(-1)
     while running:
         mouse_pos = pygame.mouse.get_pos()
 
@@ -282,6 +284,8 @@ def run_saloon_game(num_coins, bow, gem, backpack, labubu, happiness, HAPPINESS_
                         screen_mode = "selfie"
                     elif button_rect_world.collidepoint(mouse_pos):
                         mode = "exit"
+                        pygame.mixer.music.load("data/audio/background_music.mp3")
+                        pygame.mixer.music.play(-1)
                         return num_coins, happiness, volume_on
                 elif screen_mode == "selfie":
                     if button_rect_home.collidepoint(mouse_pos):
@@ -314,7 +318,7 @@ def run_saloon_game(num_coins, bow, gem, backpack, labubu, happiness, HAPPINESS_
                     if button_rect_home.collidepoint(mouse_pos):
                         pygame.mixer.music.fadeout(10)
                         screen_mode = "home"
-                        pygame.mixer.music.load("data/audio/background_music.mp3")
+                        pygame.mixer.music.load("data/audio/bar_music.wav")
                         pygame.mixer.music.play(-1)
                     if shrink_button_rect.collidepoint(mouse_pos) and cigarette:
                         if not shrinking:
@@ -389,7 +393,7 @@ def run_saloon_game(num_coins, bow, gem, backpack, labubu, happiness, HAPPINESS_
 
         elif screen_mode == "alley":
             if not pygame.mixer.music.get_busy() or current_music != "alley":
-                pygame.mixer.music.load("data/audio/alley_music.mp3")
+                pygame.mixer.music.load("data/audio/alley_music.wav")
                 pygame.mixer.music.play(-1)
                 current_music = "alley"
             screen.blit(alley_screen, (0, 0))

@@ -104,7 +104,7 @@ def karaoke():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-                pygame.mixer.music.load('data/audio/background_music.mp3')
+                pygame.mixer.music.load('data/audio/bar_music.wav')
                 pygame.mixer.music.play(-1)
 
                 return 0  # No coins if quit
@@ -134,7 +134,7 @@ def karaoke():
                         pygame.mixer.music.play(-1,0)
                     elif end_button.collidepoint(mouse_pos):
                         total_coins += coins_earned
-                        pygame.mixer.music.load('data/audio/background_music.mp3')
+                        pygame.mixer.music.load('data/audio/bar_music.wav')
                         pygame.mixer.music.play(-1)
                         return total_coins
 
