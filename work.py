@@ -3,7 +3,7 @@ from happiness import draw_happiness_meter
 from box_minigame import run_tetris_minigame
 import random
 
-def run_work_game(num_coins, bow, gem, backpack, labubu, happiness, HAPPINESS_MAX, volume_on):
+def run_work_game(num_coins, num_customers, num_rows, bow, gem, backpack, labubu, happiness, HAPPINESS_MAX, volume_on):
     pygame.init()
     screen = pygame.display.set_mode((1000, 700))
     pygame.display.set_caption("Dino Work")
@@ -20,6 +20,8 @@ def run_work_game(num_coins, bow, gem, backpack, labubu, happiness, HAPPINESS_MA
     work_background = pygame.image.load("data/image/work.png")
     prumpi_work = pygame.image.load("data/image/prumpi_work.png")
     speech_right = pygame.image.load("data/image/speech_bubble_right.png")
+    quest_log = pygame.image.load("data/image/quest_log.png")
+    quest_log_close = pygame.image.load("data/image/quest_log_closed.png")
 
     #Customers
     penguin_front = pygame.image.load("data/image/penguin_front.png")
@@ -31,6 +33,8 @@ def run_work_game(num_coins, bow, gem, backpack, labubu, happiness, HAPPINESS_MA
     boyfriend_front = pygame.image.load("data/image/boyfriend_front.png")
     boyfriend_back = pygame.image.load("data/image/boyfriend_back.png")
     blush = pygame.image.load("data/image/blush.png")
+    sloth_front = pygame.image.load("data/image/sloth.png")
+    sloth_back = pygame.image.load("data/image/sloth_back.png")
 
 
     # --- Resize ---
@@ -44,6 +48,9 @@ def run_work_game(num_coins, bow, gem, backpack, labubu, happiness, HAPPINESS_MA
     prumpi_work = pygame.transform.scale(prumpi_work, (150, 150))
     speech_right = pygame.transform.scale(speech_right, (500,100))
     blush = pygame.transform.scale(blush, (200,100))
+    quest_log = pygame.transform.scale(quest_log, (800, 500))
+    quest_log_small = pygame.transform.scale(quest_log, (75,75))
+    quest_log_close = pygame.transform.scale(quest_log_close, (50,75))
 
 
     #Customers
@@ -55,10 +62,14 @@ def run_work_game(num_coins, bow, gem, backpack, labubu, happiness, HAPPINESS_MA
     polly_back = pygame.transform.scale(polly_back, (200,300))
     boyfriend_front = pygame.transform.scale(boyfriend_front, (200,300))
     boyfriend_back = pygame.transform.scale(boyfriend_back, (200,300))
+    sloth_front = pygame.transform.scale(sloth_front, (200,300))
+    sloth_back = pygame.transform.scale(sloth_back, (200,300))
 
 
     # --- Buttons ---
     font = pygame.font.SysFont("comic_sansms", 32)
+    font_small = pygame.font.SysFont("comic_sansms", 24)
+    font_xsmall = pygame.font.SysFont("comic_sansms", 18)
     button_color = (255, 225, 125)
     button_text_color = (24, 100, 24)
     button_rect_begin = pygame.Rect(screen.get_width() // 2 - 100, 600, 200, 60)
@@ -69,6 +80,10 @@ def run_work_game(num_coins, bow, gem, backpack, labubu, happiness, HAPPINESS_MA
 
     button_rect_world = pygame.Rect(50, 20, 275, 50)
     button_text_world = font.render('Return to World', True, button_text_color)
+
+    button_rect_log_open = pygame.Rect(462, 15, 75, 75)
+    button_rect_log_close = pygame.Rect(475, 610, 50, 75)
+
 
     button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0,0,0))
     coin_button_home = pygame.Rect(35, 600, 60, 60)
@@ -112,7 +127,7 @@ def run_work_game(num_coins, bow, gem, backpack, labubu, happiness, HAPPINESS_MA
     dino_pos_work = (425, 339)
     dino_speed = 2
 
-
+    #Customer Variables
     customer_present = False
     customer_pos_start = [0,400]
     customer_pos_active = customer_pos_start.copy()
@@ -128,13 +143,23 @@ def run_work_game(num_coins, bow, gem, backpack, labubu, happiness, HAPPINESS_MA
 
     customer_interval = 15000
     last_customer_time = 0
-
-    customer_list  = ["sundae", "polly", "penguin", "boyfriend"]
-
+    customer_list  = ["sundae", "polly", "penguin", "boyfriend", "sloth"]
     customers = {"sundae": [sundae_front, sundae_back],
                  "polly": [polly_front, polly_back],
                  "penguin": [penguin_front, penguin_back],
-                 "boyfriend": [boyfriend_front, boyfriend_back],}
+                 "boyfriend": [boyfriend_front, boyfriend_back],
+                 "sloth": [sloth_front, sloth_back]}
+
+    # Quest variables
+    if num_customers < 50:
+        quest1 = False
+    else:
+        quest2 = True
+
+    if num_rows < 100:
+        quest2 = False
+    else:
+        quest2 = True
 
     running = True
     while running:
@@ -143,9 +168,9 @@ def run_work_game(num_coins, bow, gem, backpack, labubu, happiness, HAPPINESS_MA
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                return num_coins, happiness, volume_on
+                return num_coins, num_customers, num_rows, happiness, volume_on
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                if screen not in ["title"] and button_volume.collidepoint(mouse_pos):
+                if screen_mode not in ["title"] and button_volume.collidepoint(mouse_pos):
                     if volume_on == True:
                         pygame.mixer.music.set_volume(0)
                         volume_on = False
@@ -156,16 +181,22 @@ def run_work_game(num_coins, bow, gem, backpack, labubu, happiness, HAPPINESS_MA
                     title_sequence = True
                 if screen_mode == "work":
                     if button_rect_world.collidepoint(mouse_pos):
-                        mode = "exit"
-                        return num_coins, happiness, volume_on
-                    elif button_rect_boxes.collidepoint(mouse_pos):
-                        num_coins += run_tetris_minigame(0)
+                        return num_coins, num_customers, num_rows, happiness, volume_on
+                    if button_rect_boxes.collidepoint(mouse_pos):
+                        coins_earned = run_tetris_minigame(0)
+                        num_coins += coins_earned
+                        num_rows += coins_earned/5
                         button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
+                    if button_rect_log_open.collidepoint(mouse_pos):
+                        screen_mode = "log"
                     if request:
                         for color, img, rect in backpacks:
                             if rect.collidepoint(mouse_pos):
                                 dragging_backpack = (color, img, rect.copy())  # save original rect
                                 drag_offset = (mouse_pos[0] - rect.x, mouse_pos[1] - rect.y)
+                if screen_mode == "log":
+                    if button_rect_log_close.collidepoint(mouse_pos):
+                        screen_mode = "work"
 
             elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 if screen_mode == "work":
@@ -179,6 +210,7 @@ def run_work_game(num_coins, bow, gem, backpack, labubu, happiness, HAPPINESS_MA
                                 if color == customer_request:
                                     message_text = "Perfect! Thank you, Prumpi!"
                                     num_coins += 5
+                                    num_customers += 1
                                     button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
 
                                     request = False
@@ -219,7 +251,7 @@ def run_work_game(num_coins, bow, gem, backpack, labubu, happiness, HAPPINESS_MA
                     customer_pos_active = customer_pos_start.copy()
                     message_text = None
 
-        if dragging_backpack:
+        if dragging_backpack and screen_mode == "work":
             color, img, rect = dragging_backpack
             rect.x = mouse_pos[0] - drag_offset[0]
             rect.y = mouse_pos[1] - drag_offset[1]
@@ -295,6 +327,40 @@ def run_work_game(num_coins, bow, gem, backpack, labubu, happiness, HAPPINESS_MA
 
             screen.blit(coin_img, (coin_button_home.x, coin_button_home.y))
             screen.blit(button_text_coin, (coin_button_home.x + 100, coin_button_home.y + 20))
+
+            screen.blit(quest_log_small, (button_rect_log_open.x, button_rect_log_open.y))
+
+
+        elif screen_mode == "log":
+            screen.blit(work_background, (0, 0))
+
+            screen.blit(quest_log, (100,100))
+
+            screen.blit(quest_log_close, (button_rect_log_close.x, button_rect_log_close.y))
+
+            quest1_text = font_small.render("Serve 50 customers", True, button_text_color)
+            quest_1_subtext = font_xsmall.render(f"{50 - num_customers} remaining", True, button_text_color)
+            quest2_text = font_small.render("Stack 100 rows of boxes", True, button_text_color)
+            quest_2_subtext = font_xsmall.render(f"{int(100 - num_rows)} remaining", True, button_text_color)
+
+            quest_1_text_pos = (525, 250)
+            quest_2_text_pos = (525, 350)
+
+            screen.blit(quest1_text, quest_1_text_pos)
+            screen.blit(quest_1_subtext, (quest_1_text_pos[0], quest_1_text_pos[1]+25) )
+
+            screen.blit(quest2_text, quest_2_text_pos)
+            screen.blit(quest_2_subtext, (quest_2_text_pos[0], quest_2_text_pos[1]+25) )
+
+
+            if quest1:
+                pygame.draw.line(screen, button_text_color, (quest_1_text_pos[0], quest_1_text_pos[1]+15), (quest_1_text_pos[0]+200, quest_1_text_pos[1]+15),3)
+            if quest2:
+                pygame.draw.line(screen, button_text_color, (quest_2_text_pos[0], quest_2_text_pos[1]+15), (quest_2_text_pos[0]+200, quest_2_text_pos[1]+15),3)
+
+
+
+
 
         pygame.display.flip()
         clock.tick(60)
