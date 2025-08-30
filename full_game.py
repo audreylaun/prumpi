@@ -36,6 +36,7 @@ labubu = False
 # Quests
 num_customers = 0
 num_rows = 0
+hydration = 0
 
 happiness = 0
 HAPPINESS_MAX = 30
@@ -111,7 +112,7 @@ while running:
                     num_coins, happiness, bow, gem, backpack, labubu, volume_on = run_store(num_coins, happiness, bow, gem, backpack, labubu, HAPPINESS_MAX, volume_on)
                     button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
                 elif button_rect_work.collidepoint(mouse_pos):
-                    num_coins, num_customers, num_rows, happiness, volume_on = run_work_game(num_coins, num_customers, num_rows, bow, gem, backpack, labubu, happiness,HAPPINESS_MAX, volume_on)
+                    num_coins, num_customers, num_rows, hydration, happiness, volume_on = run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backpack, labubu, happiness,HAPPINESS_MAX, volume_on)
                     button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
 
 

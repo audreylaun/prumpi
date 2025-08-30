@@ -1,9 +1,9 @@
 import pygame
-from happiness import draw_happiness_meter
+from happiness import draw_happiness_meter, happiness_minigame
 from box_minigame import run_tetris_minigame
 import random
 
-def run_work_game(num_coins, num_customers, num_rows, bow, gem, backpack, labubu, happiness, HAPPINESS_MAX, volume_on):
+def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backpack, labubu, happiness, HAPPINESS_MAX, volume_on):
     pygame.init()
     screen = pygame.display.set_mode((1000, 700))
     pygame.display.set_caption("Dino Work")
@@ -22,6 +22,8 @@ def run_work_game(num_coins, num_customers, num_rows, bow, gem, backpack, labubu
     speech_right = pygame.image.load("data/image/speech_bubble_right.png")
     quest_log = pygame.image.load("data/image/quest_log.png")
     quest_log_close = pygame.image.load("data/image/quest_log_closed.png")
+    water_break = pygame.image.load("data/image/water_break.png")
+    prumpi_water = pygame.image.load("data/image/prumpi_standing.png")
 
     #Customers
     penguin_front = pygame.image.load("data/image/penguin_front.png")
@@ -47,10 +49,14 @@ def run_work_game(num_coins, num_customers, num_rows, bow, gem, backpack, labubu
     volume_off_img = pygame.transform.scale(volume_off_img, (60, 60))
     prumpi_work = pygame.transform.scale(prumpi_work, (150, 150))
     speech_right = pygame.transform.scale(speech_right, (500,100))
+    speech_water = pygame.transform.scale(speech_right, (200,100))
     blush = pygame.transform.scale(blush, (200,100))
     quest_log = pygame.transform.scale(quest_log, (800, 500))
     quest_log_small = pygame.transform.scale(quest_log, (75,75))
     quest_log_close = pygame.transform.scale(quest_log_close, (50,75))
+    water_break = pygame.transform.scale(water_break, (1000,700))
+    prumpi_water = pygame.transform.scale(prumpi_water, (300,400))
+    prumpi_water = pygame.transform.flip(prumpi_water, True, False)
 
 
     #Customers
@@ -78,8 +84,14 @@ def run_work_game(num_coins, num_customers, num_rows, bow, gem, backpack, labubu
     button_rect_boxes = pygame.Rect(750, 20, 200, 60)
     button_text_boxes = font.render("Clean up shop", True, button_text_color)
 
+    button_rect_water = pygame.Rect(750, 90, 200, 60)
+    button_text_water = font.render("Get Water", True, button_text_color)
+
     button_rect_world = pygame.Rect(50, 20, 275, 50)
     button_text_world = font.render('Return to World', True, button_text_color)
+
+    button_rect_home = pygame.Rect(700, 20, 250, 60)
+    button_text_home = font.render("Return to Work", True, button_text_color)
 
     button_rect_log_open = pygame.Rect(462, 15, 75, 75)
     button_rect_log_close = pygame.Rect(475, 610, 50, 75)
@@ -150,6 +162,21 @@ def run_work_game(num_coins, num_customers, num_rows, bow, gem, backpack, labubu
                  "boyfriend": [boyfriend_front, boyfriend_back],
                  "sloth": [sloth_front, sloth_back]}
 
+    # Water variables
+    liquid_height = 0
+    max_liquid_height = 30
+    button_rect_dispenser = pygame.Rect(450,405,15,15)
+    button_rect_drink = pygame.Rect(300, 250, 100, 50)
+    button_text_drink = font_small.render("Drink", True, button_text_color)
+    dino_pos_water = (125,275)
+    draining = False
+    filling = False
+    drink_active = False
+    water_text_display = False
+    water_text_duration = 1000
+    water_text = font.render("Ahhhhhh", True, (0,0,0))
+    water_text_pos = (400,300)
+
     # Quest variables
     if num_customers < 50:
         quest1 = False
@@ -161,6 +188,11 @@ def run_work_game(num_coins, num_customers, num_rows, bow, gem, backpack, labubu
     else:
         quest2 = True
 
+    if hydration < 15:
+        quest3 = False
+    else:
+        quest3 = True
+
     running = True
     while running:
         screen.fill((255, 255, 255))
@@ -168,7 +200,7 @@ def run_work_game(num_coins, num_customers, num_rows, bow, gem, backpack, labubu
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                return num_coins, num_customers, num_rows, happiness, volume_on
+                return num_coins, num_customers, num_rows, hydration, happiness, volume_on
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if screen_mode not in ["title"] and button_volume.collidepoint(mouse_pos):
                     if volume_on == True:
@@ -181,7 +213,7 @@ def run_work_game(num_coins, num_customers, num_rows, bow, gem, backpack, labubu
                     title_sequence = True
                 if screen_mode == "work":
                     if button_rect_world.collidepoint(mouse_pos):
-                        return num_coins, num_customers, num_rows, happiness, volume_on
+                        return num_coins, num_customers, num_rows, hydration, happiness, volume_on
                     if button_rect_boxes.collidepoint(mouse_pos):
                         coins_earned = run_tetris_minigame(0)
                         num_coins += coins_earned
@@ -189,11 +221,20 @@ def run_work_game(num_coins, num_customers, num_rows, bow, gem, backpack, labubu
                         button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
                     if button_rect_log_open.collidepoint(mouse_pos):
                         screen_mode = "log"
+                    if button_rect_water.collidepoint(mouse_pos):
+                        screen_mode = "water"
                     if request:
                         for color, img, rect in backpacks:
                             if rect.collidepoint(mouse_pos):
                                 dragging_backpack = (color, img, rect.copy())  # save original rect
                                 drag_offset = (mouse_pos[0] - rect.x, mouse_pos[1] - rect.y)
+                if screen_mode == "water":
+                    if button_rect_home.collidepoint(mouse_pos):
+                        screen_mode = "work"
+                    if button_rect_dispenser.collidepoint(mouse_pos) and draining == False:
+                        filling = True
+                    if button_rect_drink.collidepoint(mouse_pos) and drink_active:
+                        draining = True
                 if screen_mode == "log":
                     if button_rect_log_close.collidepoint(mouse_pos):
                         screen_mode = "work"
@@ -219,6 +260,12 @@ def run_work_game(num_coins, num_customers, num_rows, bow, gem, backpack, labubu
                                     message_text = "That's not the right one!"
                                     original_rect.topleft = (original_rect.x, original_rect.y)
                             dragging_backpack = None
+
+                if screen_mode == "water":
+                    if filling == True:
+                        filling = False
+                    if draining == True:
+                        draining = False
 
         if screen_mode == "title" and title_sequence:
             # move dinosaur toward door
@@ -255,6 +302,23 @@ def run_work_game(num_coins, num_customers, num_rows, bow, gem, backpack, labubu
             color, img, rect = dragging_backpack
             rect.x = mouse_pos[0] - drag_offset[0]
             rect.y = mouse_pos[1] - drag_offset[1]
+
+        if filling:
+            if liquid_height < max_liquid_height:
+                liquid_height += 0.5
+            else:
+                drink_active = True
+
+        if draining:
+            if liquid_height > 0:
+                liquid_height -= 0.5
+            else:
+                happiness += 1
+                hydration += 1
+                start_time = pygame.time.get_ticks()
+                water_text_display = True
+                drink_active = False
+                draining=False
 
         current_time = pygame.time.get_ticks()
         if screen_mode == "work" and not (walk_in or request or walk_out):
@@ -296,6 +360,9 @@ def run_work_game(num_coins, num_customers, num_rows, bow, gem, backpack, labubu
             pygame.draw.rect(screen, button_color, button_rect_boxes, border_radius=12)
             screen.blit(button_text_boxes, (button_rect_boxes.x, button_rect_boxes.y))
 
+            pygame.draw.rect(screen, button_color, button_rect_water, border_radius=12)
+            screen.blit(button_text_water, (button_rect_water.x, button_rect_water.y))
+
             screen.blit(backpack_1, (backpack_1_rect.x, backpack_1_rect.y))
             screen.blit(backpack_2, (backpack_2_rect.x, backpack_2_rect.y))
             screen.blit(backpack_3, (backpack_3_rect.x, backpack_3_rect.y))
@@ -330,7 +397,47 @@ def run_work_game(num_coins, num_customers, num_rows, bow, gem, backpack, labubu
 
             screen.blit(quest_log_small, (button_rect_log_open.x, button_rect_log_open.y))
 
+        elif screen_mode == "water":
+            screen.blit(water_break, (0,0))
 
+            draw_happiness_meter(screen, happiness, HAPPINESS_MAX)
+
+            screen.blit(coin_img, (coin_button_home.x, coin_button_home.y))
+            screen.blit(button_text_coin, (coin_button_home.x + 100, coin_button_home.y + 20))
+
+            pygame.draw.rect(screen, (231, 240, 255), (450, 450, 20, 40))
+
+            if liquid_height > 0:
+                pygame.draw.rect(screen, (100, 149, 237), (450 + 2, 450 + (40 - liquid_height), 16, liquid_height))
+
+            pygame.draw.rect(screen, button_color, button_rect_dispenser, border_radius=5)
+
+            if draining:
+                pygame.draw.line(screen, (100, 149, 237), (460, 450), (350,440), 3)
+            else:
+                pygame.draw.line(screen, (255,255,255), (460, 450), (350,440), 3)
+
+            screen.blit(prumpi_water, dino_pos_water)
+
+            if drink_active:
+                pygame.draw.rect(screen, button_color, button_rect_drink, border_radius=12)
+                screen.blit(button_text_drink, (button_rect_drink.x+20, button_rect_drink.y))
+
+            current_time = pygame.time.get_ticks()
+            if water_text_display:
+                if current_time - start_time <= water_text_duration:
+                    screen.blit(speech_water, water_text_pos)
+                    screen.blit(water_text, (water_text_pos[0] + 20, water_text_pos[1]))
+                else:
+                    water_text_display=False
+
+
+
+
+
+
+            pygame.draw.rect(screen, button_color, button_rect_home, border_radius=12)
+            screen.blit(button_text_home, (button_rect_home.x + 10, button_rect_home.y + 5))
         elif screen_mode == "log":
             screen.blit(work_background, (0, 0))
 
@@ -342,9 +449,12 @@ def run_work_game(num_coins, num_customers, num_rows, bow, gem, backpack, labubu
             quest_1_subtext = font_xsmall.render(f"{50 - num_customers} remaining", True, button_text_color)
             quest2_text = font_small.render("Stack 100 rows of boxes", True, button_text_color)
             quest_2_subtext = font_xsmall.render(f"{int(100 - num_rows)} remaining", True, button_text_color)
+            quest3_text = font_small.render("Hydrate 15 times", True, button_text_color)
+            quest_3_subtext = font_xsmall.render(f"{15-hydration} drinks remaining", True, button_text_color)
 
             quest_1_text_pos = (525, 250)
             quest_2_text_pos = (525, 350)
+            quest_3_text_pos = (525, 450)
 
             screen.blit(quest1_text, quest_1_text_pos)
             screen.blit(quest_1_subtext, (quest_1_text_pos[0], quest_1_text_pos[1]+25) )
@@ -352,14 +462,22 @@ def run_work_game(num_coins, num_customers, num_rows, bow, gem, backpack, labubu
             screen.blit(quest2_text, quest_2_text_pos)
             screen.blit(quest_2_subtext, (quest_2_text_pos[0], quest_2_text_pos[1]+25) )
 
+            screen.blit(quest3_text, quest_3_text_pos)
+            screen.blit(quest_3_subtext, (quest_3_text_pos[0], quest_3_text_pos[1]+25) )
+
 
             if quest1:
                 pygame.draw.line(screen, button_text_color, (quest_1_text_pos[0], quest_1_text_pos[1]+15), (quest_1_text_pos[0]+200, quest_1_text_pos[1]+15),3)
             if quest2:
                 pygame.draw.line(screen, button_text_color, (quest_2_text_pos[0], quest_2_text_pos[1]+15), (quest_2_text_pos[0]+200, quest_2_text_pos[1]+15),3)
+            if quest3:
+                pygame.draw.line(screen, button_text_color, (quest_3_text_pos[0], quest_3_text_pos[1]+15), (quest_3_text_pos[0]+200, quest_3_text_pos[1]+15),3)
 
-
-
+        if happiness == HAPPINESS_MAX:
+            happiness=0
+            coins_added = happiness_minigame()
+            num_coins += coins_added
+            button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
 
 
         pygame.display.flip()
