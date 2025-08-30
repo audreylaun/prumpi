@@ -29,6 +29,7 @@ def calculate_coins_earned(time, mistakes):
 
 def karaoke():
     total_coins = 0
+    total_aces = 0
     background = pygame.image.load("data/image/saloon_stage.png")
     background = pygame.transform.scale(background, (1000, 700))
     dino = pygame.image.load("data/image/prumpi.png")
@@ -60,6 +61,7 @@ def karaoke():
     elapsed_time = 0
     mistakes = 0
     mistake_active = False
+    completed = False
 
     # -- Screen stuff
     # Begin
@@ -103,11 +105,10 @@ def karaoke():
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
                 pygame.mixer.music.load('data/audio/bar_music.wav')
                 pygame.mixer.music.play(-1)
 
-                return 0  # No coins if quit
+                return 0, 0  # No coins if quit
 
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if mode == "start" and begin_button.collidepoint(mouse_pos):
@@ -125,6 +126,9 @@ def karaoke():
                 elif mode == "results":
                     if results_restart_button.collidepoint(mouse_pos):
                         total_coins += coins_earned
+                        if mistakes == 0 and completed:
+                            total_aces +=1
+                        completed = False
                         mode = "start"
                         input_text = ""
                         coins_earned = 0
@@ -134,9 +138,11 @@ def karaoke():
                         pygame.mixer.music.play(-1,0)
                     elif end_button.collidepoint(mouse_pos):
                         total_coins += coins_earned
+                        if mistakes == 0 and completed:
+                            total_aces +=1
                         pygame.mixer.music.load('data/audio/bar_music.wav')
                         pygame.mixer.music.play(-1)
-                        return total_coins
+                        return total_coins, total_aces
 
             elif event.type == pygame.KEYDOWN and mode == "typing":
                 if event.key == pygame.K_BACKSPACE:
@@ -149,6 +155,7 @@ def karaoke():
                 # Check if finished
                 if input_text == lyrics_no_newlines:
                     elapsed_time = time.time() - start_time
+                    completed = True
                     coins_earned = calculate_coins_earned(elapsed_time,mistakes)
                     #CREATE AN ALGORITHM FOR CALCULATING HOW MANY COINS TO GIVE THE USER
                     # if elapsed_time <= 30:
@@ -231,4 +238,3 @@ def karaoke():
 
         pygame.display.flip()
         clock.tick(60)
-    return None

@@ -52,7 +52,7 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
     speech_water = pygame.transform.scale(speech_right, (200,100))
     blush = pygame.transform.scale(blush, (200,100))
     quest_log = pygame.transform.scale(quest_log, (800, 500))
-    quest_log_small = pygame.transform.scale(quest_log, (75,75))
+    quest_log_open = pygame.transform.scale(quest_log, (75,75))
     quest_log_close = pygame.transform.scale(quest_log_close, (50,75))
     water_break = pygame.transform.scale(water_break, (1000,700))
     prumpi_water = pygame.transform.scale(prumpi_water, (300,400))
@@ -393,7 +393,7 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
             screen.blit(coin_img, (coin_button_home.x, coin_button_home.y))
             screen.blit(button_text_coin, (coin_button_home.x + 100, coin_button_home.y + 20))
 
-            screen.blit(quest_log_small, (button_rect_log_open.x, button_rect_log_open.y))
+            screen.blit(quest_log_open, (button_rect_log_open.x, button_rect_log_open.y))
 
         elif screen_mode == "water":
             screen.blit(water_break, (0,0))
