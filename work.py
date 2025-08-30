@@ -182,12 +182,10 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
         quest1 = False
     else:
         quest2 = True
-
     if num_rows < 100:
         quest2 = False
     else:
         quest2 = True
-
     if hydration < 15:
         quest3 = False
     else:
@@ -452,9 +450,9 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
             quest3_text = font_small.render("Hydrate 15 times", True, button_text_color)
             quest_3_subtext = font_xsmall.render(f"{15-hydration} drinks remaining", True, button_text_color)
 
-            quest_1_text_pos = (525, 250)
-            quest_2_text_pos = (525, 350)
-            quest_3_text_pos = (525, 450)
+            quest_1_text_pos = (525, 225)
+            quest_2_text_pos = (525, 325)
+            quest_3_text_pos = (525, 425)
 
             screen.blit(quest1_text, quest_1_text_pos)
             screen.blit(quest_1_subtext, (quest_1_text_pos[0], quest_1_text_pos[1]+25) )
