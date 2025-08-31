@@ -106,6 +106,7 @@ while running:
         work_complete = True
     if num_aces >= 5 and num_selfies >= 50 and num_beers >= 50:
         saloon_complete = True
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -118,15 +119,15 @@ while running:
                 if button_rect_work.collidepoint(mouse_pos):
                     num_coins, num_customers, num_rows, hydration, happiness, volume_on = run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backpack, labubu, happiness,HAPPINESS_MAX, volume_on)
                     button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
-                if work_complete:
+                if saloon_complete:
                     if button_rect_salon.collidepoint(mouse_pos):
                         num_coins, happiness, volume_on = run_salon_game(num_coins, happiness, bow, gem, backpack, labubu, HAPPINESS_MAX, volume_on)
                         button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
-                if saloon_complete:
+                if work_complete:
                     if button_rect_saloon.collidepoint(mouse_pos):
                         num_coins, num_aces, num_selfies, num_beers, happiness, volume_on = run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backpack, labubu, happiness, HAPPINESS_MAX, volume_on)
                         button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
-                elif button_rect_shop.collidepoint(mouse_pos):
+                if button_rect_shop.collidepoint(mouse_pos):
                     num_coins, happiness, bow, gem, backpack, labubu, volume_on = run_store(num_coins, happiness, bow, gem, backpack, labubu, HAPPINESS_MAX, volume_on)
                     button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
                 elif button_volume.collidepoint(mouse_pos):
