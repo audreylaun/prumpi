@@ -181,7 +181,7 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
     if num_customers < 50:
         quest1 = False
     else:
-        quest2 = True
+        quest1 = True
     if num_rows < 100:
         quest2 = False
     else:
@@ -410,16 +410,16 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
 
             pygame.draw.rect(screen, button_color, button_rect_dispenser, border_radius=5)
 
-            if draining:
-                pygame.draw.line(screen, (100, 149, 237), (460, 450), (350,440), 3)
-            else:
-                pygame.draw.line(screen, (255,255,255), (460, 450), (350,440), 3)
-
             screen.blit(prumpi_water, dino_pos_water)
 
             if drink_active:
                 pygame.draw.rect(screen, button_color, button_rect_drink, border_radius=12)
                 screen.blit(button_text_drink, (button_rect_drink.x+20, button_rect_drink.y))
+
+                if draining:
+                    pygame.draw.line(screen, (100, 149, 237), (460, 450), (350, 440), 3)
+                else:
+                    pygame.draw.line(screen, (255, 255, 255), (460, 450), (350, 440), 3)
 
             current_time = pygame.time.get_ticks()
             if water_text_display:
@@ -436,6 +436,7 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
 
             pygame.draw.rect(screen, button_color, button_rect_home, border_radius=12)
             screen.blit(button_text_home, (button_rect_home.x + 10, button_rect_home.y + 5))
+
         elif screen_mode == "log":
             screen.blit(work_background, (0, 0))
 

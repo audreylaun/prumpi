@@ -241,7 +241,7 @@ def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backp
     if num_aces < 5:
         quest1 = False
     else:
-        quest2 = True
+        quest1 = True
     if num_selfies < 50:
         quest2 = False
     else:

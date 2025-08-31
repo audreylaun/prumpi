@@ -35,10 +35,12 @@ backpack = False
 labubu = False
 # ---Quests---
 # Saloon
+saloon_complete = False
 num_aces = 0
 num_selfies = 0
 num_beers = 0
 # Work
+work_complete=False
 num_customers = 0
 num_rows = 0
 hydration = 0
@@ -59,12 +61,14 @@ pin = pygame.image.load('data/image/pin.png')
 volume_on_img = pygame.image.load("data/image/volume_on.png")
 volume_off_img = pygame.image.load("data/image/volume_off.png")
 coin_img = pygame.image.load("data/image/coin.png")
+lock = pygame.image.load("data/image/lock.png")
 
 # --- Rescale images ---
 background = pygame.transform.scale(background, (1000, 700))
 title_image = pygame.transform.scale(title_image, (500, 300))
 pin = pygame.transform.scale(pin, (100,100))
 coin_img = pygame.transform.scale(coin_img, (80, 80))
+lock = pygame.transform.scale(lock, (50,50))
 
 # --- Create buttons ---
 button_rect_begin = pygame.Rect(400, 500, 200, 60)
@@ -98,6 +102,10 @@ while running:
     screen.fill((255, 255, 255))
     mouse_pos = pygame.mouse.get_pos()
 
+    if num_customers >= 50 and num_rows >= 100 and hydration >= 15:
+        work_complete = True
+    if num_aces >= 5 and num_selfies >= 50 and num_beers >= 50:
+        saloon_complete = True
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -107,21 +115,20 @@ while running:
                 if button_rect_begin.collidepoint(mouse_pos):
                     screen_mode = "home"
             if screen_mode == "home":
-                if button_rect_salon.collidepoint(mouse_pos):
-                    num_coins, happiness, volume_on = run_salon_game(num_coins, happiness, bow, gem, backpack, labubu, HAPPINESS_MAX, volume_on)
+                if button_rect_work.collidepoint(mouse_pos):
+                    num_coins, num_customers, num_rows, hydration, happiness, volume_on = run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backpack, labubu, happiness,HAPPINESS_MAX, volume_on)
                     button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
-                elif button_rect_saloon.collidepoint(mouse_pos):
-                    num_coins, num_aces, num_selfies, num_beers, happiness, volume_on = run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backpack, labubu, happiness, HAPPINESS_MAX, volume_on)
-                    button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
+                if work_complete:
+                    if button_rect_salon.collidepoint(mouse_pos):
+                        num_coins, happiness, volume_on = run_salon_game(num_coins, happiness, bow, gem, backpack, labubu, HAPPINESS_MAX, volume_on)
+                        button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
+                if saloon_complete:
+                    if button_rect_saloon.collidepoint(mouse_pos):
+                        num_coins, num_aces, num_selfies, num_beers, happiness, volume_on = run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backpack, labubu, happiness, HAPPINESS_MAX, volume_on)
+                        button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
                 elif button_rect_shop.collidepoint(mouse_pos):
                     num_coins, happiness, bow, gem, backpack, labubu, volume_on = run_store(num_coins, happiness, bow, gem, backpack, labubu, HAPPINESS_MAX, volume_on)
                     button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
-                elif button_rect_work.collidepoint(mouse_pos):
-                    num_coins, num_customers, num_rows, hydration, happiness, volume_on = run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backpack, labubu, happiness,HAPPINESS_MAX, volume_on)
-                    button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
-
-
-
                 elif button_volume.collidepoint(mouse_pos):
                     if volume_on == True:
                         pygame.mixer.music.set_volume(0)
@@ -143,9 +150,13 @@ while running:
     elif screen_mode == "home":
         screen.blit(background, (0,0))
         screen.blit(pin, button_rect_salon)
+        if not saloon_complete:
+            screen.blit(lock, (button_rect_salon.x+20, button_rect_salon.y))
         screen.blit(pin, button_rect_saloon)
-        screen.blit(pin, button_rect_shop)
+        if not work_complete:
+            screen.blit(lock, (button_rect_saloon.x+20, button_rect_saloon.y))
         screen.blit(pin, button_rect_work)
+        screen.blit(pin, button_rect_shop)
 
         screen.blit(coin_img, (coin_button_home.x, coin_button_home.y))
         screen.blit(button_text_coin, (coin_button_home.x + 100, coin_button_home.y + 20))
