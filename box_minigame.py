@@ -81,17 +81,13 @@ def run_tetris_minigame(total_coins):
     # GAME STUFF
     grid = [[0 for _ in range(GRID_WIDTH)] for _ in range(GRID_HEIGHT)]
 
-    # current_piece = random.choice(SHAPES)
     current_piece_index = random.randrange(len(SHAPES))
     current_piece = SHAPES[current_piece_index]
-    # current_color = random.randrange(len(COLORS))
     current_color = current_piece_index
     piece_x, piece_y = GRID_WIDTH // 2 - len(current_piece[0]) // 2, 0
 
     next_piece_index = random.randrange(len(SHAPES))
-    # next_piece = random.choice(SHAPES)
     next_piece = SHAPES[next_piece_index]
-    # next_color = random.randrange(len(COLORS))
     next_color = next_piece_index
     #Title screen stuff
     title = big_font.render("Box Stacking", True, (0, 0, 0))
@@ -157,6 +153,7 @@ def run_tetris_minigame(total_coins):
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if screen_mode == "title" and begin_button.collidepoint(mouse_pos):
                     screen_mode = "game"
+                    drop_time = 0
                 elif screen_mode == "game":
                     if restart_button.collidepoint(mouse_pos):
                         return run_tetris_minigame(total_coins) #need to change this so it resets within the same call
@@ -170,7 +167,7 @@ def run_tetris_minigame(total_coins):
                         total_coins += coins
                         return run_tetris_minigame(total_coins) #need to change this so it resets within the same call
 
-        if drop_time > drop_speed:
+        if screen_mode == "game" and drop_time > drop_speed:
             drop_time = 0
             if valid_position(grid, current_piece, (piece_x, piece_y + 1)):
                 piece_y += 1
