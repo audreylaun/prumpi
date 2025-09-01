@@ -3,7 +3,7 @@ from happiness import draw_happiness_meter, happiness_minigame
 from box_minigame import run_tetris_minigame
 import random
 
-def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backpack, labubu, happiness, HAPPINESS_MAX, volume_on):
+def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backpack, labubu, happiness, HAPPINESS_MAX, volume_on, work_first_open):
     pygame.init()
     screen = pygame.display.set_mode((1000, 700))
     pygame.display.set_caption("Dino Work")
@@ -57,6 +57,8 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
     water_break = pygame.transform.scale(water_break, (1000,700))
     prumpi_water = pygame.transform.scale(prumpi_water, (300,400))
     prumpi_water = pygame.transform.flip(prumpi_water, True, False)
+    prumpi_head = pygame.transform.scale(prumpi_work, (400,400))
+
 
 
     #Customers
@@ -138,6 +140,14 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
     dino_pos_title = [400, 475]
     dino_pos_work = (425, 339)
     dino_speed = 2
+
+    # First Open
+    welcome_text_1 = font.render("Another day at work.", True, (0, 0, 0))
+    welcome_text_2 = font.render("I hope I see my crush.", True, (0, 0, 0))
+    welcome_text_3 = font.render("Press any key to continue.", True, (0, 0, 0))
+    welcome_bubble = pygame.transform.scale(speech_right, (500, 300))
+    welcome_prumpi_pos = (100, 300)
+    welcome_bubble_pos = (400, 200)
 
     #Customer Variables
     customer_present = False
@@ -265,6 +275,10 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
                     if draining == True:
                         draining = False
 
+            elif event.type == pygame.KEYDOWN:
+                if screen_mode == "first open":
+                    screen_mode = "work"
+
         if screen_mode == "title" and title_sequence:
             # move dinosaur toward door
             if dino_pos_title[0] > door_rect.x:
@@ -274,7 +288,10 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
             # check collision with door
             dino_rect = pygame.Rect(dino_pos_title[0], dino_pos_title[1], 60, 80)
             if dino_rect.colliderect(door_rect):
-                screen_mode = "work"
+                if work_first_open:
+                    screen_mode = "first open"
+                else:
+                    screen_mode = "work"
                 title_sequence = False
 
         if screen_mode == "work" and customer_present:
@@ -341,6 +358,15 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
             pygame.draw.rect(screen, button_color, button_rect_begin, border_radius=10)
             pygame.draw.rect(screen, button_color, button_rect_begin, width=2, border_radius=10)
             screen.blit(button_text_begin, (button_rect_begin.x + 60, button_rect_begin.y + 5))
+
+        elif screen_mode == "first open":
+            screen.blit(work_background, (0,0))
+            work_first_open = False
+            screen.blit(prumpi_head, welcome_prumpi_pos)
+            screen.blit(welcome_bubble, welcome_bubble_pos)
+            screen.blit(welcome_text_1, (welcome_bubble_pos[0]+30, welcome_bubble_pos[1]+40))
+            screen.blit(welcome_text_2, (welcome_bubble_pos[0]+30, welcome_bubble_pos[1]+80))
+            screen.blit(welcome_text_3, (welcome_bubble_pos[0]+30, welcome_bubble_pos[1]+120))
 
         elif screen_mode == "work":
             screen.blit(work_background, (0, 0))
@@ -445,11 +471,23 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
             screen.blit(quest_log_close, (button_rect_log_close.x, button_rect_log_close.y))
 
             quest1_text = font_small.render("Serve 50 customers", True, button_text_color)
-            quest_1_subtext = font_xsmall.render(f"{50 - num_customers} remaining", True, button_text_color)
+            if 50-num_customers >= 0:
+                num1 = 50-num_customers
+            else:
+                num1 = 0
+            quest_1_subtext = font_xsmall.render(f"{num1} remaining", True, button_text_color)
             quest2_text = font_small.render("Stack 100 rows of boxes", True, button_text_color)
-            quest_2_subtext = font_xsmall.render(f"{int(100 - num_rows)} remaining", True, button_text_color)
+            if 100-num_rows >= 0:
+                num2 = int(100-num_rows)
+            else:
+                num2 = 0
+            quest_2_subtext = font_xsmall.render(f"{num2} remaining", True, button_text_color)
             quest3_text = font_small.render("Hydrate 15 times", True, button_text_color)
-            quest_3_subtext = font_xsmall.render(f"{15-hydration} drinks remaining", True, button_text_color)
+            if 15-hydration >=0:
+                num3 = 15-hydration
+            else:
+                num3 = 0
+            quest_3_subtext = font_xsmall.render(f"{num3} drinks remaining", True, button_text_color)
 
             quest_1_text_pos = (525, 225)
             quest_2_text_pos = (525, 325)
