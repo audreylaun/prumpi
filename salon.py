@@ -50,7 +50,7 @@ def flood_fill(surface, x, y, fill_color):
                 q.extend([(cx+1, cy), (cx-1, cy), (cx, cy+1), (cx, cy-1)])
 
 
-def run_salon_game(num_coins, happiness, bow, gem, backpack, labubu, HAPPINESS_MAX, volume_on):
+def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happiness, bow, gem, backpack, labubu, HAPPINESS_MAX, volume_on, salon_first_open):
     # --- Initialize Game ---
     pygame.init()
     screen = pygame.display.set_mode((1000, 700))
@@ -78,15 +78,16 @@ def run_salon_game(num_coins, happiness, bow, gem, backpack, labubu, HAPPINESS_M
     volume_on_img = pygame.image.load("data/image/volume_on.png")
     volume_off_img = pygame.image.load("data/image/volume_off.png")
     coin_img = pygame.image.load("data/image/coin.png")
-    shop_screen = pygame.image.load("data/image/shop.png")
     bow_img = pygame.image.load("data/image/bow.png")
-    check = pygame.image.load("data/image/check.png")
     gem_img = pygame.image.load("data/image/gem.png")
-    backpack_img = pygame.image.load("data/image/backpack.png")
     prumpi_backpack = pygame.image.load("data/image/prumpi_backpack.png")
     speech_left = pygame.image.load("data/image/speech_bubble_left.png")
     speech_right = pygame.image.load("data/image/speech_bubble_right.png")
     labubu_img = pygame.image.load("data/image/labubu.png")
+    quest_log = pygame.image.load("data/image/quest_log.png")
+    quest_log_close = pygame.image.load("data/image/quest_log_closed.png")
+    prumpi_head = pygame.image.load("data/image/prumpi_work.png")
+
 
 
     # --- Resize images ---
@@ -105,11 +106,18 @@ def run_salon_game(num_coins, happiness, bow, gem, backpack, labubu, HAPPINESS_M
     broom_img = pygame.transform.scale(broom_img, (120, 120))  # adjust size as needed
     curtain_img = pygame.transform.scale(curtain_img, (1000, 700))  # Adjust to your screen size
     coin_img = pygame.transform.scale(coin_img, (80,80))
-    shop_screen = pygame.transform.scale(shop_screen, (1000,700))
-    check = pygame.transform.scale(check, (50,50))
+    quest_log = pygame.transform.scale(quest_log, (800, 500))
+    quest_log_open = pygame.transform.scale(quest_log, (75, 75))
+    quest_log_close = pygame.transform.scale(quest_log_close, (50, 75))
+    prumpi_head = pygame.transform.scale(prumpi_head, (400,400))
+    speech_bubble = pygame.transform.scale(speech_right, (300,150))
+
+
 
     # --- Set Font and Button Colors  ---
     font = pygame.font.SysFont("comic_sansms", 32)
+    font_small = pygame.font.SysFont("comic_sansms", 24)
+    font_xsmall = pygame.font.SysFont("comic_sansms", 18)
     button_color = (255, 225, 125)
     button_text_color = (24, 100, 24)
 
@@ -132,6 +140,9 @@ def run_salon_game(num_coins, happiness, bow, gem, backpack, labubu, HAPPINESS_M
     button_rect_world = pygame.Rect(50, 20, 275, 50)
     button_text_world = font.render('Return to World', True, button_text_color)
 
+    button_rect_log_open = pygame.Rect(462, 15, 75, 75)
+    button_rect_log_close = pygame.Rect(475, 610, 50, 75)
+
     # All screens
     button_rect_home = pygame.Rect(700, 30, 250, 60)
     button_text_home = font.render("Return Home", True, button_text_color)
@@ -142,6 +153,14 @@ def run_salon_game(num_coins, happiness, bow, gem, backpack, labubu, HAPPINESS_M
     volume_on_img = pygame.transform.scale(volume_on_img, (60,60))
     volume_off_img = pygame.transform.scale(volume_off_img, (60,60))
     button_volume = pygame.Rect(930, 630, 60, 60)
+
+    # First Open
+    welcome_text_1 = font.render("Time to get dolled up.", True, (0,0,0))
+    welcome_text_2 = font.render("I want my scales to shine!", True, (0,0,0))
+    welcome_text_3 = font.render("Press any key to continue.", True, (0,0,0))
+    welcome_bubble = pygame.transform.scale(speech_bubble, (500, 300))
+    welcome_prumpi_pos = (100,300)
+    welcome_bubble_pos = (400, 200)
 
     # Dinner
     button_hardfiskur = pygame.Rect(700, 150, 200, 60)
@@ -224,7 +243,21 @@ def run_salon_game(num_coins, happiness, bow, gem, backpack, labubu, HAPPINESS_M
     clean_message_start_time = 0
     clean_message_duration = 2000  #ms
 
+    # Quest variables
+    if num_manicures < 10:
+        quest1 = False
+    else:
+        quest1 = True
+    if num_happiness < 30:
+        quest2 = False
+    else:
+        quest2 = True
+    if num_groomings < 15:
+        quest3 = False
+    else:
+        quest3 = True
 
+    ignore_clicks = False
     # Game loop
     running = True
     while running:
@@ -235,8 +268,7 @@ def run_salon_game(num_coins, happiness, bow, gem, backpack, labubu, HAPPINESS_M
             if event.type == pygame.QUIT:
                 running = False
 
-            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                # if screen_mode not in ["title", "alley_transition"]:
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and not ignore_clicks:
                 if screen_mode not in ["title"]:
                     if button_volume.collidepoint(mouse_pos):
                         if volume_on == True:
@@ -250,56 +282,20 @@ def run_salon_game(num_coins, happiness, bow, gem, backpack, labubu, HAPPINESS_M
                 if screen_mode == "home":
                     if button_rect_home_paint.collidepoint(mouse_pos):
                         screen_mode = "nails"
-                    elif button_rect_home_dinner.collidepoint(mouse_pos):
+                    if button_rect_home_dinner.collidepoint(mouse_pos):
                         screen_mode = "dinner"
                     elif button_rect_home_grooming.collidepoint(mouse_pos):
                         screen_mode = "grooming"
-                    # elif button_rect_shop.collidepoint(mouse_pos):
-                    #     screen_mode = "shop"
                     elif button_rect_home_dance.collidepoint(mouse_pos):
                         screen_mode = "dance"
+                    elif button_rect_log_open.collidepoint(mouse_pos):
+                        screen_mode = "log"
                     elif button_rect_world.collidepoint(mouse_pos):
-                        mode = "exit"
-                        return num_coins, happiness, volume_on
+                        return num_coins, num_manicures, num_happiness, num_groomings, happiness, volume_on
 
                 elif screen_mode == "title":
                     if button_rect.collidepoint(event.pos):
                         curtain_opening = True
-
-                elif screen_mode == "nails":
-                    # Sets different click functions in the nail screen
-                    # # Navigates to the home screen
-                    if button_rect_home.collidepoint(mouse_pos):
-                        screen_mode = "home"
-                        nail_colors = [None for _ in nail_colors]
-                        nails_screen = original_nails_screen.copy()
-                    else:
-                        for i, nail_rect in enumerate(nail_areas):
-                            if nail_rect.collidepoint(mouse_pos):
-                                seed_x, seed_y = nail_rect.center
-                                flood_fill(nails_screen, seed_x, seed_y, paint_color)
-
-                                if nail_colors[i] is None:
-                                    nail_colors[i] = paint_color
-                                    # print(nail_colors)
-                                    if not nail_thank_you and all(c is not None for c in nail_colors[1:]):
-                                        nail_thank_you = True
-                                        happiness+=1
-                                        # num_coins += 5
-                                        # button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
-                                        thank_you_start_time = pygame.time.get_ticks()
-                                else:
-                                    nail_colors[i]=paint_color
-                            # Check if any color button was clicked
-                            for i, rect in enumerate(color_buttons):
-                                if rect.collidepoint(mouse_pos):
-                                    selected_color_index = i
-                                    paint_color = color_options[i]
-                    # Check reset button
-                    if button_reset.collidepoint(mouse_pos):
-                        nail_colors = [None for _ in nail_colors]
-                        nails_screen = original_nails_screen.copy()
-                        screen.blit(nails_screen, (0, 0))
 
                 elif screen_mode == "dinner":
                     #Sets the different click functions in the dinner screen
@@ -341,10 +337,53 @@ def run_salon_game(num_coins, happiness, bow, gem, backpack, labubu, HAPPINESS_M
                         dirt_splotches = generate_dirt_splotches()
                         broom_rect = broom_img.get_rect(topleft=(20, 300))
 
-            elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                elif screen_mode == "nails":
+                    # Sets different click functions in the nail screen
+                    # # Navigates to the home screen
+                    if button_rect_home.collidepoint(mouse_pos):
+                        screen_mode = "home"
+                        nail_colors = [None for _ in nail_colors]
+                        nails_screen = original_nails_screen.copy()
+                    else:
+                        for i, nail_rect in enumerate(nail_areas):
+                            if nail_rect.collidepoint(mouse_pos):
+                                seed_x, seed_y = nail_rect.center
+                                flood_fill(nails_screen, seed_x, seed_y, paint_color)
+
+                                if nail_colors[i] is None:
+                                    nail_colors[i] = paint_color
+                                    # print(nail_colors)
+                                    if not nail_thank_you and all(c is not None for c in nail_colors[1:]):
+                                        nail_thank_you = True
+                                        happiness+=1
+                                        num_happiness +=1
+                                        num_manicures +=1
+                                        thank_you_start_time = pygame.time.get_ticks()
+                                else:
+                                    nail_colors[i]=paint_color
+                            # Check if any color button was clicked
+                            for i, rect in enumerate(color_buttons):
+                                if rect.collidepoint(mouse_pos):
+                                    selected_color_index = i
+                                    paint_color = color_options[i]
+                    # Check reset button
+                    if button_reset.collidepoint(mouse_pos):
+                        nail_colors = [None for _ in nail_colors]
+                        nails_screen = original_nails_screen.copy()
+                        screen.blit(nails_screen, (0, 0))
+
+                elif screen_mode == "log":
+                    if button_rect_log_close.collidepoint(mouse_pos):
+                        screen_mode = "home"
+
+            elif event.type == pygame.MOUSEBUTTONUP and event.button ==1:
                 if screen_mode == "grooming":
                     erasing = False  # stop erasing on mouse up
                     dragging_broom = False
+
+                # if screen_mode == "home":
+                #     if button_rect_home_paint.collidepoint(mouse_pos):
+                #         screen_mode = "nails"
 
                 elif screen_mode == "dinner" and dragging_fish is not None:
                     # Eats a fish and shows the chewing screen
@@ -358,6 +397,7 @@ def run_salon_game(num_coins, happiness, bow, gem, backpack, labubu, HAPPINESS_M
                         show_thank_you = True
                         # num_coins += 5
                         happiness += 1
+                        num_happiness +=1
                         # button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
                         thank_you_start_time = pygame.time.get_ticks()
 
@@ -373,6 +413,8 @@ def run_salon_game(num_coins, happiness, bow, gem, backpack, labubu, HAPPINESS_M
                     if screen_mode == "grooming" and len(dirt_splotches) == 0 and not show_clean_message:
                         # num_coins += 5
                         happiness += 1
+                        num_happiness +=1
+                        num_groomings +=1
                         # button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
                         show_clean_message = True
                         clean_message_start_time = pygame.time.get_ticks()
@@ -410,10 +452,17 @@ def run_salon_game(num_coins, happiness, bow, gem, backpack, labubu, HAPPINESS_M
                         if (broom_center[0] - d["pos"][0]) ** 2 + (broom_center[1] - d["pos"][1]) ** 2 > d["radius"] ** 2
                     ]
 
+            elif event.type == pygame.KEYDOWN:
+                if screen_mode == "first open":
+                    screen_mode = "home"
+
         if screen_mode == "title" and curtain_opening:
             curtain_y -= curtain_speed
             if curtain_y + curtain_img.get_height() <= 0:
-                screen_mode = "home"
+                if salon_first_open:
+                    screen_mode = "first open"
+                else:
+                    screen_mode = "home"
                 curtain_opening = False
         # --- Draw sections ---
         if screen_mode == "home":
@@ -430,6 +479,8 @@ def run_salon_game(num_coins, happiness, bow, gem, backpack, labubu, HAPPINESS_M
             screen.blit(button_text_world, (button_rect_world.x, button_rect_world.y))
             pygame.draw.rect(screen, button_color, button_rect_home_dance, border_radius=12)
             screen.blit(button_text_dance, (button_rect_home_dance.x + 20, button_rect_home_dance.y + 10))
+            screen.blit(quest_log_open, (button_rect_log_open.x, button_rect_log_open.y))
+
             if giggle_triggered:
                 elapsed_since_giggle = (pygame.time.get_ticks() - giggle_start_time) / 1000
                 draw_happiness_meter(screen, happiness, HAPPINESS_MAX)
@@ -442,6 +493,7 @@ def run_salon_game(num_coins, happiness, bow, gem, backpack, labubu, HAPPINESS_M
                 else:
                     giggle_triggered = False  # reset after bubble disappears
                     happiness += 5
+                    num_happiness +=5
             #put volume button
             if volume_on == True:
                 screen.blit(volume_on_img, (button_volume.x, button_volume.y))
@@ -461,6 +513,66 @@ def run_salon_game(num_coins, happiness, bow, gem, backpack, labubu, HAPPINESS_M
             screen.blit(coin_img, (coin_button_home.x, coin_button_home.y))
             screen.blit(button_text_coin, (coin_button_home.x + 100, coin_button_home.y + 20))
 
+        elif screen_mode == "log":
+            screen.blit(background, (0, 0))
+
+            screen.blit(quest_log, (100, 100))
+
+            screen.blit(quest_log_close, (button_rect_log_close.x, button_rect_log_close.y))
+
+            quest1_text = font_small.render("Get 10 manicures", True, button_text_color)
+            if 10-num_manicures >= 0:
+                num1 = 10-num_manicures
+            else:
+                num1 = 0
+            quest_1_subtext = font_xsmall.render(f"{num1} remaining", True, button_text_color)
+
+            quest2_text = font_small.render("Gain 30 happiness", True, button_text_color)
+            if 30-num_happiness >= 0:
+                num2 = 30-num_happiness
+            else:
+                num2 = 0
+            quest_2_subtext = font_xsmall.render(f"{num2} remaining", True, button_text_color)
+
+            quest3_text = font_small.render("Get 15 groomings", True, button_text_color)
+            if 15-num_groomings >= 0:
+                num3 = 15-num_groomings
+            else:
+                num3 = 0
+            quest_3_subtext = font_xsmall.render(f"{num3} remaining", True, button_text_color)
+
+            quest_1_text_pos = (525, 225)
+            quest_2_text_pos = (525, 325)
+            quest_3_text_pos = (525, 425)
+
+            screen.blit(quest1_text, quest_1_text_pos)
+            screen.blit(quest_1_subtext, (quest_1_text_pos[0], quest_1_text_pos[1] + 25))
+
+            screen.blit(quest2_text, quest_2_text_pos)
+            screen.blit(quest_2_subtext, (quest_2_text_pos[0], quest_2_text_pos[1] + 25))
+
+            screen.blit(quest3_text, quest_3_text_pos)
+            screen.blit(quest_3_subtext, (quest_3_text_pos[0], quest_3_text_pos[1] + 25))
+
+            if quest1:
+                pygame.draw.line(screen, button_text_color, (quest_1_text_pos[0], quest_1_text_pos[1] + 15),
+                                 (quest_1_text_pos[0] + 200, quest_1_text_pos[1] + 15), 3)
+            if quest2:
+                pygame.draw.line(screen, button_text_color, (quest_2_text_pos[0], quest_2_text_pos[1] + 15),
+                                 (quest_2_text_pos[0] + 200, quest_2_text_pos[1] + 15), 3)
+            if quest3:
+                pygame.draw.line(screen, button_text_color, (quest_3_text_pos[0], quest_3_text_pos[1] + 15),
+                                 (quest_3_text_pos[0] + 200, quest_3_text_pos[1] + 15), 3)
+
+        elif screen_mode == "first open":
+            salon_first_open = False
+            screen.blit(background, (0,0))
+            screen.blit(prumpi_head, welcome_prumpi_pos)
+            screen.blit(welcome_bubble, welcome_bubble_pos)
+            screen.blit(welcome_text_1, (welcome_bubble_pos[0]+30, welcome_bubble_pos[1]+40))
+            screen.blit(welcome_text_2, (welcome_bubble_pos[0]+30, welcome_bubble_pos[1]+80))
+            screen.blit(welcome_text_3, (welcome_bubble_pos[0]+30, welcome_bubble_pos[1]+120))
+
         elif screen_mode == "title":
             # Draw background behind curtain (so it's already there as it pulls up)
             screen.blit(background, (0, 0))  # or use a solid color for stage
@@ -476,14 +588,11 @@ def run_salon_game(num_coins, happiness, bow, gem, backpack, labubu, HAPPINESS_M
 
         elif screen_mode == "nails":
             screen.blit(nails_screen, (0, 0))
-            # Show speech bubble if all fish eaten
-            current_time = pygame.time.get_ticks()
-
             screen.blit(coin_img, (coin_button_else.x, coin_button_else.y))
             screen.blit(button_text_coin, (coin_button_else.x + 100, coin_button_else.y + 20))
 
             draw_happiness_meter(screen, happiness, HAPPINESS_MAX)
-
+            current_time = pygame.time.get_ticks()
             if nail_thank_you and (current_time - thank_you_start_time < thank_you_duration):
                 # Bubble background
                 speech_pos = (300, 80)

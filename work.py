@@ -18,7 +18,7 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
     dino_title = pygame.image.load("data/image/prumpi_standing.png")
     title_image = pygame.image.load("data/image/gift_shop_title.png")
     work_background = pygame.image.load("data/image/work.png")
-    prumpi_work = pygame.image.load("data/image/prumpi_work.png")
+    prumpi_head = pygame.image.load("data/image/prumpi_work.png")
     speech_right = pygame.image.load("data/image/speech_bubble_right.png")
     quest_log = pygame.image.load("data/image/quest_log.png")
     quest_log_close = pygame.image.load("data/image/quest_log_closed.png")
@@ -47,7 +47,7 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
     work_background = pygame.transform.scale(work_background, (1000, 700))
     volume_on_img = pygame.transform.scale(volume_on_img, (60, 60))
     volume_off_img = pygame.transform.scale(volume_off_img, (60, 60))
-    prumpi_work = pygame.transform.scale(prumpi_work, (150, 150))
+    prumpi_work = pygame.transform.scale(prumpi_head, (150, 150))
     speech_right = pygame.transform.scale(speech_right, (500,100))
     speech_water = pygame.transform.scale(speech_right, (200,100))
     blush = pygame.transform.scale(blush, (200,100))
@@ -57,7 +57,7 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
     water_break = pygame.transform.scale(water_break, (1000,700))
     prumpi_water = pygame.transform.scale(prumpi_water, (300,400))
     prumpi_water = pygame.transform.flip(prumpi_water, True, False)
-    prumpi_head = pygame.transform.scale(prumpi_work, (400,400))
+    prumpi_head = pygame.transform.scale(prumpi_head, (400,400))
 
 
 
@@ -188,11 +188,11 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
     water_text_pos = (400,300)
 
     # Quest variables
-    if num_customers < 50:
+    if num_customers < 20:
         quest1 = False
     else:
         quest1 = True
-    if num_rows < 100:
+    if num_rows < 50:
         quest2 = False
     else:
         quest2 = True
@@ -470,15 +470,15 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
 
             screen.blit(quest_log_close, (button_rect_log_close.x, button_rect_log_close.y))
 
-            quest1_text = font_small.render("Serve 50 customers", True, button_text_color)
-            if 50-num_customers >= 0:
-                num1 = 50-num_customers
+            quest1_text = font_small.render("Serve 20 customers", True, button_text_color)
+            if 20-num_customers >= 0:
+                num1 = 20-num_customers
             else:
                 num1 = 0
             quest_1_subtext = font_xsmall.render(f"{num1} remaining", True, button_text_color)
-            quest2_text = font_small.render("Stack 100 rows of boxes", True, button_text_color)
-            if 100-num_rows >= 0:
-                num2 = int(100-num_rows)
+            quest2_text = font_small.render("Stack 50 rows of boxes", True, button_text_color)
+            if 50-num_rows >= 0:
+                num2 = int(50-num_rows)
             else:
                 num2 = 0
             quest_2_subtext = font_xsmall.render(f"{num2} remaining", True, button_text_color)

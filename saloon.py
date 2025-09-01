@@ -384,10 +384,6 @@ def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backp
                             # Print that you need more coins for that...
                             None
 
-                elif screen_mode == "log":
-                    if button_rect_log_close.collidepoint(mouse_pos):
-                        screen_mode = "work"
-
 
             elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 if screen_mode == "alley":
@@ -684,12 +680,25 @@ def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backp
 
             quest1_text_1 = font_small.render("Make 0 mistakes while", True, button_text_color)
             quest1_text_2 = font_small.render("singing 5 times", True, button_text_color)
+            if 5-num_aces >= 0:
+                num1 = 5-num_aces
+            else:
+                num1 = 0
+            quest_1_subtext = font_xsmall.render(f"{num1} remaining", True, button_text_color)
 
-            quest_1_subtext = font_xsmall.render(f"{5 - num_aces} remaining", True, button_text_color)
             quest2_text = font_small.render("Take 50 selfies", True, button_text_color)
-            quest_2_subtext = font_xsmall.render(f"{int(50 - num_selfies)} remaining", True, button_text_color)
+            if 50-num_selfies >= 0:
+                num2 = 50-num_selfies
+            else:
+                num2 = 0
+            quest_2_subtext = font_xsmall.render(f"{num2} remaining", True, button_text_color)
+
             quest3_text = font_small.render("Drink 50 beers", True, button_text_color)
-            quest_3_subtext = font_xsmall.render(f"{50 - num_beers} beers remaining", True, button_text_color)
+            if 50-num_beers >= 0:
+                num3 = 50-num_beers
+            else:
+                num3 = 0
+            quest_3_subtext = font_xsmall.render(f"{num3} beers remaining", True, button_text_color)
 
             quest_1_text_pos = (525, 225)
             quest_2_text_pos = (525, 325)
