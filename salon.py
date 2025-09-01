@@ -243,26 +243,26 @@ def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happi
     clean_message_start_time = 0
     clean_message_duration = 2000  #ms
 
-    # Quest variables
-    if num_manicures < 10:
-        quest1 = False
-    else:
-        quest1 = True
-    if num_happiness < 30:
-        quest2 = False
-    else:
-        quest2 = True
-    if num_groomings < 15:
-        quest3 = False
-    else:
-        quest3 = True
-
     ignore_clicks = False
     # Game loop
     running = True
     while running:
         screen.fill((255, 255, 255))
         mouse_pos = pygame.mouse.get_pos()
+
+        # Quest variables
+        if num_manicures < 10:
+            quest1 = False
+        else:
+            quest1 = True
+        if num_happiness < 30:
+            quest2 = False
+        else:
+            quest2 = True
+        if num_groomings < 15:
+            quest3 = False
+        else:
+            quest3 = True
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

@@ -247,20 +247,6 @@ def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backp
         if liquid_height > 0:
             pygame.draw.rect(screen, BROWN, (x + 2, y + (40 - liquid_height), 16, liquid_height))
 
-    # Quest variables
-    if num_aces < 5:
-        quest1 = False
-    else:
-        quest1 = True
-    if num_selfies < 50:
-        quest2 = False
-    else:
-        quest2 = True
-    if num_beers < 50:
-        quest3 = False
-    else:
-        quest3 = True
-
     # --- Music ---
     def draw_volume(volume_on):
         if volume_on == True:
@@ -275,6 +261,20 @@ def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backp
     pygame.mixer.music.play(-1)
     while running:
         mouse_pos = pygame.mouse.get_pos()
+
+        # Quest variables
+        if num_aces < 5:
+            quest1 = False
+        else:
+            quest1 = True
+        if num_selfies < 50:
+            quest2 = False
+        else:
+            quest2 = True
+        if num_beers < 50:
+            quest3 = False
+        else:
+            quest3 = True
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

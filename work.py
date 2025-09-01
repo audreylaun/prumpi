@@ -187,24 +187,24 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
     water_text = font.render("Ahhhhhh", True, (0,0,0))
     water_text_pos = (400,300)
 
-    # Quest variables
-    if num_customers < 20:
-        quest1 = False
-    else:
-        quest1 = True
-    if num_rows < 50:
-        quest2 = False
-    else:
-        quest2 = True
-    if hydration < 15:
-        quest3 = False
-    else:
-        quest3 = True
-
     running = True
     while running:
         screen.fill((255, 255, 255))
         mouse_pos = pygame.mouse.get_pos()
+
+        # Quest variables
+        if num_customers < 20:
+            quest1 = False
+        else:
+            quest1 = True
+        if num_rows < 50:
+            quest2 = False
+        else:
+            quest2 = True
+        if hydration < 15:
+            quest3 = False
+        else:
+            quest3 = True
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
