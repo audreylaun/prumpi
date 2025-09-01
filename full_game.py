@@ -27,7 +27,7 @@ pygame.init()
 screen = pygame.display.set_mode((1000, 700))
 pygame.display.set_caption("Prumpi World")
 clock = pygame.time.Clock()
-num_coins = 0
+num_coins = 1000
 # Accessories
 bow = False
 gem = False
@@ -145,7 +145,7 @@ while running:
                             saloon_first_open = False
                         button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
                 if button_rect_shop.collidepoint(mouse_pos):
-                    num_coins, num_manicures, num_happiness, num_groomings, happiness, bow, gem, backpack, labubu, volume_on = run_store(num_coins, happiness, bow, gem, backpack, labubu, HAPPINESS_MAX, volume_on)
+                    num_coins, happiness, bow, gem, backpack, labubu, volume_on = run_store(num_coins, happiness, bow, gem, backpack, labubu, HAPPINESS_MAX, volume_on)
                     button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
                 elif button_volume.collidepoint(mouse_pos):
                     if volume_on == True:
