@@ -1,7 +1,7 @@
 import pygame
 from happiness import draw_happiness_meter
 
-def run_store(num_coins, happiness, bow, gem, backpack, labubu, HAPPINESS_MAX, volume_on):
+def run_store(num_coins, happiness, bow, gem, backpack, hat, labubu, HAPPINESS_MAX, volume_on):
     pygame.init()
     screen = pygame.display.set_mode((1000, 700))
     pygame.display.set_caption("Dino Shop")
@@ -19,9 +19,9 @@ def run_store(num_coins, happiness, bow, gem, backpack, labubu, HAPPINESS_MAX, v
     prumpi_backpack = pygame.image.load("data/image/prumpi_backpack.png")
     labubu_img = pygame.image.load("data/image/labubu.png")
     lock = pygame.image.load("data/image/lock.png")
+    hat_img = pygame.image.load("data/image/hat.png")
 
     #resize pictures
-    prumpi_backpack = pygame.transform.scale(prumpi_backpack, (300, 400))
     coin_img = pygame.transform.scale(coin_img, (80, 80))
     shop_screen = pygame.transform.scale(shop_screen, (1000, 700))
     check = pygame.transform.scale(check, (50, 50))
@@ -48,30 +48,29 @@ def run_store(num_coins, happiness, bow, gem, backpack, labubu, HAPPINESS_MAX, v
     # Shop
     # bow = False
     item_1_rect = pygame.Rect(200, 125, 100, 100)
-    item_1_text = font.render('30¢', True, button_text_color)
+    item_1_text = font.render('100¢', True, button_text_color)
 
     # gem = False
     item_2_rect = pygame.Rect(400, 125, 100, 100)
-    item_2_text = font.render('50¢', True, button_text_color)
+    item_2_text = font.render('300¢', True, button_text_color)
 
     # backpack = False
     item_3_rect = pygame.Rect(600, 125, 100, 100)
-    item_3_text = font.render('100¢', True, button_text_color)
+    item_3_text = font.render('500¢', True, button_text_color)
 
     item_4_rect = pygame.Rect(200, 275, 100, 100)
-    item_4_text = font.render('150¢', True, button_text_color)
+    item_4_text = font.render('750¢', True, button_text_color)
 
     item_5_rect = pygame.Rect(400, 275, 100, 100)
     item_5_text = font.render('150¢', True, button_text_color)
 
     item_6_rect = pygame.Rect(600, 275, 100, 100)
-    item_6_text = font.render('150¢', True, button_text_color)
+    item_6_text = font.render('1000¢', True, button_text_color)
 
     screen_mode = "home"
 
     running = True
     while running:
-        # screen.fill((255, 255, 255))
         mouse_pos = pygame.mouse.get_pos()
 
         for event in pygame.event.get():
@@ -81,7 +80,7 @@ def run_store(num_coins, happiness, bow, gem, backpack, labubu, HAPPINESS_MAX, v
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if screen_mode == "home":
                     if button_rect_world.collidepoint(mouse_pos):
-                        return num_coins, happiness, bow, gem, backpack, labubu, volume_on
+                        return num_coins, happiness, bow, gem, backpack, hat,labubu, volume_on
                     elif button_volume.collidepoint(mouse_pos):
                         if volume_on == True:
                             pygame.mixer.music.set_volume(0)
@@ -89,24 +88,29 @@ def run_store(num_coins, happiness, bow, gem, backpack, labubu, HAPPINESS_MAX, v
                         elif volume_on == False:
                             pygame.mixer.music.set_volume(0.5)
                             volume_on = True
-                    if item_1_rect.collidepoint(mouse_pos) and num_coins >= 30 and bow==False:
+                    if item_1_rect.collidepoint(mouse_pos) and num_coins >= 100 and bow==False:
                         bow=True
-                        num_coins-=30
+                        num_coins-=100
                         happiness +=1
                         button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
-                    if item_2_rect.collidepoint(mouse_pos) and num_coins >= 50 and gem==False:
+                    if item_2_rect.collidepoint(mouse_pos) and num_coins >= 300 and gem==False:
                         gem=True
-                        num_coins-=50
+                        num_coins-=300
                         happiness += 2
                         button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
-                    if item_3_rect.collidepoint(mouse_pos) and num_coins >= 100 and backpack==False:
+                    if item_3_rect.collidepoint(mouse_pos) and num_coins >= 500 and backpack==False:
                         backpack=True
-                        num_coins-=100
+                        num_coins-=500
                         happiness +=3
                         button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
-                    if item_6_rect.collidepoint(mouse_pos) and num_coins >= 150 and backpack:
+                    if item_4_rect.collidepoint(mouse_pos) and num_coins >= 750 and hat==False:
+                        hat=True
+                        num_coins-=750
+                        happiness +=3
+                        button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
+                    if item_6_rect.collidepoint(mouse_pos) and num_coins >= 1000 and backpack:
                         labubu=True
-                        num_coins-=150
+                        num_coins-=1000
                         happiness +=6
                         button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
 
@@ -136,6 +140,13 @@ def run_store(num_coins, happiness, bow, gem, backpack, labubu, HAPPINESS_MAX, v
                 screen.blit(item_2_text, (item_2_rect.x + 20, item_2_rect.y + 80))
             if gem == True:
                 screen.blit(check, (item_2_rect.x + 30, item_2_rect.y + 30))
+
+            hat_img = pygame.transform.scale(hat_img, (100,100))
+            screen.blit(hat_img, (item_4_rect.x, item_4_rect.y))
+            if hat == False:
+                screen.blit(item_4_text, (item_4_rect.x + 20, item_4_rect.y+ 80))
+            if hat == True:
+                screen.blit(check, (item_4_rect.x + 30, item_4_rect.y + 30))
 
             labubu_img = pygame.transform.scale(labubu_img, (100,100))
             screen.blit(labubu_img, (item_6_rect.x, item_6_rect.y))

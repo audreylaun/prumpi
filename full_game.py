@@ -32,6 +32,7 @@ num_coins = 0
 bow = False
 gem = False
 backpack = False
+hat = False
 labubu = False
 
 # ---Quests---
@@ -134,18 +135,18 @@ while running:
                     button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
                 if work_complete:
                     if button_rect_salon.collidepoint(mouse_pos):
-                        num_coins, num_manicures, num_happiness, num_groomings, happiness, volume_on = run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happiness, bow, gem, backpack, labubu, HAPPINESS_MAX, volume_on, salon_first_open)
+                        num_coins, num_manicures, num_happiness, num_groomings, happiness, volume_on = run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happiness, bow, gem, backpack, hat, labubu, HAPPINESS_MAX, volume_on, salon_first_open)
                         if salon_first_open:
                             salon_first_open = False
                         button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
                 if salon_complete:
                     if button_rect_saloon.collidepoint(mouse_pos):
-                        num_coins, num_aces, num_selfies, num_beers, happiness, volume_on = run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backpack, labubu, happiness, HAPPINESS_MAX, volume_on, saloon_first_open)
+                        num_coins, num_aces, num_selfies, num_beers, happiness, volume_on = run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backpack, hat, labubu, happiness, HAPPINESS_MAX, volume_on, saloon_first_open)
                         if saloon_first_open:
                             saloon_first_open = False
                         button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
                 if button_rect_shop.collidepoint(mouse_pos):
-                    num_coins, happiness, bow, gem, backpack, labubu, volume_on = run_store(num_coins, happiness, bow, gem, backpack, labubu, HAPPINESS_MAX, volume_on)
+                    num_coins, happiness, bow, gem, backpack, hat, labubu, volume_on = run_store(num_coins, happiness, bow, gem, backpack, hat, labubu, HAPPINESS_MAX, volume_on)
                     button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
                 elif button_volume.collidepoint(mouse_pos):
                     if volume_on == True:

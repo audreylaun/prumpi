@@ -3,7 +3,7 @@ from happiness import draw_happiness_meter, happiness_minigame
 from box_minigame import run_tetris_minigame
 import random
 
-def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backpack, labubu, happiness, HAPPINESS_MAX, volume_on, work_first_open):
+def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backpack,labubu, happiness, HAPPINESS_MAX, volume_on, work_first_open):
     pygame.init()
     screen = pygame.display.set_mode((1000, 700))
     pygame.display.set_caption("Dino Work")

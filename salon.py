@@ -50,7 +50,7 @@ def flood_fill(surface, x, y, fill_color):
                 q.extend([(cx+1, cy), (cx-1, cy), (cx, cy+1), (cx, cy-1)])
 
 
-def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happiness, bow, gem, backpack, labubu, HAPPINESS_MAX, volume_on, salon_first_open):
+def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happiness, bow, gem, backpack, hat, labubu, HAPPINESS_MAX, volume_on, salon_first_open):
     # --- Initialize Game ---
     pygame.init()
     screen = pygame.display.set_mode((1000, 700))
@@ -87,6 +87,7 @@ def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happi
     quest_log = pygame.image.load("data/image/quest_log.png")
     quest_log_close = pygame.image.load("data/image/quest_log_closed.png")
     prumpi_head = pygame.image.load("data/image/prumpi_work.png")
+    hat_img = pygame.image.load("data/image/hat.png")
 
 
 
@@ -111,6 +112,7 @@ def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happi
     quest_log_close = pygame.transform.scale(quest_log_close, (50, 75))
     prumpi_head = pygame.transform.scale(prumpi_head, (400,400))
     speech_bubble = pygame.transform.scale(speech_right, (300,150))
+    hat_img = pygame.transform.scale(hat_img, (130,100))
 
 
 
@@ -381,10 +383,6 @@ def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happi
                     erasing = False  # stop erasing on mouse up
                     dragging_broom = False
 
-                # if screen_mode == "home":
-                #     if button_rect_home_paint.collidepoint(mouse_pos):
-                #         screen_mode = "nails"
-
                 elif screen_mode == "dinner" and dragging_fish is not None:
                     # Eats a fish and shows the chewing screen
                     if mouth_rect.collidepoint(fish_rects[dragging_fish].center):
@@ -510,6 +508,8 @@ def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happi
             if gem:
                 gem_img = pygame.transform.scale(gem_img, (10,10))
                 screen.blit(gem_img, (397,274))
+            if hat:
+                screen.blit(hat_img, (dino_pos[0]+60, dino_pos[1]+15))
             screen.blit(coin_img, (coin_button_home.x, coin_button_home.y))
             screen.blit(button_text_coin, (coin_button_home.x + 100, coin_button_home.y + 20))
 

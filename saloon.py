@@ -34,7 +34,7 @@ def tallies(beer_count):
 
     return tally_string
 
-def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backpack, labubu, happiness, HAPPINESS_MAX, volume_on, saloon_first_open):
+def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backpack, hat,labubu, happiness, HAPPINESS_MAX, volume_on, saloon_first_open):
     pygame.init()
     screen = pygame.display.set_mode((1000, 700))
     pygame.display.set_caption("Dino Rugged Saloon")
@@ -79,6 +79,7 @@ def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backp
     quest_log = pygame.image.load("data/image/quest_log.png")
     quest_log_close = pygame.image.load("data/image/quest_log_closed.png")
     prumpi_head = pygame.image.load("data/image/prumpi_work.png")
+    hat_img = pygame.image.load("data/image/hat.png")
 
 
 
@@ -110,6 +111,7 @@ def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backp
     quest_log_open = pygame.transform.scale(quest_log, (75, 75))
     quest_log_close = pygame.transform.scale(quest_log_close, (50, 75))
     prumpi_head = pygame.transform.scale(prumpi_head, (400,400))
+    hat_img = pygame.transform.scale(hat_img, (130,100))
 
 
     # --- Create buttons ---
@@ -472,6 +474,8 @@ def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backp
             if gem:
                 gem_img = pygame.transform.scale(gem_img, (10,10))
                 screen.blit(gem_img, (397,274))
+            if hat:
+                screen.blit(hat_img, (dino_pos_alley[0] + 60, dino_pos_alley[1] + 15))
             if num_coins < 15:
                 this_button_color = (180, 170, 140)
             else:
@@ -628,7 +632,8 @@ def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backp
             if gem:
                 gem_img = pygame.transform.scale(gem_img, (10,10))
                 screen.blit(gem_img, (722,314))
-
+            if hat:
+                screen.blit(hat_img, (dino_pos[0]+60, dino_pos[1]+15))
             if drink_active and drink_pos:
                 draw_drink(drink_pos[0], drink_pos[1], liquid_height)
 
