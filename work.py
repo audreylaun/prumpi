@@ -222,8 +222,16 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
             "Dinosaur plushie shipment arrived",
             "Weekly sales report",
             "Gift shop inventory update",
-            "Special discount on mugs",
-            "Meeting at 3PM"
+            "Will I see you at the saloon tonight?",
+            "Hvenær ertu í heimsókn???",
+            "10% manicures at the salon, today only!",
+            "Beautiful Ukranian women near you",
+            "Ugandan prince seeking marriage",
+            "Rave með Björk-þema í kvöld",
+            "Mamma mamma mamma",
+            "Your Splajompy one time login code:",
+            "Your tracked flight to Iceland...",
+            "Your LA mamma misses you!"
         ]
         subject = random.choice(subjects)
         emails.insert(0, Email(subject))
