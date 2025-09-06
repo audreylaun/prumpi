@@ -2,6 +2,7 @@ import pygame
 from happiness import draw_happiness_meter, happiness_minigame
 from box_minigame import run_tetris_minigame
 import random
+import time
 
 def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backpack,labubu, happiness, HAPPINESS_MAX, volume_on, work_first_open):
     pygame.init()
@@ -24,6 +25,7 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
     quest_log_close = pygame.image.load("data/image/quest_log_closed.png")
     water_break = pygame.image.load("data/image/water_break.png")
     prumpi_water = pygame.image.load("data/image/prumpi_standing.png")
+    computer_background = pygame.image.load("data/image/computer.png")
 
     #Customers
     penguin_front = pygame.image.load("data/image/penguin_front.png")
@@ -58,6 +60,7 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
     prumpi_water = pygame.transform.scale(prumpi_water, (300,400))
     prumpi_water = pygame.transform.flip(prumpi_water, True, False)
     prumpi_head = pygame.transform.scale(prumpi_head, (400,400))
+    computer_background = pygame.transform.scale(computer_background, (1000,700))
 
 
 
@@ -88,6 +91,9 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
 
     button_rect_water = pygame.Rect(750, 90, 200, 60)
     button_text_water = font.render("Get Water", True, button_text_color)
+
+    button_rect_computer = pygame.Rect(750, 160, 200, 60)
+    button_text_computer = font.render("Check Email", True, button_text_color)
 
     button_rect_world = pygame.Rect(50, 20, 275, 50)
     button_text_world = font.render('Return to World', True, button_text_color)
@@ -187,6 +193,77 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
     water_text = font.render("Ahhhhhh", True, (0,0,0))
     water_text_pos = (400,300)
 
+    #EMAIL STUFF
+    FONT = pygame.font.SysFont("arial", 24)
+
+    # Colors
+    EMAIL_COLOR = (255, 255, 255)
+    READ_COLOR = (200, 200, 200)
+    TEXT_COLOR = (0, 0, 0)
+    CHECKBOX_COLOR = (180, 180, 180)
+    GREEN = (50, 200, 50)
+
+    # Define monitor screen area (adjust these numbers!)
+    monitor_rect = pygame.Rect(275, 115, 450, 250)
+
+    # Inbox setup
+    emails = []
+    next_email_time = time.time() + random.randint(5, 10)
+
+    class Email:
+        def __init__(self, subject):
+            self.subject = subject
+            self.read = False
+            self.rect = None
+            self.checkbox_rect = None
+
+    def add_email():
+        subjects = [
+            "Dinosaur plushie shipment arrived",
+            "Weekly sales report",
+            "Gift shop inventory update",
+            "Special discount on mugs",
+            "Meeting at 3PM"
+        ]
+        subject = random.choice(subjects)
+        emails.insert(0, Email(subject))
+
+    def draw_inbox():
+        # Draw computer first
+        screen.blit(computer_background, (0, 0))
+
+        # Draw inbox only inside the monitor area
+        inbox_surface = pygame.Surface(monitor_rect.size)
+        inbox_surface.fill((156, 219, 218))  # pale background
+
+        # Draw unread counter
+        unread_count = sum(1 for e in emails if not e.read)
+        counter_text = FONT.render(f"Dino Mail Unread Messages: {unread_count}", True, TEXT_COLOR)
+        inbox_surface.blit(counter_text, (20, 10))
+
+        # Draw emails
+        y = 50
+        for email in emails[:6]:  # fit 6 per screen
+            color = READ_COLOR if email.read else EMAIL_COLOR
+            email.rect = pygame.Rect(20, y, 520, 50)
+            pygame.draw.rect(inbox_surface, color, email.rect, border_radius=8)
+
+            # Checkbox
+            email.checkbox_rect = pygame.Rect(25, y + 10, 30, 30)
+            pygame.draw.rect(inbox_surface, CHECKBOX_COLOR, email.checkbox_rect, border_radius=5)
+            if email.read:
+                pygame.draw.line(inbox_surface, GREEN, (30, y + 25), (45, y + 35), 3)
+                pygame.draw.line(inbox_surface, GREEN, (45, y + 35), (60, y + 15), 3)
+
+            # Subject
+            text = FONT.render(email.subject, True, TEXT_COLOR)
+            inbox_surface.blit(text, (70, y + 12))
+
+            y += 60
+
+        # Blit inbox onto monitor
+        screen.blit(inbox_surface, monitor_rect.topleft)
+
     running = True
     while running:
         screen.fill((255, 255, 255))
@@ -231,6 +308,8 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
                         screen_mode = "log"
                     if button_rect_water.collidepoint(mouse_pos):
                         screen_mode = "water"
+                    if button_rect_computer.collidepoint(mouse_pos):
+                        screen_mode = "computer"
                     if request:
                         for color, img, rect in backpacks:
                             if rect.collidepoint(mouse_pos):
@@ -246,6 +325,15 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
                 if screen_mode == "log":
                     if button_rect_log_close.collidepoint(mouse_pos):
                         screen_mode = "work"
+                if screen_mode == "computer":
+                    if button_rect_home.collidepoint(mouse_pos):
+                        screen_mode = "work"
+                    if monitor_rect.collidepoint(mouse_pos):
+                        local_pos = (mouse_pos[0] - monitor_rect.x, mouse_pos[1] - monitor_rect.y)
+                        for email in emails:
+                            if email.checkbox_rect and email.checkbox_rect.collidepoint(local_pos):
+                                email.read = True
+                                happiness +=1
 
             elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 if screen_mode == "work":
@@ -278,6 +366,11 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
             elif event.type == pygame.KEYDOWN:
                 if screen_mode == "first open":
                     screen_mode = "work"
+        if screen_mode == "computer":
+            now = time.time()
+            if now >= next_email_time:
+                add_email()
+                next_email_time = now + random.randint(5, 10)
 
         if screen_mode == "title" and title_sequence:
             # move dinosaur toward door
@@ -387,6 +480,9 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
             pygame.draw.rect(screen, button_color, button_rect_water, border_radius=12)
             screen.blit(button_text_water, (button_rect_water.x, button_rect_water.y))
 
+            pygame.draw.rect(screen, button_color, button_rect_computer, border_radius=12)
+            screen.blit(button_text_computer, (button_rect_computer.x, button_rect_computer.y))
+
             screen.blit(backpack_1, (backpack_1_rect.x, backpack_1_rect.y))
             screen.blit(backpack_2, (backpack_2_rect.x, backpack_2_rect.y))
             screen.blit(backpack_3, (backpack_3_rect.x, backpack_3_rect.y))
@@ -455,10 +551,21 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
                 else:
                     water_text_display=False
 
+            pygame.draw.rect(screen, button_color, button_rect_home, border_radius=12)
+            screen.blit(button_text_home, (button_rect_home.x + 10, button_rect_home.y + 5))
 
+        elif screen_mode == "computer":
+            draw_inbox()
 
+            if volume_on == True:
+                screen.blit(volume_on_img, (button_volume.x, button_volume.y))
+            elif volume_on == False:
+                screen.blit(volume_off_img, (button_volume.x, button_volume.y))
 
+            draw_happiness_meter(screen, happiness, HAPPINESS_MAX)
 
+            screen.blit(coin_img, (coin_button_home.x, coin_button_home.y))
+            screen.blit(button_text_coin, (coin_button_home.x + 100, coin_button_home.y + 20))
 
             pygame.draw.rect(screen, button_color, button_rect_home, border_radius=12)
             screen.blit(button_text_home, (button_rect_home.x + 10, button_rect_home.y + 5))
