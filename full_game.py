@@ -38,19 +38,19 @@ labubu = False
 
 # ---Quests---
 # Saloon
-saloon_complete = True
+saloon_complete = False
 saloon_first_open = True
 num_aces = 0
 num_selfies = 0
 num_beers = 0
 # Work
-work_complete=True
+work_complete=False
 work_first_open=True
 num_customers = 0
 num_rows = 0
 hydration = 0
 # Salon
-salon_complete = True
+salon_complete = False
 salon_first_open = True
 num_manicures = 0
 num_happiness = 0
