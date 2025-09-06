@@ -34,7 +34,7 @@ def tallies(beer_count):
 
     return tally_string
 
-def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backpack, hat,labubu, happiness, HAPPINESS_MAX, volume_on, saloon_first_open):
+def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backpack, hat, heels, labubu, happiness, HAPPINESS_MAX, volume_on, saloon_first_open):
     pygame.init()
     screen = pygame.display.set_mode((1000, 700))
     pygame.display.set_caption("Dino Rugged Saloon")
@@ -80,6 +80,7 @@ def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backp
     quest_log_close = pygame.image.load("data/image/quest_log_closed.png")
     prumpi_head = pygame.image.load("data/image/prumpi_work.png")
     hat_img = pygame.image.load("data/image/hat.png")
+    heel_img = pygame.image.load("data/image/heel.png")
 
 
 
@@ -112,6 +113,7 @@ def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backp
     quest_log_close = pygame.transform.scale(quest_log_close, (50, 75))
     prumpi_head = pygame.transform.scale(prumpi_head, (400,400))
     hat_img = pygame.transform.scale(hat_img, (130,100))
+    heel_img = pygame.transform.scale(heel_img, (150,150))
 
 
     # --- Create buttons ---
@@ -381,6 +383,7 @@ def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backp
                             show_fiend = False  # Also hide "another one" bubble if shown
                             fiend_start_time = None
                             num_coins -= 15
+                            happiness += 1
                             button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
                         else:
                             # Print that you need more coins for that...
@@ -460,6 +463,7 @@ def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backp
                 pygame.mixer.music.play(-1)
                 current_music = "alley"
             screen.blit(alley_screen, (0, 0))
+            draw_happiness_meter(screen, happiness, HAPPINESS_MAX)
             pygame.draw.rect(screen, button_color, button_rect_home, border_radius=12)
             screen.blit(button_text_home, (button_rect_home.x + 10, button_rect_home.y + 5))
             screen.blit(dino, dino_pos_alley)
@@ -476,6 +480,9 @@ def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backp
                 screen.blit(gem_img, (397,274))
             if hat:
                 screen.blit(hat_img, (dino_pos_alley[0] + 60, dino_pos_alley[1] + 15))
+            if heels:
+                screen.blit(heel_img, (dino_pos_alley[0]-50, dino_pos_alley[1]+215))
+                screen.blit(heel_img, (dino_pos_alley[0]+65, dino_pos_alley[1]+230))
             if num_coins < 15:
                 this_button_color = (180, 170, 140)
             else:
@@ -634,6 +641,9 @@ def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backp
                 screen.blit(gem_img, (722,314))
             if hat:
                 screen.blit(hat_img, (dino_pos[0]+60, dino_pos[1]+15))
+            if heels:
+                screen.blit(heel_img, (dino_pos[0]-50, dino_pos[1]+215))
+                screen.blit(heel_img, (dino_pos[0]+65, dino_pos[1]+230))
             if drink_active and drink_pos:
                 draw_drink(drink_pos[0], drink_pos[1], liquid_height)
 

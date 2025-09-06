@@ -50,7 +50,7 @@ def flood_fill(surface, x, y, fill_color):
                 q.extend([(cx+1, cy), (cx-1, cy), (cx, cy+1), (cx, cy-1)])
 
 
-def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happiness, bow, gem, backpack, hat, labubu, HAPPINESS_MAX, volume_on, salon_first_open):
+def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happiness, bow, gem, backpack, hat, heels,labubu, HAPPINESS_MAX, volume_on, salon_first_open):
     # --- Initialize Game ---
     pygame.init()
     screen = pygame.display.set_mode((1000, 700))
@@ -88,6 +88,7 @@ def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happi
     quest_log_close = pygame.image.load("data/image/quest_log_closed.png")
     prumpi_head = pygame.image.load("data/image/prumpi_work.png")
     hat_img = pygame.image.load("data/image/hat.png")
+    heel_img = pygame.image.load("data/image/heel.png")
 
 
 
@@ -113,6 +114,7 @@ def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happi
     prumpi_head = pygame.transform.scale(prumpi_head, (400,400))
     speech_bubble = pygame.transform.scale(speech_right, (300,150))
     hat_img = pygame.transform.scale(hat_img, (130,100))
+    heel_img = pygame.transform.scale(heel_img, (150,150))
 
 
 
@@ -510,6 +512,9 @@ def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happi
                 screen.blit(gem_img, (397,274))
             if hat:
                 screen.blit(hat_img, (dino_pos[0]+60, dino_pos[1]+15))
+            if heels:
+                screen.blit(heel_img, (dino_pos[0]-50, dino_pos[1]+215))
+                screen.blit(heel_img, (dino_pos[0]+65, dino_pos[1]+230))
             screen.blit(coin_img, (coin_button_home.x, coin_button_home.y))
             screen.blit(button_text_coin, (coin_button_home.x + 100, coin_button_home.y + 20))
 
