@@ -759,7 +759,7 @@ def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backp
             shrink_fraction = min((total_shrink_time + current_hold) / 7500, 1)  # 7.5 seconds to fully shrink
             cylinder_width = max(cylinder_max_width * (1 - shrink_fraction), 0)
 
-        if happiness == HAPPINESS_MAX:
+        if happiness >= HAPPINESS_MAX:
             happiness=0
             coins_added = happiness_minigame()
             num_coins += coins_added

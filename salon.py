@@ -729,7 +729,7 @@ def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happi
                 screen_mode = "home"  # or whatever you call your home screen
 
 
-        if happiness == HAPPINESS_MAX:
+        if happiness >= HAPPINESS_MAX:
             happiness=0
             coins_added = happiness_minigame()
             num_coins += coins_added

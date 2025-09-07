@@ -1,5 +1,5 @@
 import pygame
-from happiness import draw_happiness_meter
+from happiness import draw_happiness_meter, happiness_minigame
 
 def run_store(num_coins, happiness, bow, gem, backpack, hat, heels, labubu, HAPPINESS_MAX, volume_on):
     pygame.init()
@@ -179,5 +179,11 @@ def run_store(num_coins, happiness, bow, gem, backpack, hat, heels, labubu, HAPP
 
             screen.blit(coin_img, (coin_button_home.x, coin_button_home.y))
             screen.blit(button_text_coin, (coin_button_home.x + 100, coin_button_home.y + 20))
+            
+        if happiness >= HAPPINESS_MAX:
+            happiness=0
+            coins_added = happiness_minigame()
+            num_coins += coins_added
+            button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
 
         pygame.display.flip()

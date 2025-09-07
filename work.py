@@ -630,7 +630,7 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
             if quest3:
                 pygame.draw.line(screen, button_text_color, (quest_3_text_pos[0], quest_3_text_pos[1]+15), (quest_3_text_pos[0]+200, quest_3_text_pos[1]+15),3)
 
-        if happiness == HAPPINESS_MAX:
+        if happiness >= HAPPINESS_MAX:
             happiness=0
             coins_added = happiness_minigame()
             num_coins += coins_added
