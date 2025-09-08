@@ -41,6 +41,8 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
     sloth_back = pygame.image.load("data/image/sloth_back.png")
     bear_front = pygame.image.load("data/image/bear_front.png")
     bear_back = pygame.image.load("data/image/bear_back.png")
+    cow_front = pygame.image.load("data/image/cow_front.png")
+    cow_back = pygame.image.load("data/image/cow_back.png")
 
 
     # --- Resize ---
@@ -79,6 +81,8 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
     sloth_back = pygame.transform.scale(sloth_back, (200,300))
     bear_front = pygame.transform.scale(bear_front, (200,300))
     bear_back = pygame.transform.scale(bear_back, (275,300))
+    cow_front = pygame.transform.scale(cow_front, (200,300))
+    cow_back = pygame.transform.scale(cow_back, (200,300))
 
 
     # --- Buttons ---
@@ -175,13 +179,14 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
 
     customer_interval = 15000
     last_customer_time = 0
-    customer_list  = ["sundae", "polly", "penguin", "boyfriend", "sloth","bear"]
+    customer_list  = ["sundae", "polly", "penguin", "boyfriend", "sloth","bear","cow"]
     customers = {"sundae": [sundae_front, sundae_back],
                  "polly": [polly_front, polly_back],
                  "penguin": [penguin_front, penguin_back],
                  "boyfriend": [boyfriend_front, boyfriend_back],
                  "sloth": [sloth_front, sloth_back],
-                 "bear": [bear_front, bear_back],}
+                 "bear": [bear_front, bear_back],
+                 "cow": [cow_front, cow_back],}
 
     # Water variables
     liquid_height = 0
