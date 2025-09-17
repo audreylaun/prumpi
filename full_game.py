@@ -29,29 +29,34 @@ pygame.display.set_caption("Prumpi World")
 clock = pygame.time.Clock()
 num_coins = 0
 # Accessories
-bow = False
-gem = False
+bow = True
+gem = True
 backpack = False
-hat = False
+hat = True
 heels = False
-labubu = False
+labubu = True
 
 # ---Quests---
 # Saloon
 saloon_complete = False
 saloon_first_open = True
+saloon_first_complete = True
 num_aces = 0
 num_selfies = 0
 num_beers = 0
+
 # Work
-work_complete=False
-work_first_open=True
+work_complete = False
+work_first_open = True
+work_first_complete = True
 num_customers = 0
 num_rows = 0
 hydration = 0
+
 # Salon
 salon_complete = False
 salon_first_open = True
+salon_first_complete = True
 num_manicures = 0
 num_happiness = 0
 num_groomings = 0
@@ -130,19 +135,19 @@ while running:
                     screen_mode = "home"
             if screen_mode == "home":
                 if button_rect_work.collidepoint(mouse_pos):
-                    num_coins, num_customers, num_rows, hydration, happiness, volume_on = run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backpack, labubu, happiness,HAPPINESS_MAX, volume_on, work_first_open)
+                    num_coins, num_customers, num_rows, hydration, happiness, volume_on, work_first_complete = run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backpack, labubu, hat, heels, happiness,HAPPINESS_MAX, volume_on, work_first_open, work_first_complete)
                     if work_first_open:
                         work_first_open = False
                     button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
                 if work_complete:
                     if button_rect_salon.collidepoint(mouse_pos):
-                        num_coins, num_manicures, num_happiness, num_groomings, happiness, volume_on = run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happiness, bow, gem, backpack, hat, heels, labubu, HAPPINESS_MAX, volume_on, salon_first_open)
+                        num_coins, num_manicures, num_happiness, num_groomings, happiness, volume_on, salon_first_complete = run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happiness, bow, gem, backpack, hat, heels, labubu, HAPPINESS_MAX, volume_on, salon_first_open, salon_first_complete)
                         if salon_first_open:
                             salon_first_open = False
                         button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
                 if salon_complete:
                     if button_rect_saloon.collidepoint(mouse_pos):
-                        num_coins, num_aces, num_selfies, num_beers, happiness, volume_on = run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backpack, hat, heels, labubu, happiness, HAPPINESS_MAX, volume_on, saloon_first_open)
+                        num_coins, num_aces, num_selfies, num_beers, happiness, volume_on, saloon_first_complete = run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backpack, hat, heels, labubu, happiness, HAPPINESS_MAX, volume_on, saloon_first_open, saloon_first_complete)
                         if saloon_first_open:
                             saloon_first_open = False
                         button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
@@ -204,12 +209,9 @@ while running:
                     tooltip_surf.get_width() + 10,
                     tooltip_surf.get_height() + 6
                 )
-                # Position the rect relative to the pin rect
                 tooltip_bg_rect.centerx = rect.centerx
                 tooltip_bg_rect.bottom = rect.top - 5  # slightly above the pin
-                # Draw a rounded rectangle directly on the main screen
                 pygame.draw.rect(screen, button_color, tooltip_bg_rect, border_radius=8)
-                # Draw the tooltip text on top of the rounded rect, with some padding
                 screen.blit(tooltip_surf, (tooltip_bg_rect.x + 5, tooltip_bg_rect.y + 3))
 
 

@@ -16,7 +16,6 @@ def run_store(num_coins, happiness, bow, gem, backpack, hat, heels, labubu, HAPP
     check = pygame.image.load("data/image/check.png")
     gem_img = pygame.image.load("data/image/gem.png")
     backpack_img = pygame.image.load("data/image/backpack.png")
-    prumpi_backpack = pygame.image.load("data/image/prumpi_backpack.png")
     labubu_img = pygame.image.load("data/image/labubu.png")
     lock = pygame.image.load("data/image/lock.png")
     hat_img = pygame.image.load("data/image/hat.png")
@@ -34,7 +33,6 @@ def run_store(num_coins, happiness, bow, gem, backpack, hat, heels, labubu, HAPP
     button_text_color = (24, 100, 24)
 
     coin_button_home = pygame.Rect(35, 600, 60, 60)
-    coin_button_else = pygame.Rect(35, 35, 60, 60)
     button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
 
 

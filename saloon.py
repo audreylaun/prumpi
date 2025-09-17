@@ -1,6 +1,7 @@
 import pygame
 from karaoke_minigame import karaoke
 from happiness import draw_happiness_meter, happiness_minigame
+from displays import announcement
 
 
 
@@ -34,7 +35,7 @@ def tallies(beer_count):
 
     return tally_string
 
-def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backpack, hat, heels, labubu, happiness, HAPPINESS_MAX, volume_on, saloon_first_open):
+def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backpack, hat, heels, labubu, happiness, HAPPINESS_MAX, volume_on, saloon_first_open, saloon_first_complete):
     pygame.init()
     screen = pygame.display.set_mode((1000, 700))
     pygame.display.set_caption("Dino Rugged Saloon")
@@ -62,7 +63,6 @@ def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backp
     volume_off_img = pygame.image.load("data/image/volume_off.png")
     bow_img = pygame.image.load("data/image/bow.png")
     gem_img = pygame.image.load("data/image/gem.png")
-    backpack_img = pygame.image.load("data/image/backpack.png")
     prumpi_backpack = pygame.image.load("data/image/prumpi_backpack.png")
     duck_face = pygame.image.load("data/image/duck_face.png")
     smile_face = pygame.image.load("data/image/smile.png")
@@ -81,8 +81,6 @@ def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backp
     prumpi_head = pygame.image.load("data/image/prumpi_work.png")
     hat_img = pygame.image.load("data/image/hat.png")
     heel_img = pygame.image.load("data/image/heel.png")
-
-
 
 
     # --- Resize images ---
@@ -111,7 +109,6 @@ def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backp
     quest_log = pygame.transform.scale(quest_log, (800, 500))
     quest_log_open = pygame.transform.scale(quest_log, (75, 75))
     quest_log_close = pygame.transform.scale(quest_log_close, (50, 75))
-    prumpi_head = pygame.transform.scale(prumpi_head, (400,400))
     hat_img = pygame.transform.scale(hat_img, (130,100))
     heel_img = pygame.transform.scale(heel_img, (150,150))
 
@@ -183,14 +180,6 @@ def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backp
     # Title
     door_angle = 0  # For swinging animation
     door_animation_speed = 3  # Degrees per frame
-
-    # First Open
-    welcome_text_1 = font.render("Time to hang out at the bar.", True, (0,0,0))
-    welcome_text_2 = font.render("I hope I see my crush.", True, (0,0,0))
-    welcome_text_3 = font.render("Press any key to continue.", True, (0,0,0))
-    welcome_bubble = pygame.transform.scale(speech_bubble, (500, 300))
-    welcome_prumpi_pos = (100,300)
-    welcome_bubble_pos = (400, 200)
 
     # Alley transition
     exit_sound = pygame.mixer.Sound("data/audio/exit_sequence.mp3")
@@ -325,7 +314,7 @@ def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backp
                         mode = "exit"
                         pygame.mixer.music.load("data/audio/background_music.mp3")
                         pygame.mixer.music.play(-1)
-                        return num_coins, num_aces, num_selfies, num_beers, happiness, volume_on
+                        return num_coins, num_aces, num_selfies, num_beers, happiness, volume_on, saloon_first_complete
                     elif button_rect_log_open.collidepoint(mouse_pos):
                         screen_mode = "log"
                 if screen_mode == "log":
@@ -401,7 +390,10 @@ def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backp
 
             elif event.type == pygame.KEYDOWN:
                 if screen_mode == "first open":
+                    saloon_first_open = False
                     screen_mode = "home"
+                elif screen_mode == "first complete":
+                    screen_mode = current_screen
 
         if drink_active and drink_pos:
             if drink_pos[0] < dino_pos[0] + 20 and not draining:
@@ -439,16 +431,19 @@ def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backp
             screen.blit(button_text_begin, (button_rect_begin.x + 60, button_rect_begin.y + 5))
 
         elif screen_mode == "first open":
-            saloon_first_open = False
-            # Display prumpi's head and a speech bubble with instructions for the bar
-            screen.blit(prumpi_head, welcome_prumpi_pos)
-            screen.blit(welcome_bubble, welcome_bubble_pos)
-            screen.blit(welcome_text_1, (welcome_bubble_pos[0]+30, welcome_bubble_pos[1]+40))
-            screen.blit(welcome_text_2, (welcome_bubble_pos[0]+30, welcome_bubble_pos[1]+80))
-            screen.blit(welcome_text_3, (welcome_bubble_pos[0]+30, welcome_bubble_pos[1]+120))
+            welcome_text_1 = "Time to hang out at the bar."
+            welcome_text_2 = "I hope I see my crush."
+            welcome_text_3 ="Press any key to continue."
 
-            # display instructions to press any key to continue button
-            # need it to be
+            announcement(screen, background, welcome_text_1, welcome_text_2, welcome_text_3)
+
+        elif screen_mode == "first complete":
+            complete_text_1 = "That was a lot of beer..."
+            complete_text_2 = "I have nothing else to do yet."
+            complete_text_3 ="Press any key to continue."
+
+            announcement(screen, background, complete_text_1, complete_text_2, complete_text_3)
+
         elif screen_mode == "alley_transition":
             screen.fill((0, 0, 0))  # black screen
             # Check if exit_sequence.mp3 is done
@@ -474,10 +469,11 @@ def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backp
                     screen.blit(labubu_img, (dino_pos_alley[0] + 260, dino_pos_alley[1] + 200))
             if bow:
                 bow_img =pygame.transform.scale(bow_img, (40,40))
-                screen.blit(bow_img, (475, 175))
+                screen.blit(bow_img, ( dino_pos_alley[0]+160, dino_pos_alley[1] + 50))
             if gem:
                 gem_img = pygame.transform.scale(gem_img, (10,10))
-                screen.blit(gem_img, (397,274))
+                # screen.blit(gem_img, (397,274))
+                screen.blit(gem_img, (dino_pos_alley[0]+82, dino_pos_alley[1]+149))
             if hat:
                 screen.blit(hat_img, (dino_pos_alley[0] + 60, dino_pos_alley[1] + 15))
             if heels:
@@ -635,10 +631,10 @@ def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backp
 
             if bow:
                 bow_img =pygame.transform.scale(bow_img, (40,40))
-                screen.blit(bow_img, (800, 215))
+                screen.blit(bow_img, (dino_pos[0]+160, dino_pos[1] + 50))
             if gem:
                 gem_img = pygame.transform.scale(gem_img, (10,10))
-                screen.blit(gem_img, (722,314))
+                screen.blit(gem_img, (dino_pos[0]+82, dino_pos[1]+149))
             if hat:
                 screen.blit(hat_img, (dino_pos[0]+60, dino_pos[1]+15))
             if heels:
@@ -739,7 +735,6 @@ def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backp
                 pygame.draw.line(screen, button_text_color, (quest_3_text_pos[0], quest_3_text_pos[1] + 15),
                                  (quest_3_text_pos[0] + 200, quest_3_text_pos[1] + 15), 3)
 
-        # shrinking logic (move later)
         if screen_mode == "alley":
             # Compute total shrink duration (current hold + past holds)
             current_hold = 0
@@ -765,6 +760,10 @@ def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backp
             num_coins += coins_added
             button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
 
+        if saloon_first_complete and quest1 and quest2 and quest3:
+            current_screen = screen_mode
+            screen_mode = "first complete"
+            saloon_first_complete = False
         pygame.display.flip()
 
         clock.tick(60)

@@ -3,8 +3,9 @@ from happiness import draw_happiness_meter, happiness_minigame
 from box_minigame import run_tetris_minigame
 import random
 import time
+from displays import announcement
 
-def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backpack,labubu, happiness, HAPPINESS_MAX, volume_on, work_first_open):
+def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backpack, labubu, hat, heels, happiness, HAPPINESS_MAX, volume_on, work_first_open, work_first_complete):
     pygame.init()
     screen = pygame.display.set_mode((1000, 700))
     pygame.display.set_caption("Dino Work")
@@ -15,7 +16,6 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
     volume_off_img = pygame.image.load("data/image/volume_off.png")
     coin_img = pygame.image.load("data/image/coin.png")
     title_background = pygame.image.load("data/image/cabazon.png")
-    dino = pygame.image.load("data/image/prumpi.png")
     dino_title = pygame.image.load("data/image/prumpi_standing.png")
     title_image = pygame.image.load("data/image/gift_shop_title.png")
     work_background = pygame.image.load("data/image/work.png")
@@ -26,6 +26,23 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
     water_break = pygame.image.load("data/image/water_break.png")
     prumpi_water = pygame.image.load("data/image/prumpi_standing.png")
     computer_background = pygame.image.load("data/image/computer.png")
+
+    # Accessories
+    hat_img = pygame.image.load("data/image/hat.png")
+    heel_img = pygame.image.load("data/image/heel.png")
+    bow_img = pygame.image.load("data/image/bow.png")
+    gem_img = pygame.image.load("data/image/gem.png")
+    prumpi_backpack = pygame.image.load("data/image/prumpi_backpack.png")
+    labubu_img = pygame.image.load("data/image/labubu.png")
+    #Resize
+    hat_img = pygame.transform.scale(hat_img, (130,100))
+    hat_img = pygame.transform.flip(hat_img, True, False)
+    heel_img = pygame.transform.scale(heel_img, (150,150))
+    bow_img = pygame.transform.scale(bow_img, (40, 40))
+    bow_img = pygame.transform.flip(bow_img, True, False)
+    gem_img = pygame.transform.scale(gem_img, (10, 10))
+    prumpi_backpack = pygame.transform.scale(prumpi_backpack, (300, 400))
+    labubu_img = pygame.transform.scale(labubu_img, (50, 50))
 
     #Customers
     penguin_front = pygame.image.load("data/image/penguin_front.png")
@@ -43,6 +60,21 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
     bear_back = pygame.image.load("data/image/bear_back.png")
     cow_front = pygame.image.load("data/image/cow_front.png")
     cow_back = pygame.image.load("data/image/cow_back.png")
+    # Resize
+    penguin_front = pygame.transform.scale(penguin_front, (200,300))
+    penguin_back = pygame.transform.scale(penguin_back, (200,300))
+    sundae_front = pygame.transform.scale(sundae_front, (200,300))
+    sundae_back = pygame.transform.scale(sundae_back, (200,300))
+    polly_front = pygame.transform.scale(polly_front, (200,300))
+    polly_back = pygame.transform.scale(polly_back, (200,300))
+    boyfriend_front = pygame.transform.scale(boyfriend_front, (200,300))
+    boyfriend_back = pygame.transform.scale(boyfriend_back, (200,300))
+    sloth_front = pygame.transform.scale(sloth_front, (200,300))
+    sloth_back = pygame.transform.scale(sloth_back, (200,300))
+    bear_front = pygame.transform.scale(bear_front, (200,300))
+    bear_back = pygame.transform.scale(bear_back, (275,300))
+    cow_front = pygame.transform.scale(cow_front, (200,300))
+    cow_back = pygame.transform.scale(cow_back, (200,300))
 
 
     # --- Resize ---
@@ -63,26 +95,7 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
     water_break = pygame.transform.scale(water_break, (1000,700))
     prumpi_water = pygame.transform.scale(prumpi_water, (300,400))
     prumpi_water = pygame.transform.flip(prumpi_water, True, False)
-    prumpi_head = pygame.transform.scale(prumpi_head, (400,400))
     computer_background = pygame.transform.scale(computer_background, (1000,700))
-
-
-
-    #Customers
-    penguin_front = pygame.transform.scale(penguin_front, (200,300))
-    penguin_back = pygame.transform.scale(penguin_back, (200,300))
-    sundae_front = pygame.transform.scale(sundae_front, (200,300))
-    sundae_back = pygame.transform.scale(sundae_back, (200,300))
-    polly_front = pygame.transform.scale(polly_front, (200,300))
-    polly_back = pygame.transform.scale(polly_back, (200,300))
-    boyfriend_front = pygame.transform.scale(boyfriend_front, (200,300))
-    boyfriend_back = pygame.transform.scale(boyfriend_back, (200,300))
-    sloth_front = pygame.transform.scale(sloth_front, (200,300))
-    sloth_back = pygame.transform.scale(sloth_back, (200,300))
-    bear_front = pygame.transform.scale(bear_front, (200,300))
-    bear_back = pygame.transform.scale(bear_back, (275,300))
-    cow_front = pygame.transform.scale(cow_front, (200,300))
-    cow_back = pygame.transform.scale(cow_back, (200,300))
 
 
     # --- Buttons ---
@@ -154,14 +167,6 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
     dino_pos_title = [400, 475]
     dino_pos_work = (425, 339)
     dino_speed = 2
-
-    # First Open
-    welcome_text_1 = font.render("Another day at work.", True, (0, 0, 0))
-    welcome_text_2 = font.render("I hope I see my crush.", True, (0, 0, 0))
-    welcome_text_3 = font.render("Press any key to continue.", True, (0, 0, 0))
-    welcome_bubble = pygame.transform.scale(speech_right, (500, 300))
-    welcome_prumpi_pos = (100, 300)
-    welcome_bubble_pos = (400, 200)
 
     #Customer Variables
     customer_present = False
@@ -241,7 +246,8 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
             "Mamma mamma mamma",
             "Your Splajompy one time login code:",
             "Your tracked flight to Iceland...",
-            "Your LA mamma misses you!"
+            "Your LA mamma misses you!",
+            "Splajompy official just posted..."
         ]
         subject = random.choice(subjects)
         emails.insert(0, Email(subject))
@@ -282,6 +288,7 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
         # Blit inbox onto monitor
         screen.blit(inbox_surface, monitor_rect.topleft)
 
+
     running = True
     while running:
         screen.fill((255, 255, 255))
@@ -303,7 +310,7 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                return num_coins, num_customers, num_rows, hydration, happiness, volume_on
+                return num_coins, num_customers, num_rows, hydration, happiness, volume_on, work_first_complete
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if screen_mode not in ["title"] and button_volume.collidepoint(mouse_pos):
                     if volume_on == True:
@@ -316,7 +323,7 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
                     title_sequence = True
                 if screen_mode == "work":
                     if button_rect_world.collidepoint(mouse_pos):
-                        return num_coins, num_customers, num_rows, hydration, happiness, volume_on
+                        return num_coins, num_customers, num_rows, hydration, happiness, volume_on, work_first_complete
                     if button_rect_boxes.collidepoint(mouse_pos):
                         coins_earned = run_tetris_minigame(0)
                         num_coins += coins_earned
@@ -383,7 +390,11 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
 
             elif event.type == pygame.KEYDOWN:
                 if screen_mode == "first open":
+                    print('click')
                     screen_mode = "work"
+                elif screen_mode == "first complete":
+                    screen_mode = current_screen
+
         if screen_mode == "computer":
             now = time.time()
             if now >= next_email_time:
@@ -471,13 +482,12 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
             screen.blit(button_text_begin, (button_rect_begin.x + 60, button_rect_begin.y + 5))
 
         elif screen_mode == "first open":
-            screen.blit(work_background, (0,0))
+            welcome_text_1 = "Another day at work."
+            welcome_text_2 = "I hope I see my crush."
+            welcome_text_3 = "Press any key to continue."
+
             work_first_open = False
-            screen.blit(prumpi_head, welcome_prumpi_pos)
-            screen.blit(welcome_bubble, welcome_bubble_pos)
-            screen.blit(welcome_text_1, (welcome_bubble_pos[0]+30, welcome_bubble_pos[1]+40))
-            screen.blit(welcome_text_2, (welcome_bubble_pos[0]+30, welcome_bubble_pos[1]+80))
-            screen.blit(welcome_text_3, (welcome_bubble_pos[0]+30, welcome_bubble_pos[1]+120))
+            announcement(screen, work_background, welcome_text_1, welcome_text_2, welcome_text_3)
 
         elif screen_mode == "work":
             screen.blit(work_background, (0, 0))
@@ -488,6 +498,15 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
                 screen.blit(volume_on_img, (button_volume.x, button_volume.y))
             elif volume_on == False:
                 screen.blit(volume_off_img, (button_volume.x, button_volume.y))
+
+            if bow:
+                screen.blit(bow_img, (dino_pos_work[0]+20, dino_pos_work[1]+30))
+            if gem:
+                screen.blit(gem_img, (dino_pos_work[0]+103, dino_pos_work[1]+92))
+            if labubu:
+                screen.blit(labubu_img, (400, 450))
+            if hat:
+                screen.blit(hat_img, (dino_pos_work[0]+20, dino_pos_work[1]-25))
 
             pygame.draw.rect(screen, button_color, button_rect_world, border_radius=12)
             screen.blit(button_text_world, (button_rect_world.x, button_rect_world.y))
@@ -635,12 +654,23 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
             if quest3:
                 pygame.draw.line(screen, button_text_color, (quest_3_text_pos[0], quest_3_text_pos[1]+15), (quest_3_text_pos[0]+200, quest_3_text_pos[1]+15),3)
 
+        elif screen_mode == "first complete":
+            complete_text_1 = "All done at work!"
+            complete_text_2 = "Now I can head to the salon."
+            complete_text_3 = "Press any key to continue"
+            work_first_complete = False
+            announcement(screen, work_background, complete_text_1, complete_text_2, complete_text_3)
+
         if happiness >= HAPPINESS_MAX:
             happiness=0
             coins_added = happiness_minigame()
             num_coins += coins_added
             button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
 
+        if work_first_complete and quest1 and quest2 and quest3:
+            current_screen = screen_mode
+            screen_mode = 'first complete'
+            work_first_complete = False
 
         pygame.display.flip()
         clock.tick(60)

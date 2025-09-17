@@ -1,10 +1,9 @@
-
 import pygame
-import sys
 import random
 from collections import deque
 from dance_minigame import twerk_minigame_menu
 from happiness import draw_happiness_meter, happiness_minigame
+from displays import announcement
 
 # Functions
 def generate_dirt_splotches(num_splotches=20):
@@ -50,15 +49,12 @@ def flood_fill(surface, x, y, fill_color):
                 q.extend([(cx+1, cy), (cx-1, cy), (cx, cy+1), (cx, cy-1)])
 
 
-def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happiness, bow, gem, backpack, hat, heels,labubu, HAPPINESS_MAX, volume_on, salon_first_open):
+def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happiness, bow, gem, backpack, hat, heels,labubu, HAPPINESS_MAX, volume_on, salon_first_open, salon_first_complete):
     # --- Initialize Game ---
     pygame.init()
     screen = pygame.display.set_mode((1000, 700))
     pygame.display.set_caption("Dino Beauty Salon")
     clock = pygame.time.Clock()
-
-    # --- Sets the default state to the home screen---
-    # screen_mode = "home"
 
     # --- Load images ---
     title_image = pygame.image.load("data/image/title.png").convert_alpha()
@@ -74,7 +70,6 @@ def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happi
     dirt_texture = pygame.image.load("data/image/dirt_texture.png").convert_alpha()
     broom_img = pygame.image.load("data/image/broom.png").convert_alpha()
     curtain_img = pygame.image.load("data/image/curtain.png").convert_alpha()
-    alley_screen = pygame.image.load("data/image/alley.png")
     volume_on_img = pygame.image.load("data/image/volume_on.png")
     volume_off_img = pygame.image.load("data/image/volume_off.png")
     coin_img = pygame.image.load("data/image/coin.png")
@@ -82,11 +77,9 @@ def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happi
     gem_img = pygame.image.load("data/image/gem.png")
     prumpi_backpack = pygame.image.load("data/image/prumpi_backpack.png")
     speech_left = pygame.image.load("data/image/speech_bubble_left.png")
-    speech_right = pygame.image.load("data/image/speech_bubble_right.png")
     labubu_img = pygame.image.load("data/image/labubu.png")
     quest_log = pygame.image.load("data/image/quest_log.png")
     quest_log_close = pygame.image.load("data/image/quest_log_closed.png")
-    prumpi_head = pygame.image.load("data/image/prumpi_work.png")
     hat_img = pygame.image.load("data/image/hat.png")
     heel_img = pygame.image.load("data/image/heel.png")
 
@@ -95,7 +88,6 @@ def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happi
     # --- Resize images ---
     title_image = pygame.transform.scale(title_image, (500,300))
     background = pygame.transform.scale(background, (1000, 700))
-    alley_screen = pygame.transform.scale(alley_screen, (1000, 700))
     scales_bg = pygame.transform.scale(scales_bg, (1000, 700))
     dino = pygame.transform.scale(dino, (300, 400))
     prumpi_backpack = pygame.transform.scale(prumpi_backpack, (300, 400))
@@ -111,8 +103,6 @@ def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happi
     quest_log = pygame.transform.scale(quest_log, (800, 500))
     quest_log_open = pygame.transform.scale(quest_log, (75, 75))
     quest_log_close = pygame.transform.scale(quest_log_close, (50, 75))
-    prumpi_head = pygame.transform.scale(prumpi_head, (400,400))
-    speech_bubble = pygame.transform.scale(speech_right, (300,150))
     hat_img = pygame.transform.scale(hat_img, (130,100))
     heel_img = pygame.transform.scale(heel_img, (150,150))
 
@@ -158,14 +148,6 @@ def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happi
     volume_off_img = pygame.transform.scale(volume_off_img, (60,60))
     button_volume = pygame.Rect(930, 630, 60, 60)
 
-    # First Open
-    welcome_text_1 = font.render("Time to get dolled up.", True, (0,0,0))
-    welcome_text_2 = font.render("I want my scales to shine!", True, (0,0,0))
-    welcome_text_3 = font.render("Press any key to continue.", True, (0,0,0))
-    welcome_bubble = pygame.transform.scale(speech_bubble, (500, 300))
-    welcome_prumpi_pos = (100,300)
-    welcome_bubble_pos = (400, 200)
-
     # Dinner
     button_hardfiskur = pygame.Rect(700, 150, 200, 60)
     button_kokosbollar = pygame.Rect(700, 230, 200, 60)
@@ -209,7 +191,6 @@ def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happi
     color_buttons = []
     selected_color_index = 0
     paint_color = color_options[selected_color_index]  # initial color
-    # Generate rects for nail color buttons (bottom left corner)
     for i in range(len(color_options)):
         x = 20 + i * 50  # spacing
         y = 640
@@ -295,7 +276,7 @@ def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happi
                     elif button_rect_log_open.collidepoint(mouse_pos):
                         screen_mode = "log"
                     elif button_rect_world.collidepoint(mouse_pos):
-                        return num_coins, num_manicures, num_happiness, num_groomings, happiness, volume_on
+                        return num_coins, num_manicures, num_happiness, num_groomings, happiness, volume_on, salon_first_complete
 
                 elif screen_mode == "title":
                     if button_rect.collidepoint(event.pos):
@@ -356,7 +337,6 @@ def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happi
 
                                 if nail_colors[i] is None:
                                     nail_colors[i] = paint_color
-                                    # print(nail_colors)
                                     if not nail_thank_you and all(c is not None for c in nail_colors[1:]):
                                         nail_thank_you = True
                                         happiness+=1
@@ -454,7 +434,10 @@ def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happi
 
             elif event.type == pygame.KEYDOWN:
                 if screen_mode == "first open":
+                    salon_first_open = False
                     screen_mode = "home"
+                elif screen_mode == "first complete":
+                    screen_mode = current_screen
 
         if screen_mode == "title" and curtain_opening:
             curtain_y -= curtain_speed
@@ -464,6 +447,7 @@ def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happi
                 else:
                     screen_mode = "home"
                 curtain_opening = False
+
         # --- Draw sections ---
         if screen_mode == "home":
             screen.blit(background, (0, 0))
@@ -506,10 +490,10 @@ def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happi
                     screen.blit(labubu_img, (dino_pos[0] + 260, dino_pos[1] + 200))
             if bow:
                 bow_img =pygame.transform.scale(bow_img, (40,40))
-                screen.blit(bow_img, (475, 175))
+                screen.blit(bow_img, (dino_pos[0]+160, dino_pos[1] + 50))
             if gem:
                 gem_img = pygame.transform.scale(gem_img, (10,10))
-                screen.blit(gem_img, (397,274))
+                screen.blit(gem_img, (dino_pos[0]+82, dino_pos[1]+149))
             if hat:
                 screen.blit(hat_img, (dino_pos[0]+60, dino_pos[1]+15))
             if heels:
@@ -570,13 +554,17 @@ def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happi
                                  (quest_3_text_pos[0] + 200, quest_3_text_pos[1] + 15), 3)
 
         elif screen_mode == "first open":
-            salon_first_open = False
-            screen.blit(background, (0,0))
-            screen.blit(prumpi_head, welcome_prumpi_pos)
-            screen.blit(welcome_bubble, welcome_bubble_pos)
-            screen.blit(welcome_text_1, (welcome_bubble_pos[0]+30, welcome_bubble_pos[1]+40))
-            screen.blit(welcome_text_2, (welcome_bubble_pos[0]+30, welcome_bubble_pos[1]+80))
-            screen.blit(welcome_text_3, (welcome_bubble_pos[0]+30, welcome_bubble_pos[1]+120))
+            welcome_text_1 = "Time to get dolled up."
+            welcome_text_2 = "I want my scales to shine!"
+            welcome_text_3 = "Press any key to continue."
+
+            announcement(screen, background, welcome_text_1, welcome_text_2, welcome_text_3)
+
+        elif screen_mode == "first complete":
+            complete_text_1 = "I'm the prettiest dino ever!"
+            complete_text_2 = "Now I can go to the bar!"
+            complete_text_3 = "Press any key to continue."
+            announcement(screen, background, complete_text_1, complete_text_2, complete_text_3)
 
         elif screen_mode == "title":
             # Draw background behind curtain (so it's already there as it pulls up)
@@ -604,8 +592,12 @@ def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happi
                 speech_left = pygame.transform.scale(speech_left, (300,100))
                 screen.blit(speech_left, speech_pos)
                 # Speech text
-                if all(c in ((255, 255, 0), (160, 32, 240)) for c in nail_colors[1:]):
+                if all(c in ((255, 255, 0), (160, 32, 240)) for c in nail_colors[1:]) and (255,255,0) in nail_colors[1:] and (160, 32, 240) in nail_colors[1:]:
                     text = font.render("Go Lakers!", True, (0,0,0))
+                elif all(c in ((0, 0, 255), (255, 255, 0)) for c in nail_colors[1:]) and (255,255,0) in nail_colors[1:] and (0, 0, 255) in nail_colors[1:]:
+                    text = font.render("Go Bruins!", True, (0,0,0))
+                elif all(c in ((255, 0, 0), (255, 255, 0)) for c in nail_colors[1:]) and (255,255,0) in nail_colors[1:] and (255, 0, 0) in nail_colors[1:]:
+                    text = font.render("Not the Trojans...", True, (0,0,0))
                 else:
                     text = font.render("I feel so pretty!", True, (0, 0, 0))
                 screen.blit(text, (speech_pos[0]+ 20, speech_pos[1] + 20))
@@ -735,6 +727,10 @@ def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happi
             num_coins += coins_added
             button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
 
+        if salon_first_complete and quest1 and quest2 and quest3:
+            current_screen = screen_mode
+            screen_mode = "first complete"
+            salon_first_complete = False
 
         pygame.display.flip()
         clock.tick(60)
