@@ -46,7 +46,7 @@ num_selfies = 0
 num_beers = 0
 
 # Work
-work_complete = False
+work_complete = True
 work_first_open = True
 work_first_complete = True
 num_customers = 0
@@ -54,7 +54,7 @@ num_rows = 0
 hydration = 0
 
 # Salon
-salon_complete = False
+salon_complete = True
 salon_first_open = True
 salon_first_complete = True
 num_manicures = 0

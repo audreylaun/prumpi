@@ -2,6 +2,7 @@ import pygame
 from karaoke_minigame import karaoke
 from happiness import draw_happiness_meter, happiness_minigame
 from displays import announcement
+from spitball import spitball_game
 
 
 
@@ -144,6 +145,9 @@ def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backp
 
     button_rect_selfie = pygame.Rect(750, 90, 200, 60)
     button_text_selfie = font.render("Selfie Time", True, button_text_color)
+
+    button_rect_spitball = pygame.Rect(750, 160, 200, 60)
+    button_text_spitball = font.render("Spitballs", True, button_text_color)
 
     button_rect_smile = pygame.Rect(750, 120, 200, 60)
     button_text_smile = font.render("Smile", True, button_text_color)
@@ -305,6 +309,12 @@ def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backp
                         if not volume_on:
                             pygame.mixer.music.set_volume(0)
                         button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
+                    elif button_rect_spitball.collidepoint(mouse_pos):
+                        a,b,c = spitball_game(num_coins, happiness, HAPPINESS_MAX, volume_on)
+                        num_coins +=a
+                        happiness = b
+                        volume_on = c
+
                     elif stomach_hitbox.collidepoint(mouse_pos) and beer_count >= 5:
                             burp_start_time = pygame.time.get_ticks()
                             burp_triggered = True
@@ -615,6 +625,9 @@ def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backp
 
             pygame.draw.rect(screen, button_color, button_rect_selfie, border_radius=12)
             screen.blit(button_text_selfie, (button_rect_selfie.x + 20, button_rect_selfie.y +10))
+
+            pygame.draw.rect(screen, button_color, button_rect_spitball, border_radius=12)
+            screen.blit(button_text_spitball, (button_rect_spitball.x + 20, button_rect_spitball.y + 10))
 
             draw_volume(volume_on)
 
