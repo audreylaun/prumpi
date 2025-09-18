@@ -29,12 +29,12 @@ pygame.display.set_caption("Prumpi World")
 clock = pygame.time.Clock()
 num_coins = 0
 # Accessories
-bow = True
-gem = True
+bow = False
+gem = False
 backpack = False
-hat = True
+hat = False
 heels = False
-labubu = True
+labubu = False
 
 # ---Quests---
 # Saloon

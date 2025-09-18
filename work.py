@@ -32,16 +32,19 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
     heel_img = pygame.image.load("data/image/heel.png")
     bow_img = pygame.image.load("data/image/bow.png")
     gem_img = pygame.image.load("data/image/gem.png")
-    prumpi_backpack = pygame.image.load("data/image/prumpi_backpack.png")
+    prumpi_backpack = pygame.image.load("data/image/prumpi_backpack_standing.png")
     labubu_img = pygame.image.load("data/image/labubu.png")
     #Resize
     hat_img = pygame.transform.scale(hat_img, (130,100))
     hat_img = pygame.transform.flip(hat_img, True, False)
-    heel_img = pygame.transform.scale(heel_img, (150,150))
+    heel_img = pygame.transform.scale(heel_img, (125,125))
+    heel_img = pygame.transform.flip(heel_img, True, False)
+    heel_img = pygame.transform.rotate(heel_img, -45)
     bow_img = pygame.transform.scale(bow_img, (40, 40))
     bow_img = pygame.transform.flip(bow_img, True, False)
     gem_img = pygame.transform.scale(gem_img, (10, 10))
     prumpi_backpack = pygame.transform.scale(prumpi_backpack, (300, 400))
+    prumpi_backpack = pygame.transform.flip(prumpi_backpack, True, False)
     labubu_img = pygame.transform.scale(labubu_img, (50, 50))
 
     #Customers
@@ -390,7 +393,6 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
 
             elif event.type == pygame.KEYDOWN:
                 if screen_mode == "first open":
-                    print('click')
                     screen_mode = "work"
                 elif screen_mode == "first complete":
                     screen_mode = current_screen
@@ -559,9 +561,6 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
 
             draw_happiness_meter(screen, happiness, HAPPINESS_MAX)
 
-            screen.blit(coin_img, (coin_button_home.x, coin_button_home.y))
-            screen.blit(button_text_coin, (coin_button_home.x + 100, coin_button_home.y + 20))
-
             pygame.draw.rect(screen, (231, 240, 255), (450, 450, 20, 40))
 
             if liquid_height > 0:
@@ -569,7 +568,24 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
 
             pygame.draw.rect(screen, button_color, button_rect_dispenser, border_radius=5)
 
-            screen.blit(prumpi_water, dino_pos_water)
+            if backpack:
+                screen.blit(prumpi_backpack, dino_pos_water)
+            else:
+                screen.blit(prumpi_water, dino_pos_water)
+            if bow:
+                screen.blit(bow_img, (dino_pos_water[0]+100, dino_pos_water[1]+50))
+            if gem:
+                screen.blit(gem_img, (dino_pos_water[0]+188, dino_pos_water[1]+148))
+            if labubu:
+                screen.blit(labubu_img, (dino_pos_water[0]+10, dino_pos_water[1]+205))
+            if hat:
+                screen.blit(hat_img, (dino_pos_water[0]+110, dino_pos_water[1]+15))
+            if heels:
+                screen.blit(heel_img, (dino_pos_water[0]+115, dino_pos_water[1]+265))
+                screen.blit(heel_img, (dino_pos_water[0]+45, dino_pos_water[1]+275))
+
+            screen.blit(coin_img, (coin_button_home.x, coin_button_home.y))
+            screen.blit(button_text_coin, (coin_button_home.x + 100, coin_button_home.y + 20))
 
             if drink_active:
                 pygame.draw.rect(screen, button_color, button_rect_drink, border_radius=12)
