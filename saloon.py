@@ -314,6 +314,8 @@ def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backp
                         num_coins +=a
                         happiness = b
                         volume_on = c
+                        button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
+
 
                     elif stomach_hitbox.collidepoint(mouse_pos) and beer_count >= 5:
                             burp_start_time = pygame.time.get_ticks()

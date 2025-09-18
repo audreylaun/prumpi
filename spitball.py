@@ -237,7 +237,6 @@ def spitball_game(num_coins, happiness, HAPPINESS_MAX, volume_on):
             if bottle.collidepoint(ball['x'], ball['y']):
                 spitballs.remove(ball)
                 happiness +=1
-                print("HIT! (bottle)")
 
             # cleanup: lifetime or off-screen
             if now - ball['t'] > spit_lifetime or not ( -50 <= ball['x'] <= WIDTH + 50 and -50 <= ball['y'] <= HEIGHT + 50):
