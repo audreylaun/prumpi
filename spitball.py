@@ -83,7 +83,7 @@ def draw_straw(surface, x, y, ang):
     ex = x + math.cos(rad) * straw_length
     ey = y + math.sin(rad) * straw_length
     pygame.draw.line(surface, GRAY, (x, y), (ex, ey), 16)
-    pygame.draw.circle(surface, BLACK, (int(ex), int(ey)), 8)
+    # pygame.draw.circle(surface, GRAY, (int(ex), int(ey)), 8)
     return ex, ey
 
 def spawn_spit(x, y, ang, now):
@@ -98,7 +98,7 @@ def draw_rotating_fan(surface, rect, fan_dir_deg, blade_offset_deg):
     pygame.draw.line(surface, GRAY, (230, 325), (230,700), 8)
     pygame.draw.rect(surface, GRAY, rect, border_radius=8)
     # hub
-    pygame.draw.circle(surface, BLACK, (cx, cy), 10)
+    pygame.draw.circle(surface, WHITE, (cx, cy), 10)
     blade_len = rect.width * 0.45
     for i in range(num_blades):
         ang = math.radians(fan_dir_deg + blade_offset_deg + i * (360.0 / num_blades))
@@ -231,7 +231,7 @@ def spitball_game(num_coins, happiness, HAPPINESS_MAX, volume_on):
             ball['y'] += ball['vy'] * dt
 
             # draw spitball
-            pygame.draw.circle(screen, BLACK, (int(ball['x']), int(ball['y'])), 5)
+            pygame.draw.circle(screen, WHITE, (int(ball['x']), int(ball['y'])), 5)
 
             # collisions
             if bottle.collidepoint(ball['x'], ball['y']):
