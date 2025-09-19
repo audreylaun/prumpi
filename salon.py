@@ -49,7 +49,7 @@ def flood_fill(surface, x, y, fill_color):
                 q.extend([(cx+1, cy), (cx-1, cy), (cx, cy+1), (cx, cy-1)])
 
 
-def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happiness, bow, gem, backpack, hat, heels,labubu, HAPPINESS_MAX, volume_on, salon_first_open, salon_first_complete):
+def run_salon_game(num_coins, num_dinners, num_desserts, num_twerks, num_happiness, happiness, bow, gem, backpack, hat, heels,labubu, HAPPINESS_MAX, volume_on, salon_first_open, salon_first_complete):
     # --- Initialize Game ---
     pygame.init()
     screen = pygame.display.set_mode((1000, 700))
@@ -236,15 +236,19 @@ def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happi
         mouse_pos = pygame.mouse.get_pos()
 
         # Quest variables
-        if num_manicures < 10:
+        # if num_manicures < 10:
+        #     quest1 = False
+        # else:
+        #     quest1 = True
+        if num_dinners < 3 and num_desserts < 3:
             quest1 = False
         else:
             quest1 = True
-        if num_happiness < 30:
+        if num_twerks < 50:
             quest2 = False
         else:
             quest2 = True
-        if num_groomings < 15:
+        if num_happiness < 30:
             quest3 = False
         else:
             quest3 = True
@@ -276,7 +280,7 @@ def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happi
                     elif button_rect_log_open.collidepoint(mouse_pos):
                         screen_mode = "log"
                     elif button_rect_world.collidepoint(mouse_pos):
-                        return num_coins, num_manicures, num_happiness, num_groomings, happiness, volume_on, salon_first_complete
+                        return num_coins, num_dinners, num_desserts, num_twerks, num_happiness, happiness, volume_on, salon_first_complete
 
                 elif screen_mode == "title":
                     if button_rect.collidepoint(event.pos):
@@ -340,7 +344,7 @@ def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happi
                                     if not nail_thank_you and all(c is not None for c in nail_colors[1:]):
                                         nail_thank_you = True
                                         happiness+=1
-                                        num_happiness +=1
+                                        num_happiness+=1
                                         num_manicures +=1
                                         thank_you_start_time = pygame.time.get_ticks()
                                 else:
@@ -375,10 +379,12 @@ def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happi
                     # Check if all fish are eaten and say thank you if yes
                     if all(f is None for f in fish_rects):
                         show_thank_you = True
-                        # num_coins += 5
                         happiness += 1
                         num_happiness +=1
-                        # button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
+                        if active_food == "chocolate":
+                            num_desserts +=1
+                        else:
+                            num_dinners += 1
                         thank_you_start_time = pygame.time.get_ticks()
 
             elif event.type == pygame.MOUSEMOTION:
@@ -394,7 +400,6 @@ def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happi
                         # num_coins += 5
                         happiness += 1
                         num_happiness +=1
-                        num_groomings +=1
                         # button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
                         show_clean_message = True
                         clean_message_start_time = pygame.time.get_ticks()
@@ -477,7 +482,7 @@ def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happi
                 else:
                     giggle_triggered = False  # reset after bubble disappears
                     happiness += 5
-                    num_happiness +=5
+                    num_happiness += 5
             #put volume button
             if volume_on == True:
                 screen.blit(volume_on_img, (button_volume.x, button_volume.y))
@@ -509,23 +514,29 @@ def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happi
 
             screen.blit(quest_log_close, (button_rect_log_close.x, button_rect_log_close.y))
 
-            quest1_text = font_small.render("Get 10 manicures", True, button_text_color)
-            if 10-num_manicures >= 0:
-                num1 = 10-num_manicures
+            quest1_text_1 = font_small.render("Get 3 servings of", True, button_text_color)
+            quest1_text_2 = font_small.render("dinner and dessert", True, button_text_color)
+            if 3-num_dinners >= 0:
+                num1_1 = 3-num_dinners
             else:
-                num1 = 0
-            quest_1_subtext = font_xsmall.render(f"{num1} remaining", True, button_text_color)
+                num1_1 = 0
+            if 3 - num_desserts >= 0:
+                num1_2 = 3 - num_desserts
+            else:
+                num1_2 = 0
+            quest_1_subtext_1 = font_xsmall.render(f"{num1_1} dinners remaining", True, button_text_color)
+            quest_1_subtext_2 = font_xsmall.render(f"{num1_2} desserts remaining", True, button_text_color)
 
-            quest2_text = font_small.render("Gain 30 happiness", True, button_text_color)
-            if 30-num_happiness >= 0:
-                num2 = 30-num_happiness
+            quest2_text = font_small.render("Twerk on beat 50 times", True, button_text_color)
+            if 50-num_twerks >= 0:
+                num2 = 50-num_twerks
             else:
                 num2 = 0
             quest_2_subtext = font_xsmall.render(f"{num2} remaining", True, button_text_color)
 
-            quest3_text = font_small.render("Get 15 groomings", True, button_text_color)
-            if 15-num_groomings >= 0:
-                num3 = 15-num_groomings
+            quest3_text = font_small.render("Gain 30 happiness", True, button_text_color)
+            if 30-num_happiness >= 0:
+                num3 = 30-num_happiness
             else:
                 num3 = 0
             quest_3_subtext = font_xsmall.render(f"{num3} remaining", True, button_text_color)
@@ -534,8 +545,10 @@ def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happi
             quest_2_text_pos = (525, 325)
             quest_3_text_pos = (525, 425)
 
-            screen.blit(quest1_text, quest_1_text_pos)
-            screen.blit(quest_1_subtext, (quest_1_text_pos[0], quest_1_text_pos[1] + 25))
+            screen.blit(quest1_text_1, (quest_1_text_pos[0], quest_1_text_pos[1]-25))
+            screen.blit(quest1_text_2, quest_1_text_pos)
+            screen.blit(quest_1_subtext_1, (quest_1_text_pos[0], quest_1_text_pos[1] + 25))
+            screen.blit(quest_1_subtext_2, (quest_1_text_pos[0], quest_1_text_pos[1] + 45))
 
             screen.blit(quest2_text, quest_2_text_pos)
             screen.blit(quest_2_subtext, (quest_2_text_pos[0], quest_2_text_pos[1] + 25))
@@ -544,6 +557,8 @@ def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happi
             screen.blit(quest_3_subtext, (quest_3_text_pos[0], quest_3_text_pos[1] + 25))
 
             if quest1:
+                pygame.draw.line(screen, button_text_color, (quest_1_text_pos[0], quest_1_text_pos[1] -10),
+                                 (quest_1_text_pos[0] + 200, quest_1_text_pos[1] -10), 3)
                 pygame.draw.line(screen, button_text_color, (quest_1_text_pos[0], quest_1_text_pos[1] + 15),
                                  (quest_1_text_pos[0] + 200, quest_1_text_pos[1] + 15), 3)
             if quest2:
@@ -715,6 +730,7 @@ def run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happi
 
         elif screen_mode == "dance":
             coins, back_to_game = twerk_minigame_menu()
+            num_twerks += coins
             num_coins += coins
             button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
             if back_to_game:

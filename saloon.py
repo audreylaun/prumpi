@@ -36,7 +36,7 @@ def tallies(beer_count):
 
     return tally_string
 
-def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backpack, hat, heels, labubu, happiness, HAPPINESS_MAX, volume_on, saloon_first_open, saloon_first_complete):
+def run_saloon_game(num_coins, num_aces, num_spitballs, num_beers, bow, gem, backpack, hat, heels, labubu, happiness, HAPPINESS_MAX, volume_on, saloon_first_open, saloon_first_complete):
     pygame.init()
     screen = pygame.display.set_mode((1000, 700))
     pygame.display.set_caption("Dino Rugged Saloon")
@@ -264,7 +264,7 @@ def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backp
             quest1 = False
         else:
             quest1 = True
-        if num_selfies < 50:
+        if num_spitballs < 20:
             quest2 = False
         else:
             quest2 = True
@@ -310,12 +310,12 @@ def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backp
                             pygame.mixer.music.set_volume(0)
                         button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
                     elif button_rect_spitball.collidepoint(mouse_pos):
-                        a,b,c = spitball_game(num_coins, happiness, HAPPINESS_MAX, volume_on)
+                        score, a,b,c = spitball_game(num_coins, happiness, HAPPINESS_MAX, volume_on)
+                        num_spitballs += score
                         num_coins +=a
                         happiness = b
                         volume_on = c
                         button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
-
 
                     elif stomach_hitbox.collidepoint(mouse_pos) and beer_count >= 5:
                             burp_start_time = pygame.time.get_ticks()
@@ -323,10 +323,9 @@ def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backp
                     elif button_rect_selfie.collidepoint(mouse_pos):
                         screen_mode = "selfie"
                     elif button_rect_world.collidepoint(mouse_pos):
-                        mode = "exit"
                         pygame.mixer.music.load("data/audio/background_music.mp3")
                         pygame.mixer.music.play(-1)
-                        return num_coins, num_aces, num_selfies, num_beers, happiness, volume_on, saloon_first_complete
+                        return num_coins, num_aces, num_spitballs, num_beers, happiness, volume_on, saloon_first_complete
                     elif button_rect_log_open.collidepoint(mouse_pos):
                         screen_mode = "log"
                 if screen_mode == "log":
@@ -336,28 +335,29 @@ def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backp
                 elif screen_mode == "selfie":
                     if button_rect_home.collidepoint(mouse_pos):
                         screen_mode = "home"
-                    elif button_rect_smile.collidepoint(event.pos):
+                    elif button_rect_smile.collidepoint(mouse_pos):
+                        print("clicked")
                         current_face = smile_face
                         face_start_time = pygame.time.get_ticks()
                         flash_active = True
                         flash_start_time = pygame.time.get_ticks()
                         happiness += 1
-                        num_selfies += 1
-                    elif button_rect_duck.collidepoint(event.pos):
+                        # num_selfies += 1
+                    elif button_rect_duck.collidepoint(mouse_pos):
                         current_face = duck_face
                         face_start_time = pygame.time.get_ticks()
                         flash_active = True
                         flash_start_time = pygame.time.get_ticks()
                         happiness += 1
-                        num_selfies += 1
-                    elif button_rect_tongue.collidepoint(event.pos):
+                        # num_selfies += 1
+                    elif button_rect_tongue.collidepoint(mouse_pos):
                         current_face = tongue_face
                         face_start_time = pygame.time.get_ticks()
                         flash_active = True
                         flash_start_time = pygame.time.get_ticks()
                         happiness += 1
-                        num_selfies += 1
-                    elif button_rect_send.collidepoint(event.pos) and beer_count >= 5 and sent ==False:
+                        # num_selfies += 1
+                    elif button_rect_send.collidepoint(mouse_pos) and beer_count >= 5 and sent ==False:
                         sent = True
 
                 elif screen_mode == "title" and button_rect_begin.collidepoint(mouse_pos):
@@ -389,7 +389,6 @@ def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backp
                         else:
                             # Print that you need more coins for that...
                             None
-
 
             elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 if screen_mode == "alley":
@@ -444,7 +443,7 @@ def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backp
 
         elif screen_mode == "first open":
             welcome_text_1 = "Time to hang out at the bar."
-            welcome_text_2 = "I hope I see my crush."
+            welcome_text_2 = "Let's turn up!"
             welcome_text_3 ="Press any key to continue."
 
             announcement(screen, background, welcome_text_1, welcome_text_2, welcome_text_3)
@@ -611,6 +610,24 @@ def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backp
             screen.blit(dino, dino_pos)
             screen.blit(sloth_bar, sloth_bar_pos)
 
+            if backpack:
+                screen.blit(prumpi_backpack, dino_pos)
+                if labubu:
+                    labubu_img = pygame.transform.scale(labubu_img, (50, 50))
+                    screen.blit(labubu_img, (dino_pos[0] + 260, dino_pos[1] + 200))
+
+            if bow:
+                bow_img =pygame.transform.scale(bow_img, (40,40))
+                screen.blit(bow_img, (dino_pos[0]+160, dino_pos[1] + 50))
+            if gem:
+                gem_img = pygame.transform.scale(gem_img, (10,10))
+                screen.blit(gem_img, (dino_pos[0]+82, dino_pos[1]+149))
+            if hat:
+                screen.blit(hat_img, (dino_pos[0]+60, dino_pos[1]+15))
+            if heels:
+                screen.blit(heel_img, (dino_pos[0]-50, dino_pos[1]+215))
+                screen.blit(heel_img, (dino_pos[0]+65, dino_pos[1]+230))
+
             draw_happiness_meter(screen, happiness, HAPPINESS_MAX)
 
             screen.blit(beer_text_header, (15 + beer_button_home.x, beer_button_home.y))
@@ -638,23 +655,23 @@ def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backp
             screen.blit(coin_img, (coin_button_home.x, coin_button_home.y))
             screen.blit(button_text_coin, (coin_button_home.x + 100, coin_button_home.y + 20))
 
-            if backpack:
-                screen.blit(prumpi_backpack, dino_pos)
-                if labubu:
-                    labubu_img = pygame.transform.scale(labubu_img, (50, 50))
-                    screen.blit(labubu_img, (dino_pos[0] + 260, dino_pos[1] + 200))
-
-            if bow:
-                bow_img =pygame.transform.scale(bow_img, (40,40))
-                screen.blit(bow_img, (dino_pos[0]+160, dino_pos[1] + 50))
-            if gem:
-                gem_img = pygame.transform.scale(gem_img, (10,10))
-                screen.blit(gem_img, (dino_pos[0]+82, dino_pos[1]+149))
-            if hat:
-                screen.blit(hat_img, (dino_pos[0]+60, dino_pos[1]+15))
-            if heels:
-                screen.blit(heel_img, (dino_pos[0]-50, dino_pos[1]+215))
-                screen.blit(heel_img, (dino_pos[0]+65, dino_pos[1]+230))
+            # if backpack:
+            #     screen.blit(prumpi_backpack, dino_pos)
+            #     if labubu:
+            #         labubu_img = pygame.transform.scale(labubu_img, (50, 50))
+            #         screen.blit(labubu_img, (dino_pos[0] + 260, dino_pos[1] + 200))
+            #
+            # if bow:
+            #     bow_img =pygame.transform.scale(bow_img, (40,40))
+            #     screen.blit(bow_img, (dino_pos[0]+160, dino_pos[1] + 50))
+            # if gem:
+            #     gem_img = pygame.transform.scale(gem_img, (10,10))
+            #     screen.blit(gem_img, (dino_pos[0]+82, dino_pos[1]+149))
+            # if hat:
+            #     screen.blit(hat_img, (dino_pos[0]+60, dino_pos[1]+15))
+            # if heels:
+            #     screen.blit(heel_img, (dino_pos[0]-50, dino_pos[1]+215))
+            #     screen.blit(heel_img, (dino_pos[0]+65, dino_pos[1]+230))
             if drink_active and drink_pos:
                 draw_drink(drink_pos[0], drink_pos[1], liquid_height)
 
@@ -712,9 +729,9 @@ def run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backp
                 num1 = 0
             quest_1_subtext = font_xsmall.render(f"{num1} remaining", True, button_text_color)
 
-            quest2_text = font_small.render("Take 50 selfies", True, button_text_color)
-            if 50-num_selfies >= 0:
-                num2 = 50-num_selfies
+            quest2_text = font_small.render("Make 20 spitball shots", True, button_text_color)
+            if 20-num_spitballs >= 0:
+                num2 = 20-num_spitballs
             else:
                 num2 = 0
             quest_2_subtext = font_xsmall.render(f"{num2} remaining", True, button_text_color)

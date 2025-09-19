@@ -124,11 +124,11 @@ def rhythm_game():
                         notes.remove(hit_note)
                         button_text_coin = font.render(str(score) + " Prumpi Coins Earned", True, (0, 0, 0))
                         score += 1
+                        button_text_coin = font.render(str(score) + " Prumpi Coins Earned", True, (0, 0, 0))
                         prumpi_image = prumpi_squatting  # change to squat pose
                         pose_timer = pygame.time.get_ticks()  # record when we changed
                     else:
-                        running = False  # Miss = end game
-
+                        running = False
         # Spawn new notes
         note_timer += dt
         if note_timer >= NOTE_INTERVAL:

@@ -306,14 +306,14 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
             quest2 = False
         else:
             quest2 = True
-        if hydration < 15:
+        if hydration < 7:
             quest3 = False
         else:
             quest3 = True
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                return num_coins, num_customers, num_rows, hydration, happiness, volume_on, work_first_complete
+                return 0
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if screen_mode not in ["title"] and button_volume.collidepoint(mouse_pos):
                     if volume_on == True:
@@ -504,7 +504,7 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
             if bow:
                 screen.blit(bow_img, (dino_pos_work[0]+20, dino_pos_work[1]+30))
             if gem:
-                screen.blit(gem_img, (dino_pos_work[0]+103, dino_pos_work[1]+92))
+                screen.blit(gem_img, (dino_pos_work[0]+105, dino_pos_work[1]+92))
             if labubu:
                 screen.blit(labubu_img, (400, 450))
             if hat:
@@ -642,9 +642,9 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
             else:
                 num2 = 0
             quest_2_subtext = font_xsmall.render(f"{num2} remaining", True, button_text_color)
-            quest3_text = font_small.render("Hydrate 15 times", True, button_text_color)
-            if 15-hydration >=0:
-                num3 = 15-hydration
+            quest3_text = font_small.render("Hydrate 7 times", True, button_text_color)
+            if 7-hydration >=0:
+                num3 = 7-hydration
             else:
                 num3 = 0
             quest_3_subtext = font_xsmall.render(f"{num3} drinks remaining", True, button_text_color)

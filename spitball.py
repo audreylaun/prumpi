@@ -29,6 +29,7 @@ coin_button_home = pygame.Rect(35, 600, 60, 60)
 
 button_volume = pygame.Rect(930, 630, 60, 60)
 
+
 def draw_volume(volume_on):
     if volume_on == True:
         screen.blit(volume_on_img, (button_volume.x, button_volume.y))
@@ -143,6 +144,7 @@ def draw_wind_cone(surface, fan_cx, fan_cy, dir_deg, cone_half, rng):
 
 def spitball_game(num_coins, happiness, HAPPINESS_MAX, volume_on):
     global angle, blade_spin, last_shot
+    score = 0
     button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
     running = True
     while running:
@@ -163,7 +165,7 @@ def spitball_game(num_coins, happiness, HAPPINESS_MAX, volume_on):
                         last_shot = now
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if button_rect_home.collidepoint(mouse_pos):
-                    return num_coins, happiness, volume_on
+                    return score, num_coins, happiness, volume_on
                 if button_volume.collidepoint(mouse_pos):
                     if volume_on == True:
                         pygame.mixer.music.set_volume(0)
@@ -237,6 +239,7 @@ def spitball_game(num_coins, happiness, HAPPINESS_MAX, volume_on):
             if bottle.collidepoint(ball['x'], ball['y']):
                 spitballs.remove(ball)
                 happiness +=1
+                score += 1
 
             # cleanup: lifetime or off-screen
             if now - ball['t'] > spit_lifetime or not ( -50 <= ball['x'] <= WIDTH + 50 and -50 <= ball['y'] <= HEIGHT + 50):

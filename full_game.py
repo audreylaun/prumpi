@@ -42,7 +42,7 @@ saloon_complete = False
 saloon_first_open = True
 saloon_first_complete = True
 num_aces = 0
-num_selfies = 0
+num_spitballs = 0
 num_beers = 0
 
 # Work
@@ -57,9 +57,10 @@ hydration = 0
 salon_complete = False
 salon_first_open = True
 salon_first_complete = True
-num_manicures = 0
+num_dinners = 0
+num_desserts = 0
+num_twerks = 0
 num_happiness = 0
-num_groomings = 0
 
 happiness = 0
 HAPPINESS_MAX = 30
@@ -118,11 +119,11 @@ while running:
     screen.fill((255, 255, 255))
     mouse_pos = pygame.mouse.get_pos()
 
-    if num_customers >= 20 and num_rows >= 50 and hydration >= 15:
+    if num_customers >= 20 and num_rows >= 50 and hydration >= 7:
         work_complete = True
-    if num_aces >= 5 and num_selfies >= 50 and num_beers >= 50:
+    if num_aces >= 5 and num_spitballs >= 20 and num_beers >= 50:
         saloon_complete = True
-    if num_manicures >=10 and num_happiness >= 30 and num_groomings >=15:
+    if num_dinners >=3 and num_desserts >=3 and num_twerks >= 50 and num_happiness >=30:
         salon_complete = True
 
     for event in pygame.event.get():
@@ -141,13 +142,13 @@ while running:
                     button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
                 if work_complete:
                     if button_rect_salon.collidepoint(mouse_pos):
-                        num_coins, num_manicures, num_happiness, num_groomings, happiness, volume_on, salon_first_complete = run_salon_game(num_coins, num_manicures, num_happiness, num_groomings, happiness, bow, gem, backpack, hat, heels, labubu, HAPPINESS_MAX, volume_on, salon_first_open, salon_first_complete)
+                        num_coins, num_dinners, num_desserts, num_twerks, num_happiness, happiness, volume_on, salon_first_complete = run_salon_game(num_coins, num_dinners, num_desserts, num_twerks, num_happiness, happiness, bow, gem, backpack, hat, heels, labubu, HAPPINESS_MAX, volume_on, salon_first_open, salon_first_complete)
                         if salon_first_open:
                             salon_first_open = False
                         button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
                 if salon_complete:
                     if button_rect_saloon.collidepoint(mouse_pos):
-                        num_coins, num_aces, num_selfies, num_beers, happiness, volume_on, saloon_first_complete = run_saloon_game(num_coins, num_aces, num_selfies, num_beers, bow, gem, backpack, hat, heels, labubu, happiness, HAPPINESS_MAX, volume_on, saloon_first_open, saloon_first_complete)
+                        num_coins, num_aces, num_spitballs, num_beers, happiness, volume_on, saloon_first_complete = run_saloon_game(num_coins, num_aces, num_spitballs, num_beers, bow, gem, backpack, hat, heels, labubu, happiness, HAPPINESS_MAX, volume_on, saloon_first_open, saloon_first_complete)
                         if saloon_first_open:
                             saloon_first_open = False
                         button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
