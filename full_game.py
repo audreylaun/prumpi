@@ -1,6 +1,7 @@
 from saloon import run_saloon_game
 from salon import run_salon_game
 from work import run_work_game
+from bedroom import run_bedroom_game
 from happiness import draw_happiness_meter
 import pygame
 from store import run_store
@@ -37,16 +38,8 @@ heels = False
 labubu = False
 
 # ---Quests---
-# Saloon
-saloon_complete = False
-saloon_first_open = True
-saloon_first_complete = True
-num_aces = 0
-num_spitballs = 0
-num_beers = 0
-
 # Work
-work_complete = False
+work_complete = True
 work_first_open = True
 work_first_complete = True
 num_customers = 0
@@ -54,7 +47,7 @@ num_rows = 0
 hydration = 0
 
 # Salon
-salon_complete = False
+salon_complete = True
 salon_first_open = True
 salon_first_complete = True
 num_dinners = 0
@@ -62,6 +55,20 @@ num_desserts = 0
 num_twerks = 0
 num_happiness = 0
 
+# Saloon
+saloon_complete = True
+saloon_first_open = True
+saloon_first_complete = True
+num_aces = 0
+num_spitballs = 0
+num_beers = 0
+
+# Bedroom
+bedroom_complete = True
+bedroom_first_open = True
+bedroom_first_complete = True
+
+# Happiness
 happiness = 0
 HAPPINESS_MAX = 30
 
@@ -92,9 +99,10 @@ button_rect_begin = pygame.Rect(400, 500, 200, 60)
 button_text_begin = font.render("Begin", True, button_text_color)
 
 button_rect_salon = pygame.Rect(100, 400, 100, 100)
-button_rect_saloon = pygame.Rect(500, 350, 100, 100)
+button_rect_saloon = pygame.Rect(500, 250, 100, 100)
 button_rect_shop = pygame.Rect(700, 500, 100, 100)
 button_rect_work = pygame.Rect(800, 375, 100, 100)
+button_rect_bedroom = pygame.Rect(200, 240, 100, 100 )
 
 button_rect_title = title_image.get_rect(center=(screen.get_width() // 2, 300))
 
@@ -152,6 +160,13 @@ while running:
                         if saloon_first_open:
                             saloon_first_open = False
                         button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
+                if saloon_complete:
+                    if button_rect_bedroom.collidepoint(mouse_pos):
+                        num_coins, happiness, volume_on, bedroom_first_complete = run_bedroom_game(num_coins, bow, gem, backpack, labubu, hat, heels, happiness, HAPPINESS_MAX, volume_on, bedroom_first_open, bedroom_first_complete)
+                        if bedroom_first_open:
+                            bedroom_first_open = False
+                        button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
+
                 if button_rect_shop.collidepoint(mouse_pos):
                     num_coins, happiness, bow, gem, backpack, hat, heels, labubu, volume_on = run_store(num_coins, happiness, bow, gem, backpack, hat, heels, labubu, HAPPINESS_MAX, volume_on)
                     button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
@@ -175,13 +190,20 @@ while running:
 
     elif screen_mode == "home":
         screen.blit(background, (0,0))
+
+        screen.blit(pin, button_rect_work)
+
         screen.blit(pin, button_rect_salon)
         if not work_complete:
             screen.blit(lock, (button_rect_salon.x+20, button_rect_salon.y))
+
         screen.blit(pin, button_rect_saloon)
         if not salon_complete:
             screen.blit(lock, (button_rect_saloon.x+20, button_rect_saloon.y))
-        screen.blit(pin, button_rect_work)
+
+        screen.blit(pin, button_rect_bedroom)
+        if not saloon_complete:
+            screen.blit(lock, (button_rect_bedroom.x+20, button_rect_bedroom.y+20))
         screen.blit(pin, button_rect_shop)
 
         screen.blit(coin_img, (coin_button_home.x, coin_button_home.y))
@@ -198,6 +220,7 @@ while running:
             (button_rect_saloon, "Go to the Saloon"),
             (button_rect_shop, "Go to Shop"),
             (button_rect_work, "Go to Work"),
+            (button_rect_bedroom, "Go Home"),
         ]
 
         draw_happiness_meter(screen, happiness, HAPPINESS_MAX)

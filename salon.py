@@ -345,7 +345,6 @@ def run_salon_game(num_coins, num_dinners, num_desserts, num_twerks, num_happine
                                         nail_thank_you = True
                                         happiness+=1
                                         num_happiness+=1
-                                        num_manicures +=1
                                         thank_you_start_time = pygame.time.get_ticks()
                                 else:
                                     nail_colors[i]=paint_color
