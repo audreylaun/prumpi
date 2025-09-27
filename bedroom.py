@@ -5,6 +5,7 @@ import random
 import time
 import pygame
 import os
+from jumping_minigame import run_trex
 
 def load_book_images(folder, max_width=800, max_height=600):
     pages = []
@@ -21,7 +22,7 @@ def load_book_images(folder, max_width=800, max_height=600):
         pages.append(img)
     return pages
 
-def run_bedroom_game(num_coins, bow, gem, backpack, labubu, hat, heels, happiness, HAPPINESS_MAX, volume_on, bedroom_first_open, bedroom_first_complete):
+def run_bedroom_game(num_coins, web_coins, num_reads, bow, gem, backpack, labubu, hat, heels, happiness, HAPPINESS_MAX, volume_on, bedroom_first_open, bedroom_first_complete):
     pygame.init()
     screen = pygame.display.set_mode((1000, 700))
     pygame.display.set_caption("Dino Home")
@@ -31,9 +32,7 @@ def run_bedroom_game(num_coins, bow, gem, backpack, labubu, hat, heels, happines
     volume_on_img = pygame.image.load("data/image/volume_on.png")
     volume_off_img = pygame.image.load("data/image/volume_off.png")
     coin_img = pygame.image.load("data/image/coin.png")
-    title_background = pygame.image.load("data/image/cabazon.png")
-    dino_title = pygame.image.load("data/image/prumpi_standing.png")
-    title_image = pygame.image.load("data/image/gift_shop_title.png")
+    title_image = pygame.image.load("data/image/bedroom_title.png")
     bedroom_background = pygame.image.load("data/image/bedroom_updated.png")
     prumpi_head = pygame.image.load("data/image/prumpi_work.png")
     speech_right = pygame.image.load("data/image/speech_bubble_right.png")
@@ -45,10 +44,11 @@ def run_bedroom_game(num_coins, bow, gem, backpack, labubu, hat, heels, happines
     book = pygame.image.load("data/image/book.png")
     arrow_right = pygame.image.load("data/image/arrow_right.png")
     arrow_left = pygame.image.load("data/image/arrow_left.png")
+    computer_background = pygame.image.load("data/image/computer_close.png")
+    thought_bubble = pygame.image.load("data/image/thought_bubble.png")
 
     # --- Resize ---
     coin_img = pygame.transform.scale(coin_img, (80, 80))
-    title_background = pygame.transform.scale(title_background, (1000, 700))
     title_image = pygame.transform.scale(title_image, (500, 300))
     bedroom_background = pygame.transform.scale(bedroom_background, (1000, 700))
     volume_on_img = pygame.transform.scale(volume_on_img, (60, 60))
@@ -64,20 +64,21 @@ def run_bedroom_game(num_coins, bow, gem, backpack, labubu, hat, heels, happines
     book = pygame.transform.scale(book, (125,100))
     arrow_right = pygame.transform.scale(arrow_right, (50,50))
     arrow_left = pygame.transform.scale(arrow_left, (50,50))
+    computer_background = pygame.transform.scale(computer_background, (1000,700))
+    thought_bubble = pygame.transform.scale(thought_bubble, (500,500))
 
     # Accessories
     hat_img = pygame.image.load("data/image/hat.png")
     heel_img = pygame.image.load("data/image/heel.png")
     bow_img = pygame.image.load("data/image/bow.png")
     gem_img = pygame.image.load("data/image/gem.png")
-    prumpi_backpack = pygame.image.load("data/image/prumpi_backpack_standing.png")
+    prumpi_backpack = pygame.image.load("data/image/prumpi_backpack.png")
     labubu_img = pygame.image.load("data/image/labubu.png")
     # Resize
     hat_img = pygame.transform.scale(hat_img, (130, 100))
     hat_img = pygame.transform.flip(hat_img, True, False)
     heel_img = pygame.transform.scale(heel_img, (125, 125))
     heel_img = pygame.transform.flip(heel_img, True, False)
-    heel_img = pygame.transform.rotate(heel_img, -45)
     bow_img = pygame.transform.scale(bow_img, (40, 40))
     bow_img = pygame.transform.flip(bow_img, True, False)
     gem_img = pygame.transform.scale(gem_img, (10, 10))
@@ -91,14 +92,14 @@ def run_bedroom_game(num_coins, bow, gem, backpack, labubu, hat, heels, happines
     font_xsmall = pygame.font.SysFont("comic_sansms", 18)
     button_color = (255, 225, 125)
     button_text_color = (24, 100, 24)
-    button_rect_begin = pygame.Rect(screen.get_width() // 2 - 100, 600, 200, 60)
+    button_rect_begin = pygame.Rect(400, 350, 200, 60)
     button_text_begin = font.render("Begin", True, button_text_color)
 
     button_rect_home = pygame.Rect(700, 20, 250, 60)
     button_text_home = font.render("Return to Bed", True, button_text_color)
 
-    button_rect_game = pygame.Rect(750, 20, 200, 60)
-    button_text_game = font.render("TBD", True, button_text_color)
+    button_rect_game = pygame.Rect(750, 20, 225, 60)
+    button_text_game = font.render("Surf the Web", True, button_text_color)
 
     button_rect_world = pygame.Rect(50, 20, 275, 50)
     button_text_world = font.render('Return to World', True, button_text_color)
@@ -122,9 +123,7 @@ def run_bedroom_game(num_coins, bow, gem, backpack, labubu, hat, heels, happines
     book_complete = False
     mama_text = False
 
-    screen_mode = "bedroom"
-    if bedroom_first_open:
-        screen_mode = "first open"
+    screen_mode = "title"
 
     running = True
     pygame.mixer.music.load("data/audio/bedroom.mp3")
@@ -134,19 +133,16 @@ def run_bedroom_game(num_coins, bow, gem, backpack, labubu, hat, heels, happines
         screen.fill((255, 255, 255))
         mouse_pos = pygame.mouse.get_pos()
 
-        # Quest variables
-        # if num_customers < 20:
-        #     quest1 = False
-        # else:
-        #     quest1 = True
-        # if num_rows < 50:
-        #     quest2 = False
-        # else:
-        #     quest2 = True
-        # if hydration < 7:
-        #     quest3 = False
-        # else:
-        #     quest3 = True
+        #Quest variables
+        if web_coins < 100:
+            quest1 = False
+        else:
+            quest1 = True
+        if num_reads < 5:
+            quest2 = False
+        else:
+            quest2 = True
+
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -159,31 +155,48 @@ def run_bedroom_game(num_coins, bow, gem, backpack, labubu, hat, heels, happines
                     elif volume_on == False:
                         pygame.mixer.music.set_volume(0.5)
                         volume_on = True
-                if screen_mode == "bedroom":
+                elif screen_mode == "title":
+                    if button_rect_begin.collidepoint(mouse_pos):
+                        if bedroom_first_open:
+                            screen_mode = "first open"
+                        else:
+                            screen_mode = "bedroom"
+                elif screen_mode == "bedroom":
                     if button_rect_world.collidepoint(mouse_pos):
                         pygame.mixer.music.load("data/audio/background_music.mp3")
                         pygame.mixer.music.play(-1)
-                        return num_coins, happiness, volume_on, bedroom_first_complete
+                        return num_coins, web_coins, num_reads, happiness, volume_on, bedroom_first_complete
                     elif button_rect_log_open.collidepoint(mouse_pos):
                         screen_mode = "log"
                     elif book_pos.collidepoint(mouse_pos):
                         screen_mode = "book"
-                if screen_mode == "log":
+                    elif button_rect_game.collidepoint(mouse_pos):
+                        screen_mode = "game"
+                elif screen_mode == "log":
                     if button_rect_log_close.collidepoint(mouse_pos):
                         screen_mode = "bedroom"
-                if screen_mode == "book":
-                    if left_rect.collidepoint(event.pos) and current_page > 0:
+                elif screen_mode == "book":
+                    if left_rect.collidepoint(mouse_pos) and current_page > 0:
                         current_page -= 1
-                    elif right_rect.collidepoint(event.pos) and current_page < len(pages) - 1:
+                    elif right_rect.collidepoint(mouse_pos) and current_page < len(pages) - 1:
                         current_page += 1
-                    elif button_rect_home.collidepoint(event.pos):
+                    elif button_rect_home.collidepoint(mouse_pos):
                         screen_mode = "bedroom"
                         current_page = 0
+                elif screen_mode == "game":
+                    if button_rect_home.collidepoint(mouse_pos):
+                        screen_mode = "bedroom"
+
             elif event.type == pygame.KEYDOWN:
                 if screen_mode == "first open":
                     screen_mode = "bedroom"
-                # elif screen_mode == "first complete":
-                #     screen_mode = current_screen
+                elif screen_mode == "game":
+                    coins = run_trex()
+                    web_coins += coins
+                    num_coins += coins
+                    button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
+                elif screen_mode == "first complete":
+                    screen_mode = current_screen
 
         #Drawing
         if screen_mode == "bedroom":
@@ -196,6 +209,22 @@ def run_bedroom_game(num_coins, bow, gem, backpack, labubu, hat, heels, happines
 
             screen.blit(prumpi_sitting, dino_pos)
 
+            if backpack:
+                screen.blit(prumpi_backpack, dino_pos)
+                if labubu:
+                    labubu_img = pygame.transform.scale(labubu_img, (50, 50))
+                    screen.blit(labubu_img, (dino_pos[0]+15, dino_pos[1] + 200))
+            if bow:
+                bow_img =pygame.transform.scale(bow_img, (40,40))
+                screen.blit(bow_img, (dino_pos[0]+75, dino_pos[1] + 75))
+            if gem:
+                gem_img = pygame.transform.scale(gem_img, (10,10))
+                screen.blit(gem_img, (dino_pos[0]+207, dino_pos[1]+149))
+            if hat:
+                screen.blit(hat_img, (dino_pos[0]+100, dino_pos[1]+15))
+            if heels:
+                screen.blit(heel_img, (dino_pos[0]+200, dino_pos[1]+220))
+                screen.blit(heel_img, (dino_pos[0]+90, dino_pos[1]+230))
             screen.blit(book, book_pos)
 
             pygame.draw.rect(screen, button_color, button_rect_world, border_radius=12)
@@ -213,6 +242,7 @@ def run_bedroom_game(num_coins, bow, gem, backpack, labubu, hat, heels, happines
 
             if book_complete:
                 happiness+=5
+                num_reads +=1
                 mama_text = True
                 current_time = pygame.time.get_ticks()
                 book_complete = False
@@ -226,6 +256,14 @@ def run_bedroom_game(num_coins, bow, gem, backpack, labubu, hat, heels, happines
                 mama_text = False
             draw_happiness_meter(screen, happiness, HAPPINESS_MAX)
 
+        if screen_mode == "title":
+            screen.blit(bedroom_background, (0, 0))
+            title_rect = title_image.get_rect(center=(screen.get_width() // 2, 200))
+            screen.blit(title_image, title_rect)
+
+            pygame.draw.rect(screen, button_color, button_rect_begin, border_radius=10)
+            pygame.draw.rect(screen, button_color, button_rect_begin, width=2, border_radius=10)
+            screen.blit(button_text_begin, (button_rect_begin.x + 60, button_rect_begin.y + 5))
         elif screen_mode == "log":
             screen.blit(bedroom_background, (0, 0))
 
@@ -233,46 +271,55 @@ def run_bedroom_game(num_coins, bow, gem, backpack, labubu, hat, heels, happines
 
             screen.blit(quest_log_close, (button_rect_log_close.x, button_rect_log_close.y))
 
-            quest1_text = font_small.render("Quest 1 Text", True, button_text_color)
-            # if 20-num_customers >= 0:
-            #     num1 = 20-num_customers
-            # else:
-            #     num1 = 0
-            num1 = 100
+            quest1_text_1 = font_small.render("Earn 100 coins", True, button_text_color)
+            quest1_text_2 = font_small.render("from web game", True, button_text_color)
+
+            if 100-web_coins >= 0:
+                num1 = 100-web_coins
+            else:
+                num1 = 0
             quest_1_subtext = font_xsmall.render(f"{num1} remaining", True, button_text_color)
-            quest2_text = font_small.render("Quest 2 Text", True, button_text_color)
-            # if 50-num_rows >= 0:
-            #     num2 = int(50-num_rows)
-            # else:
-            #     num2 = 0
-            num2 = 100
+
+            quest2_text_1 = font_small.render("Read favorite book", True, button_text_color)
+            quest2_text_2 = font_small.render("5 times", True, button_text_color)
+
+            if 5-num_reads >= 0:
+                num2 = 5-num_reads
+            else:
+                num2 = 0
             quest_2_subtext = font_xsmall.render(f"{num2} remaining", True, button_text_color)
-            quest3_text = font_small.render("Quest 3 Text", True, button_text_color)
+            # quest3_text = font_small.render("Quest 3 Text", True, button_text_color)
             # if 7-hydration >=0:
             #     num3 = 7-hydration
             # else:
             #     num3 = 0
-            num3 = 100
-            quest_3_subtext = font_xsmall.render(f"{num3} remaining", True, button_text_color)
+            # num3 = 100
+            # quest_3_subtext = font_xsmall.render(f"{num3} remaining", True, button_text_color)
 
             quest_1_text_pos = (525, 225)
             quest_2_text_pos = (525, 325)
-            quest_3_text_pos = (525, 425)
+            # quest_3_text_pos = (525, 425)
 
-            screen.blit(quest1_text, quest_1_text_pos)
-            screen.blit(quest_1_subtext, (quest_1_text_pos[0], quest_1_text_pos[1]+25) )
+            screen.blit(quest1_text_1, quest_1_text_pos)
+            screen.blit(quest1_text_2, (quest_1_text_pos[0], quest_1_text_pos[1]+25))
+            screen.blit(quest_1_subtext, (quest_1_text_pos[0], quest_1_text_pos[1]+50))
 
-            screen.blit(quest2_text, quest_2_text_pos)
-            screen.blit(quest_2_subtext, (quest_2_text_pos[0], quest_2_text_pos[1]+25) )
+            screen.blit(quest2_text_1, quest_2_text_pos)
+            screen.blit(quest2_text_2, (quest_2_text_pos[0], quest_2_text_pos[1]+25))
+            screen.blit(quest_2_subtext, (quest_2_text_pos[0], quest_2_text_pos[1]+50) )
 
-            screen.blit(quest3_text, quest_3_text_pos)
-            screen.blit(quest_3_subtext, (quest_3_text_pos[0], quest_3_text_pos[1]+25) )
-            # if quest1:
-            #     pygame.draw.line(screen, button_text_color, (quest_1_text_pos[0], quest_1_text_pos[1] + 15),
-            #                      (quest_1_text_pos[0] + 200, quest_1_text_pos[1] + 15), 3)
-            # if quest2:
-            #     pygame.draw.line(screen, button_text_color, (quest_2_text_pos[0], quest_2_text_pos[1] + 15),
-            #                      (quest_2_text_pos[0] + 200, quest_2_text_pos[1] + 15), 3)
+            # screen.blit(quest3_text, quest_3_text_pos)
+            # screen.blit(quest_3_subtext, (quest_3_text_pos[0], quest_3_text_pos[1]+25) )
+            if quest1:
+                pygame.draw.line(screen, button_text_color, (quest_1_text_pos[0], quest_1_text_pos[1] + 15),
+                                 (quest_1_text_pos[0] + 200, quest_1_text_pos[1] + 15), 3)
+                pygame.draw.line(screen, button_text_color, (quest_1_text_pos[0], quest_1_text_pos[1] + 40),
+                                 (quest_1_text_pos[0] + 200, quest_1_text_pos[1] + 40), 3)
+            if quest2:
+                pygame.draw.line(screen, button_text_color, (quest_2_text_pos[0], quest_2_text_pos[1] + 15),
+                                 (quest_2_text_pos[0] + 200, quest_2_text_pos[1] + 15), 3)
+                pygame.draw.line(screen, button_text_color, (quest_2_text_pos[0], quest_2_text_pos[1] + 40),
+                                 (quest_2_text_pos[0] + 200, quest_2_text_pos[1] + 40), 3)
             # if quest3:
             #     pygame.draw.line(screen, button_text_color, (quest_3_text_pos[0], quest_3_text_pos[1] + 15),
             #                      (quest_3_text_pos[0] + 200, quest_3_text_pos[1] + 15), 3)
@@ -289,12 +336,37 @@ def run_bedroom_game(num_coins, bow, gem, backpack, labubu, hat, heels, happines
             # Draw navigation buttons (simple rectangles for now)
             screen.blit(arrow_left, left_rect)
             screen.blit(arrow_right, right_rect)
-            # pygame.draw.rect(screen, (200, 200, 200), left_rect)
-            # pygame.draw.rect(screen, (200, 200, 200), right_rect)
 
             # Exit button (top-right)
             pygame.draw.rect(screen, button_color, button_rect_home, border_radius=12)
             screen.blit(button_text_home, (button_rect_home.x + 10, button_rect_home.y + 5))
+
+        elif screen_mode == "game":
+            screen.blit(computer_background, (0,0))
+            screen.blit(thought_bubble, (250, 100))
+            thought_text_1 = font_small.render("I forgot to pay the", True, (0,0,0))
+            thought_text_1_pos = (350, 170)
+            thought_text_2 = font_small.render("internet bill again. Dang it.", True, (0,0,0))
+            thought_text_2_pos = (350, 200)
+            thought_text_3 = font_small.render("What can I do offline?", True, (0,0,0))
+            thought_text_3_pos = (350, 230)
+            thought_text_4 = font_small.render("Press any key to continue.", True, (0,0,0))
+            thought_text_4_pos = (350, 260)
+
+            screen.blit(thought_text_1, thought_text_1_pos)
+            screen.blit(thought_text_2, thought_text_2_pos)
+            screen.blit(thought_text_3, thought_text_3_pos)
+            screen.blit(thought_text_4, thought_text_4_pos)
+
+            pygame.draw.rect(screen, button_color, button_rect_home, border_radius=12)
+            screen.blit(button_text_home, (button_rect_home.x + 10, button_rect_home.y + 5))
+
+            draw_happiness_meter(screen, happiness, HAPPINESS_MAX)
+            screen.blit(coin_img, (coin_button_home.x, coin_button_home.y))
+            screen.blit(button_text_coin, (coin_button_home.x + 100, coin_button_home.y + 20))
+
+
+
 
         elif screen_mode == "first open":
             welcome_text_1 = "Finally home!"
@@ -304,23 +376,24 @@ def run_bedroom_game(num_coins, bow, gem, backpack, labubu, hat, heels, happines
             bedroom_first_open = False
             announcement(screen, bedroom_background, welcome_text_1, welcome_text_2, welcome_text_3)
 
-        # elif screen_mode == "first complete":
-        #     complete_text_1 = "I've decompressed!"
-        #     complete_text_2 = "What's next? Who knows."
-        #     complete_text_3 = "Press any key to continue"
-        #     bedroom_first_complete = False
-        #     announcement(screen, bedroom_background, complete_text_1, complete_text_2, complete_text_3)
+        elif screen_mode == "first complete":
+            complete_text_1 = "I've decompressed!"
+            complete_text_2 = "What's next? Who knows."
+            complete_text_3 = "Press any key to continue"
+            bedroom_first_complete = False
+            announcement(screen, bedroom_background, complete_text_1, complete_text_2, complete_text_3)
 
         if happiness >= HAPPINESS_MAX:
             happiness=0
+
             coins_added = happiness_minigame()
             num_coins += coins_added
             button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
 
-        # if work_first_complete and quest1 and quest2 and quest3:
-        #     current_screen = screen_mode
-        #     screen_mode = 'first complete'
-        #     work_first_complete = False
+        if bedroom_first_complete and quest1 and quest2:
+            current_screen = screen_mode
+            screen_mode = 'first complete'
+            bedroom_first_complete = False
 
         pygame.display.flip()
         clock.tick(60)

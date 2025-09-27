@@ -49,35 +49,40 @@ def draw_dotted_line(surface, color, start_loc, end_loc, width=2, dash_length=10
                  "bedroom": [250, 340]}
     start_pos = locations[start_loc]
     end_pos = locations[end_loc]
-    x1, y1 = start_pos
-    x2, y2 = end_pos
-    dx = x2 - x1
-    dy = y2 - y1
-    distance = (dx ** 2 + dy ** 2) ** 0.5
-    steps = int(distance // (dash_length + space_length))
+    if start_pos == end_pos:
+        return 0
+    else:
+        x1, y1 = start_pos
+        x2, y2 = end_pos
+        dx = x2 - x1
+        dy = y2 - y1
+        distance = (dx ** 2 + dy ** 2) ** 0.5
+        steps = int(distance // (dash_length + space_length))
 
-    for i in range(steps + 1):
-        start_x = x1 + (dx / distance) * (i * (dash_length + space_length))
-        start_y = y1 + (dy / distance) * (i * (dash_length + space_length))
-        end_x = x1 + (dx / distance) * (i * (dash_length + space_length) + dash_length)
-        end_y = y1 + (dy / distance) * (i * (dash_length + space_length) + dash_length)
+        for i in range(steps + 1):
+            start_x = x1 + (dx / distance) * (i * (dash_length + space_length))
+            start_y = y1 + (dy / distance) * (i * (dash_length + space_length))
+            end_x = x1 + (dx / distance) * (i * (dash_length + space_length) + dash_length)
+            end_y = y1 + (dy / distance) * (i * (dash_length + space_length) + dash_length)
 
-        # Clamp final segment so it doesn’t overshoot
-        if (end_x - x1) * dx + (end_y - y1) * dy > dx ** 2 + dy ** 2:
-            end_x, end_y = x2, y2
+            # Clamp final segment so it doesn’t overshoot
+            if (end_x - x1) * dx + (end_y - y1) * dy > dx ** 2 + dy ** 2:
+                end_x, end_y = x2, y2
 
-        pygame.draw.line(surface, color, (start_x, start_y), (end_x, end_y), width)
+            pygame.draw.line(surface, color, (start_x, start_y), (end_x, end_y), width)
 
 def draw_face(miles_traveled, face_rect):
     if miles_traveled < 1000:
-        face = pygame.image.load(f"data/image/face{1}.png")
+        face = pygame.image.load(f"data/image/face{0}.png")
     elif 1000 <= miles_traveled < 10000:
-        face = pygame.image.load(f"data/image/face{2}.png")
+        face = pygame.image.load(f"data/image/face{1}.png")
     elif 10000 <= miles_traveled < 20000:
-        face = pygame.image.load(f"data/image/face{3}.png")
+        face = pygame.image.load(f"data/image/face{2}.png")
     elif 20000 <= miles_traveled < 30000:
+        face = pygame.image.load(f"data/image/face{3}.png")
+    elif 30000 <= miles_traveled < 40000:
         face = pygame.image.load(f"data/image/face{4}.png")
-    elif 30000 <= miles_traveled:
+    elif 40000 <= miles_traveled:
         face = pygame.image.load(f"data/image/face{5}.png")
     face = pygame.transform.scale(face, (50, 50))
     screen.blit(face, face_rect)
@@ -131,9 +136,11 @@ num_spitballs = 0
 num_beers = 0
 
 # Bedroom
-bedroom_complete = True
+bedroom_complete = False
 bedroom_first_open = True
 bedroom_first_complete = True
+web_coins = 0
+num_reads = 0
 
 # Happiness
 happiness = 0
@@ -204,7 +211,7 @@ while running:
 
     if num_customers >= 20 and num_rows >= 50 and hydration >= 7:
         work_complete = True
-    if num_aces >= 5 and num_spitballs >= 20 and num_beers >= 50:
+    if num_aces >= 5 and num_spitballs >= 20 and num_beers >= 25:
         saloon_complete = True
     if num_dinners >=3 and num_desserts >=3 and num_twerks >= 50 and num_happiness >=30:
         salon_complete = True
@@ -218,7 +225,6 @@ while running:
                 if button_rect_begin.collidepoint(mouse_pos):
                     screen_mode = "home"
             if screen_mode == "home":
-                print(connections)
                 if button_rect_work.collidepoint(mouse_pos):
                     num_coins, num_customers, num_rows, hydration, happiness, volume_on, work_first_complete = run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backpack, labubu, hat, heels, happiness,HAPPINESS_MAX, volume_on, work_first_open, work_first_complete)
                     if work_first_open:
@@ -260,7 +266,7 @@ while running:
 
                 if saloon_complete:
                     if button_rect_bedroom.collidepoint(mouse_pos):
-                        num_coins, happiness, volume_on, bedroom_first_complete = run_bedroom_game(num_coins, bow, gem, backpack, labubu, hat, heels, happiness, HAPPINESS_MAX, volume_on, bedroom_first_open, bedroom_first_complete)
+                        num_coins, web_coins, num_reads, happiness, volume_on, bedroom_first_complete = run_bedroom_game(num_coins, web_coins, num_reads, bow, gem, backpack, labubu, hat, heels, happiness, HAPPINESS_MAX, volume_on, bedroom_first_open, bedroom_first_complete)
                         if bedroom_first_open:
                             bedroom_first_open = False
                         current_world = "bedroom"

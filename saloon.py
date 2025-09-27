@@ -268,7 +268,7 @@ def run_saloon_game(num_coins, num_aces, num_spitballs, num_beers, bow, gem, bac
             quest2 = False
         else:
             quest2 = True
-        if num_beers < 50:
+        if num_beers < 25:
             quest3 = False
         else:
             quest3 = True
@@ -449,7 +449,7 @@ def run_saloon_game(num_coins, num_aces, num_spitballs, num_beers, bow, gem, bac
 
         elif screen_mode == "first complete":
             complete_text_1 = "That was a lot of beer..."
-            complete_text_2 = "I have nothing else to do yet."
+            complete_text_2 = "I need to go home."
             complete_text_3 ="Press any key to continue."
 
             announcement(screen, background, complete_text_1, complete_text_2, complete_text_3)
@@ -735,9 +735,9 @@ def run_saloon_game(num_coins, num_aces, num_spitballs, num_beers, bow, gem, bac
                 num2 = 0
             quest_2_subtext = font_xsmall.render(f"{num2} remaining", True, button_text_color)
 
-            quest3_text = font_small.render("Drink 50 beers", True, button_text_color)
-            if 50-num_beers >= 0:
-                num3 = 50-num_beers
+            quest3_text = font_small.render("Drink 25 beers", True, button_text_color)
+            if 25-num_beers >= 0:
+                num3 = 25-num_beers
             else:
                 num3 = 0
             quest_3_subtext = font_xsmall.render(f"{num3} beers remaining", True, button_text_color)
