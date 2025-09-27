@@ -37,6 +37,10 @@ hat = False
 heels = False
 labubu = False
 
+# Mileage tracker
+miles_traveled = 0
+last_world = None
+
 # ---Quests---
 # Work
 work_complete = True

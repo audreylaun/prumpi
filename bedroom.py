@@ -34,7 +34,7 @@ def run_bedroom_game(num_coins, bow, gem, backpack, labubu, hat, heels, happines
     title_background = pygame.image.load("data/image/cabazon.png")
     dino_title = pygame.image.load("data/image/prumpi_standing.png")
     title_image = pygame.image.load("data/image/gift_shop_title.png")
-    bedroom_background = pygame.image.load("data/image/bedroom.png")
+    bedroom_background = pygame.image.load("data/image/bedroom_updated.png")
     prumpi_head = pygame.image.load("data/image/prumpi_work.png")
     speech_right = pygame.image.load("data/image/speech_bubble_right.png")
     quest_log = pygame.image.load("data/image/quest_log.png")
@@ -42,7 +42,7 @@ def run_bedroom_game(num_coins, bow, gem, backpack, labubu, hat, heels, happines
     prumpi_standing = pygame.image.load("data/image/prumpi_standing.png")
     prumpi_sitting = pygame.image.load("data/image/prumpi.png")
     blush = pygame.image.load("data/image/blush.png")
-    book = pygame.image.load("data/image/book_tilted.png")
+    book = pygame.image.load("data/image/book.png")
     arrow_right = pygame.image.load("data/image/arrow_right.png")
     arrow_left = pygame.image.load("data/image/arrow_left.png")
 
@@ -53,7 +53,7 @@ def run_bedroom_game(num_coins, bow, gem, backpack, labubu, hat, heels, happines
     bedroom_background = pygame.transform.scale(bedroom_background, (1000, 700))
     volume_on_img = pygame.transform.scale(volume_on_img, (60, 60))
     volume_off_img = pygame.transform.scale(volume_off_img, (60, 60))
-    speech_right = pygame.transform.scale(speech_right, (500, 100))
+    speech_right = pygame.transform.scale(speech_right, (375, 100))
     blush = pygame.transform.scale(blush, (200, 100))
     quest_log = pygame.transform.scale(quest_log, (800, 500))
     quest_log_open = pygame.transform.scale(quest_log, (75, 75))
@@ -61,7 +61,7 @@ def run_bedroom_game(num_coins, bow, gem, backpack, labubu, hat, heels, happines
     prumpi_standing = pygame.transform.scale(prumpi_standing, (300, 400))
     prumpi_sitting = pygame.transform.scale(prumpi_sitting, (300, 400))
     prumpi_sitting = pygame.transform.flip(prumpi_sitting, True, False)
-    book = pygame.transform.scale(book, (50,50))
+    book = pygame.transform.scale(book, (125,100))
     arrow_right = pygame.transform.scale(arrow_right, (50,50))
     arrow_left = pygame.transform.scale(arrow_left, (50,50))
 
@@ -112,13 +112,15 @@ def run_bedroom_game(num_coins, bow, gem, backpack, labubu, hat, heels, happines
     button_volume = pygame.Rect(930, 630, 60, 60)
 
     dino_pos = pygame.Rect(100, 150, 300,400)
-    book_pos = pygame.Rect(600,365,50,50)
 
     # Book stuff
+    book_pos = pygame.Rect(415,350,125,100)
     pages = load_book_images("data/book")
     current_page = 0
     left_rect = pygame.Rect(50, 325, 50, 50)
     right_rect = pygame.Rect(910, 325, 50, 50)
+    book_complete = False
+    mama_text = False
 
     screen_mode = "bedroom"
     if bedroom_first_open:
@@ -156,7 +158,7 @@ def run_bedroom_game(num_coins, bow, gem, backpack, labubu, hat, heels, happines
                         volume_on = True
                 if screen_mode == "bedroom":
                     if button_rect_world.collidepoint(mouse_pos):
-                        return 0
+                        return num_coins, happiness, volume_on, bedroom_first_complete
                     elif button_rect_log_open.collidepoint(mouse_pos):
                         screen_mode = "log"
                     elif book_pos.collidepoint(mouse_pos):
@@ -171,6 +173,7 @@ def run_bedroom_game(num_coins, bow, gem, backpack, labubu, hat, heels, happines
                         current_page += 1
                     elif button_rect_home.collidepoint(event.pos):
                         screen_mode = "bedroom"
+                        current_page = 0
             elif event.type == pygame.KEYDOWN:
                 if screen_mode == "first open":
                     screen_mode = "bedroom"
@@ -202,6 +205,21 @@ def run_bedroom_game(num_coins, bow, gem, backpack, labubu, hat, heels, happines
             screen.blit(button_text_coin, (coin_button_home.x + 100, coin_button_home.y + 20))
 
             screen.blit(quest_log_open, (button_rect_log_open.x, button_rect_log_open.y))
+
+            if book_complete:
+                happiness+=5
+                mama_text = True
+                current_time = pygame.time.get_ticks()
+                book_complete = False
+            if mama_text and pygame.time.get_ticks() - current_time < 2000:
+                speech_pos = (300, 150)
+                message_text = "I love my mamas <3"
+                screen.blit(speech_right, speech_pos)
+                text = font.render(message_text, True, (0, 0, 0))
+                screen.blit(text, (speech_pos[0] + 40, speech_pos[1] + 20))
+            else:
+                mama_text = False
+            draw_happiness_meter(screen, happiness, HAPPINESS_MAX)
 
         elif screen_mode == "log":
             screen.blit(bedroom_background, (0, 0))
@@ -260,6 +278,8 @@ def run_bedroom_game(num_coins, bow, gem, backpack, labubu, hat, heels, happines
             page = pages[current_page]
             px, py = page.get_size()
             screen.blit(page, ((1000 - px) // 2, (700 - py) // 2))
+            if current_page == len(pages)-1:
+                book_complete = True
 
             # Draw navigation buttons (simple rectangles for now)
             screen.blit(arrow_left, left_rect)
