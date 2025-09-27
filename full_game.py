@@ -5,7 +5,7 @@ from bedroom import run_bedroom_game
 from happiness import draw_happiness_meter
 import pygame
 from store import run_store
-
+import math
 
 def fade_to_black(screen, clock, background, speed=5):
     """
@@ -23,11 +23,64 @@ def fade_to_black(screen, clock, background, speed=5):
         pygame.display.flip()
         clock.tick(60)
 
- # --- Initialize Game ---
+def calculate_miles_traveled(current_screen, previous_screen):
+    '''
+    takes in the two screens and uses a function to calculate distance in MILES between them (usa)
+    '''
+    miles_traveled = 0
+    locations = {"salon": [150,500],
+                 "saloon": [550,350],
+                 "store": [750,600],
+                 "work": [850,475],
+                 "bedroom": [250,340]}
+    loc1 = locations[previous_screen]
+    loc2 = locations[current_screen]
+
+    miles_traveled = math.sqrt((loc1[0] - loc2[0])**2 + (loc1[1] - loc2[1])**2)
+
+    return int(round(miles_traveled*10,0))
+
+
+def draw_dotted_line(surface, color, start_loc, end_loc, width=2, dash_length=10, space_length=5):
+    locations = {"salon": [150, 500],
+                 "saloon": [550, 350],
+                 "store": [750, 600],
+                 "work": [850, 475],
+                 "bedroom": [250, 340]}
+    start_pos = locations[start_loc]
+    end_pos = locations[end_loc]
+    x1, y1 = start_pos
+    x2, y2 = end_pos
+    dx = x2 - x1
+    dy = y2 - y1
+    distance = (dx ** 2 + dy ** 2) ** 0.5
+    steps = int(distance // (dash_length + space_length))
+
+    for i in range(steps + 1):
+        start_x = x1 + (dx / distance) * (i * (dash_length + space_length))
+        start_y = y1 + (dy / distance) * (i * (dash_length + space_length))
+        end_x = x1 + (dx / distance) * (i * (dash_length + space_length) + dash_length)
+        end_y = y1 + (dy / distance) * (i * (dash_length + space_length) + dash_length)
+
+        # Clamp final segment so it doesn’t overshoot
+        if (end_x - x1) * dx + (end_y - y1) * dy > dx ** 2 + dy ** 2:
+            end_x, end_y = x2, y2
+
+        pygame.draw.line(surface, color, (start_x, start_y), (end_x, end_y), width)
+
+
+# --- Initialize Game ---
 pygame.init()
 screen = pygame.display.set_mode((1000, 700))
 pygame.display.set_caption("Prumpi World")
 clock = pygame.time.Clock()
+
+# --- Set Font and Button Colors  ---
+font = pygame.font.SysFont("comic_sansms", 32)
+button_color = (255, 225, 125)
+button_text_color = (24, 100, 24)
+
+
 num_coins = 0
 # Accessories
 bow = False
@@ -36,10 +89,6 @@ backpack = False
 hat = False
 heels = False
 labubu = False
-
-# Mileage tracker
-miles_traveled = 0
-last_world = None
 
 # ---Quests---
 # Work
@@ -76,10 +125,17 @@ bedroom_first_complete = True
 happiness = 0
 HAPPINESS_MAX = 30
 
-# --- Set Font and Button Colors  ---
-font = pygame.font.SysFont("comic_sansms", 32)
-button_color = (255, 225, 125)
-button_text_color = (24, 100, 24)
+
+# Carbon footprint stuff
+miles_traveled = 0
+connections = []
+current_world = None
+last_world = None
+button_rect_miles = pygame.Rect(600, 20, 200, 60)
+button_text_miles = font.render(f"Miles Traveled: {str(miles_traveled)}", True, button_color)
+button_rect_carbon = pygame.Rect(600, 70, 200, 60)
+button_text_carbon = font.render(f"Carbon Footprint:", True, button_color)
+
 
 
 # --- Load images ---
@@ -147,33 +203,71 @@ while running:
                 if button_rect_begin.collidepoint(mouse_pos):
                     screen_mode = "home"
             if screen_mode == "home":
+                print(connections)
                 if button_rect_work.collidepoint(mouse_pos):
                     num_coins, num_customers, num_rows, hydration, happiness, volume_on, work_first_complete = run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backpack, labubu, hat, heels, happiness,HAPPINESS_MAX, volume_on, work_first_open, work_first_complete)
                     if work_first_open:
                         work_first_open = False
+                    current_world = "work"
+                    if last_world != None:
+                        connections.append([last_world, current_world])
+                        miles_traveled += calculate_miles_traveled(current_world, last_world)
+                        button_text_miles = button_text_miles = font.render(f"Miles Traveled: {str(miles_traveled)}", True, button_color)
                     button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
+                    last_world = current_world
                 if work_complete:
                     if button_rect_salon.collidepoint(mouse_pos):
                         num_coins, num_dinners, num_desserts, num_twerks, num_happiness, happiness, volume_on, salon_first_complete = run_salon_game(num_coins, num_dinners, num_desserts, num_twerks, num_happiness, happiness, bow, gem, backpack, hat, heels, labubu, HAPPINESS_MAX, volume_on, salon_first_open, salon_first_complete)
                         if salon_first_open:
                             salon_first_open = False
+                        current_world = "salon"
+                        if last_world != None:
+                            connections.append([last_world, current_world])
+                            miles_traveled += calculate_miles_traveled(current_world, last_world)
+                            button_text_miles = font.render(f"Miles Traveled: {str(miles_traveled)}", True,
+                                                            button_color)
                         button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
+                        last_world = current_world
+
                 if salon_complete:
                     if button_rect_saloon.collidepoint(mouse_pos):
                         num_coins, num_aces, num_spitballs, num_beers, happiness, volume_on, saloon_first_complete = run_saloon_game(num_coins, num_aces, num_spitballs, num_beers, bow, gem, backpack, hat, heels, labubu, happiness, HAPPINESS_MAX, volume_on, saloon_first_open, saloon_first_complete)
                         if saloon_first_open:
                             saloon_first_open = False
+                        current_world = "saloon"
+                        if last_world != None:
+                            connections.append([last_world, current_world])
+                            miles_traveled += calculate_miles_traveled(current_world, last_world)
+                            button_text_miles = font.render(f"Miles Traveled: {str(miles_traveled)}", True,
+                                                            button_color)
                         button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
+                        last_world = current_world
+
                 if saloon_complete:
                     if button_rect_bedroom.collidepoint(mouse_pos):
                         num_coins, happiness, volume_on, bedroom_first_complete = run_bedroom_game(num_coins, bow, gem, backpack, labubu, hat, heels, happiness, HAPPINESS_MAX, volume_on, bedroom_first_open, bedroom_first_complete)
                         if bedroom_first_open:
                             bedroom_first_open = False
+                        current_world = "bedroom"
+                        if last_world != None:
+                            connections.append([last_world, current_world])
+                            miles_traveled += calculate_miles_traveled(current_world, last_world)
+                            button_text_miles = font.render(f"Miles Traveled: {str(miles_traveled)}", True,
+                                                            button_color)
                         button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
+                        last_world = current_world
 
                 if button_rect_shop.collidepoint(mouse_pos):
                     num_coins, happiness, bow, gem, backpack, hat, heels, labubu, volume_on = run_store(num_coins, happiness, bow, gem, backpack, hat, heels, labubu, HAPPINESS_MAX, volume_on)
                     button_text_coin = font.render(str(num_coins) + " Prumpi Coins", True, (0, 0, 0))
+                    current_world = "store"
+                    if last_world != None:
+                        connections.append([last_world, current_world])
+                        miles_traveled += calculate_miles_traveled(current_world, last_world)
+                        button_text_miles = font.render(f"Miles Traveled: {str(miles_traveled)}", True,
+                                                        button_color)
+                    last_world = current_world
+
                 elif button_volume.collidepoint(mouse_pos):
                     if volume_on == True:
                         pygame.mixer.music.set_volume(0)
@@ -194,6 +288,10 @@ while running:
 
     elif screen_mode == "home":
         screen.blit(background, (0,0))
+
+        for conn in connections:
+            start_pos, end_pos = conn
+            draw_dotted_line(screen, (0, 0, 0), start_pos, end_pos)
 
         screen.blit(pin, button_rect_work)
 
@@ -242,6 +340,8 @@ while running:
                 pygame.draw.rect(screen, button_color, tooltip_bg_rect, border_radius=8)
                 screen.blit(tooltip_surf, (tooltip_bg_rect.x + 5, tooltip_bg_rect.y + 3))
 
+        screen.blit(button_text_miles, (button_rect_miles.x, button_rect_miles.y))
+        screen.blit(button_text_carbon, (button_rect_carbon.x, button_rect_carbon.y))
 
     pygame.display.flip()
     clock.tick(60)

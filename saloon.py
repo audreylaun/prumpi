@@ -336,7 +336,6 @@ def run_saloon_game(num_coins, num_aces, num_spitballs, num_beers, bow, gem, bac
                     if button_rect_home.collidepoint(mouse_pos):
                         screen_mode = "home"
                     elif button_rect_smile.collidepoint(mouse_pos):
-                        print("clicked")
                         current_face = smile_face
                         face_start_time = pygame.time.get_ticks()
                         flash_active = True

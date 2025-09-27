@@ -127,6 +127,9 @@ def run_bedroom_game(num_coins, bow, gem, backpack, labubu, hat, heels, happines
         screen_mode = "first open"
 
     running = True
+    pygame.mixer.music.load("data/audio/bedroom.mp3")
+    pygame.mixer.music.play(-1)
+
     while running:
         screen.fill((255, 255, 255))
         mouse_pos = pygame.mouse.get_pos()
@@ -158,6 +161,8 @@ def run_bedroom_game(num_coins, bow, gem, backpack, labubu, hat, heels, happines
                         volume_on = True
                 if screen_mode == "bedroom":
                     if button_rect_world.collidepoint(mouse_pos):
+                        pygame.mixer.music.load("data/audio/background_music.mp3")
+                        pygame.mixer.music.play(-1)
                         return num_coins, happiness, volume_on, bedroom_first_complete
                     elif button_rect_log_open.collidepoint(mouse_pos):
                         screen_mode = "log"
