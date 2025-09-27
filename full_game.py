@@ -68,6 +68,20 @@ def draw_dotted_line(surface, color, start_loc, end_loc, width=2, dash_length=10
 
         pygame.draw.line(surface, color, (start_x, start_y), (end_x, end_y), width)
 
+def draw_face(miles_traveled, face_rect):
+    if miles_traveled < 1000:
+        face = pygame.image.load(f"data/image/face{1}.png")
+    elif 1000 <= miles_traveled < 10000:
+        face = pygame.image.load(f"data/image/face{2}.png")
+    elif 10000 <= miles_traveled < 20000:
+        face = pygame.image.load(f"data/image/face{3}.png")
+    elif 20000 <= miles_traveled < 30000:
+        face = pygame.image.load(f"data/image/face{4}.png")
+    elif 30000 <= miles_traveled:
+        face = pygame.image.load(f"data/image/face{5}.png")
+    face = pygame.transform.scale(face, (50, 50))
+    screen.blit(face, face_rect)
+
 
 # --- Initialize Game ---
 pygame.init()
@@ -135,6 +149,7 @@ button_rect_miles = pygame.Rect(600, 20, 200, 60)
 button_text_miles = font.render(f"Miles Traveled: {str(miles_traveled)}", True, button_color)
 button_rect_carbon = pygame.Rect(600, 70, 200, 60)
 button_text_carbon = font.render(f"Carbon Footprint:", True, button_color)
+face_rect = pygame.Rect(875, 70, 50, 50)
 
 
 
@@ -342,6 +357,7 @@ while running:
 
         screen.blit(button_text_miles, (button_rect_miles.x, button_rect_miles.y))
         screen.blit(button_text_carbon, (button_rect_carbon.x, button_rect_carbon.y))
+        draw_face(miles_traveled, face_rect)
 
     pygame.display.flip()
     clock.tick(60)

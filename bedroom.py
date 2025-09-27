@@ -117,7 +117,7 @@ def run_bedroom_game(num_coins, bow, gem, backpack, labubu, hat, heels, happines
     book_pos = pygame.Rect(415,350,125,100)
     pages = load_book_images("data/book")
     current_page = 0
-    left_rect = pygame.Rect(50, 325, 50, 50)
+    left_rect = pygame.Rect(35, 325, 50, 50)
     right_rect = pygame.Rect(910, 325, 50, 50)
     book_complete = False
     mama_text = False
