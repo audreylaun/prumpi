@@ -111,7 +111,7 @@ labubu = False
 
 # ---Quests---
 # Work
-work_complete = True
+work_complete = False
 work_first_open = True
 work_first_complete = True
 num_customers = 0
@@ -119,7 +119,7 @@ num_rows = 0
 hydration = 0
 
 # Salon
-salon_complete = True
+salon_complete = False
 salon_first_open = True
 salon_first_complete = True
 num_dinners = 0
@@ -128,7 +128,7 @@ num_twerks = 0
 num_happiness = 0
 
 # Saloon
-saloon_complete = True
+saloon_complete = False
 saloon_first_open = True
 saloon_first_complete = True
 num_aces = 0
@@ -145,7 +145,6 @@ num_reads = 0
 # Happiness
 happiness = 0
 HAPPINESS_MAX = 30
-
 
 # Carbon footprint stuff
 miles_traveled = 0
