@@ -44,7 +44,6 @@ def calculate_miles_traveled(current_screen, previous_screen):
 
     return int(round(miles_traveled*10,0))
 
-
 def draw_dotted_line(surface, color, start_loc, end_loc, width=2, dash_length=10, space_length=5):
     locations = {"salon": [150, 500],
                  "saloon": [550, 350],
@@ -77,20 +76,41 @@ def draw_dotted_line(surface, color, start_loc, end_loc, width=2, dash_length=10
 
 def draw_face(miles_traveled, face_rect):
     if miles_traveled < 1000:
-        face = pygame.image.load(f"data/image/face{0}.png")
+        face = pygame.image.load(f"data/image/face0.png")
     elif 1000 <= miles_traveled < 10000:
-        face = pygame.image.load(f"data/image/face{1}.png")
+        face = pygame.image.load(f"data/image/face1.png")
     elif 10000 <= miles_traveled < 20000:
-        face = pygame.image.load(f"data/image/face{2}.png")
+        face = pygame.image.load(f"data/image/face2.png")
     elif 20000 <= miles_traveled < 30000:
-        face = pygame.image.load(f"data/image/face{3}.png")
+        face = pygame.image.load(f"data/image/face3.png")
     elif 30000 <= miles_traveled < 40000:
-        face = pygame.image.load(f"data/image/face{4}.png")
+        face = pygame.image.load(f"data/image/face4.png")
     elif 40000 <= miles_traveled:
-        face = pygame.image.load(f"data/image/face{5}.png")
+        face = pygame.image.load(f"data/image/face5.png")
     face = pygame.transform.scale(face, (50, 50))
     screen.blit(face, face_rect)
 
+def save_game():
+    with open(save_file, "w") as f:
+        json.dump(game_state, f)
+    print("Saved!")
+
+def load_game():
+    global game_state
+    if os.path.exists(save_file):
+        with open(save_file, "r") as f:
+            game_state = json.load(f)
+        print("Loaded:", game_state)
+    else:
+        print("No save file found, starting fresh.")
+        reset_game(save=False)
+
+def reset_game(save=True):
+    global game_state
+    game_state = copy.deepcopy(default_state)
+    if save:
+        save_game()
+    print("Game reset!")
 
 # --- Initialize Game ---
 pygame.init()
@@ -98,12 +118,9 @@ screen = pygame.display.set_mode((1000, 700))
 pygame.display.set_caption("Prumpi World")
 clock = pygame.time.Clock()
 
-# --- Set Font and Button Colors  ---
-font = pygame.font.SysFont("comic_sansms", 32)
-button_color = (255, 225, 125)
-button_text_color = (24, 100, 24)
-
+# --- Save Game ---
 save_file = "savegame.json"
+
 # GAME STATE VARIABLES
 default_state = {
     "num_coins": 0,
@@ -160,40 +177,10 @@ default_state = {
 
 game_state = copy.deepcopy(default_state)
 
-def save_game():
-    with open(save_file, "w") as f:
-        json.dump(game_state, f)
-    print("Saved!")
-
-def load_game():
-    global game_state
-    if os.path.exists(save_file):
-        with open(save_file, "r") as f:
-            game_state = json.load(f)
-        print("Loaded:", game_state)
-    else:
-        print("No save file found, starting fresh.")
-        reset_game(save=False)
-
-def reset_game(save=True):
-    global game_state
-    game_state = copy.deepcopy(default_state)
-    if save:
-        save_game()
-    print("Game reset!")
-
-button_rect_miles = pygame.Rect(600, 20, 200, 60)
-
-button_rect_carbon = pygame.Rect(600, 70, 200, 60)
-button_text_carbon = font.render(f"Carbon Footprint:", True, button_color)
-face_rect = pygame.Rect(875, 70, 50, 50)
-
-button_rect_save = pygame.Rect(25, 20, 200, 50)
-button_text_save = font.render(f"Save Game", True, button_text_color)
-button_rect_new =  pygame.Rect(25, 90, 200, 50)
-button_text_new = font.render(f"New Game", True, button_text_color)
-
-
+# --- Set Font and Button Colors  ---
+font = pygame.font.SysFont("comic_sansms", 32)
+button_color = (255, 225, 125)
+button_text_color = (24, 100, 24)
 
 # --- Load images ---
 background = pygame.image.load("data/image/prumpi_world.png")
@@ -210,8 +197,23 @@ title_image = pygame.transform.scale(title_image, (500, 300))
 pin = pygame.transform.scale(pin, (100,100))
 coin_img = pygame.transform.scale(coin_img, (80, 80))
 lock = pygame.transform.scale(lock, (50,50))
+volume_on_img = pygame.transform.scale(volume_on_img, (60,60))
+volume_off_img = pygame.transform.scale(volume_off_img, (60,60))
 
-# --- Create buttons ---
+# --- Button Rects and Text
+button_rect_miles = pygame.Rect(600, 20, 200, 60)
+
+button_rect_carbon = pygame.Rect(600, 70, 200, 60)
+button_text_carbon = font.render(f"Carbon Footprint:", True, button_color)
+
+face_rect = pygame.Rect(875, 70, 50, 50)
+
+button_rect_save = pygame.Rect(25, 20, 200, 50)
+button_text_save = font.render(f"Save Game", True, button_text_color)
+
+button_rect_new =  pygame.Rect(25, 90, 200, 50)
+button_text_new = font.render(f"New Game", True, button_text_color)
+
 button_rect_begin = pygame.Rect(400, 500, 200, 60)
 button_text_begin = font.render("Begin", True, button_text_color)
 
@@ -226,16 +228,19 @@ button_rect_title = title_image.get_rect(center=(screen.get_width() // 2, 300))
 coin_button_home = pygame.Rect(35, 600, 60, 60)
 coin_button_else = pygame.Rect(35, 35, 60, 60)
 
-volume_on_img = pygame.transform.scale(volume_on_img, (60,60))
-volume_off_img = pygame.transform.scale(volume_off_img, (60,60))
-button_volume = pygame.Rect(930, 630, 60, 60)
-volume_on = True
-HAPPINESS_MAX = 30
 button_rect_sure = pygame.Rect(250, 200, 500, 250)
 button_text_sure_1 = font.render("Are you sure you", True, button_text_color)
 button_text_sure_2 = font.render("want to start a new game?", True, button_text_color)
+
 button_rect_yes = pygame.Rect(425, 380, 50, 50)
 button_rect_no = pygame.Rect(525, 380, 50, 50)
+
+button_volume = pygame.Rect(930, 630, 60, 60)
+
+# --- Game variables not in JSON ---
+volume_on = True
+HAPPINESS_MAX = 30
+
 are_you_sure = False
 saving = False
 
@@ -244,14 +249,17 @@ pygame.mixer.music.load("data/audio/background_music.mp3")
 pygame.mixer.music.play(-1)  # -1 means loop indefinitely
 pygame.mixer.music.set_volume(0.5)  # 0.0 to 1.0
 
-screen_mode = "title"
+# --- Load game or start new save ---
 load_game()
+
+# --- Final variable settings ---
+screen_mode = "title"
 button_text_miles = font.render(f"Miles Traveled: " + str(game_state["miles_traveled"]), True,
                                                         button_color)
 button_text_coin = font.render(str(game_state["num_coins"]) + " Prumpi Coins", True, (0, 0, 0))
 
+# --- Run game ---
 running = True
-
 while running:
     screen.fill((255, 255, 255))
     mouse_pos = pygame.mouse.get_pos()
@@ -312,22 +320,11 @@ while running:
                 if game_state["work_complete"]:
                     if button_rect_salon.collidepoint(mouse_pos):
                         game_state["num_coins"],game_state["num_dinners"],game_state["num_desserts"],game_state["num_twerks"],game_state["num_happiness"],game_state["happiness"],volume_on,game_state["salon_first_complete"] = run_salon_game(
-                            game_state["num_coins"],
-                            game_state["num_dinners"],
-                            game_state["num_desserts"],
-                            game_state["num_twerks"],
-                            game_state["num_happiness"],
-                            game_state["happiness"],
-                            game_state["bow"],
-                            game_state["gem"],
-                            game_state["backpack"],
-                            game_state["hat"],
-                            game_state["heels"],
-                            game_state["labubu"],
-                            HAPPINESS_MAX,
-                            volume_on,
-                            game_state["salon_first_open"],
-                            game_state["salon_first_complete"]
+                            game_state["num_coins"],game_state["num_dinners"],game_state["num_desserts"],
+                            game_state["num_twerks"],game_state["num_happiness"],game_state["happiness"],
+                            game_state["bow"],game_state["gem"],game_state["backpack"],game_state["hat"],
+                            game_state["heels"],game_state["labubu"],HAPPINESS_MAX,volume_on,
+                            game_state["salon_first_open"],game_state["salon_first_complete"]
                         )
                         if game_state["salon_first_open"]:
                             game_state["salon_first_open"] = False
@@ -344,21 +341,10 @@ while running:
                 if game_state["salon_complete"]:
                     if button_rect_saloon.collidepoint(mouse_pos):
                         game_state["num_coins"],game_state["num_aces"],game_state["num_spitballs"],game_state["num_beers"],game_state["happiness"],volume_on,game_state["saloon_first_complete"] = run_saloon_game(
-                            game_state["num_coins"],
-                            game_state["num_aces"],
-                            game_state["num_spitballs"],
-                            game_state["num_beers"],
-                            game_state["bow"],
-                            game_state["gem"],
-                            game_state["backpack"],
-                            game_state["hat"],
-                            game_state["heels"],
-                            game_state["labubu"],
-                            game_state["happiness"],
-                            HAPPINESS_MAX,
-                            volume_on,
-                            game_state["saloon_first_open"],
-                            game_state["saloon_first_complete"]
+                            game_state["num_coins"],game_state["num_aces"],game_state["num_spitballs"],
+                            game_state["num_beers"],game_state["bow"],game_state["gem"],
+                            game_state["backpack"],game_state["hat"],game_state["heels"],game_state["labubu"],
+                            game_state["happiness"],HAPPINESS_MAX,volume_on,game_state["saloon_first_open"],game_state["saloon_first_complete"]
                         )
                         if game_state["saloon_first_open"]:
                             game_state["saloon_first_open"] = False
@@ -374,26 +360,11 @@ while running:
 
                 if game_state["saloon_complete"]:
                     if button_rect_bedroom.collidepoint(mouse_pos):
-                        (game_state["num_coins"],
-                         game_state["web_coins"],
-                         game_state["num_reads"],
-                         game_state["happiness"],
-                         volume_on,
-                         game_state["bedroom_first_complete"]) = run_bedroom_game(
-                            game_state["num_coins"],
-                            game_state["web_coins"],
-                            game_state["num_reads"],
-                            game_state["bow"],
-                            game_state["gem"],
-                            game_state["backpack"],
-                            game_state["labubu"],
-                            game_state["hat"],
-                            game_state["heels"],
-                            game_state["happiness"],
-                            HAPPINESS_MAX,
-                            volume_on,
-                            game_state["bedroom_first_open"],
-                            game_state["bedroom_first_complete"]
+                        game_state["num_coins"],game_state["web_coins"],game_state["num_reads"],game_state["happiness"],volume_on,game_state["bedroom_first_complete"] = run_bedroom_game(
+                            game_state["num_coins"],game_state["web_coins"],game_state["num_reads"],
+                            game_state["bow"],game_state["gem"],game_state["backpack"],
+                            game_state["labubu"],game_state["hat"],game_state["heels"],game_state["happiness"],
+                            HAPPINESS_MAX,volume_on,game_state["bedroom_first_open"],game_state["bedroom_first_complete"]
                         )
                         if game_state["bedroom_first_open"]:
                             game_state["bedroom_first_open"] = False
@@ -408,25 +379,11 @@ while running:
                         game_state["last_world"] = game_state["current_world"]
 
                 if button_rect_shop.collidepoint(mouse_pos):
-                    (game_state["num_coins"],
-                     game_state["happiness"],
-                     game_state["bow"],
-                     game_state["gem"],
-                     game_state["backpack"],
-                     game_state["hat"],
-                     game_state["heels"],
-                     game_state["labubu"],
-                     volume_on) = run_store(
-                        game_state["num_coins"],
-                        game_state["happiness"],
-                        game_state["bow"],
-                        game_state["gem"],
-                        game_state["backpack"],
-                        game_state["hat"],
-                        game_state["heels"],
-                        game_state["labubu"],
-                        HAPPINESS_MAX,
-                        volume_on
+                    (game_state["num_coins"],game_state["happiness"],game_state["bow"],game_state["gem"],game_state["backpack"],
+                     game_state["hat"],game_state["heels"],game_state["labubu"],volume_on) = run_store(
+                        game_state["num_coins"],game_state["happiness"],game_state["bow"],game_state["gem"],
+                        game_state["backpack"],game_state["hat"],game_state["heels"],game_state["labubu"],
+                        HAPPINESS_MAX,volume_on
                     )
                     button_text_coin = font.render(str(game_state["num_coins"]) + " Prumpi Coins", True, (0, 0, 0))
                     game_state["current_world"] = "store"
