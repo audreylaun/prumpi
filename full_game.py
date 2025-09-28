@@ -3,6 +3,8 @@ import math
 import json
 import os
 import copy
+from pathlib import Path
+import sys
 
 from saloon import run_saloon_game
 from salon import run_salon_game
@@ -12,6 +14,7 @@ from happiness import draw_happiness_meter
 from store import run_store
 from displays import announcement
 
+app_name = "Prumpi_World"
 def fade_to_black(screen, clock, background, speed=5):
     """
     Fades the screen to black
@@ -91,13 +94,27 @@ def draw_face(miles_traveled, face_rect):
     face = pygame.transform.scale(face, (50, 50))
     screen.blit(face, face_rect)
 
+def get_save_path():
+    if sys.platform == "darwin":  # macOS
+        base = Path.home() / "Library" / "Application Support" / app_name
+    elif sys.platform == "win32":  # Windows
+        base = Path(os.getenv("APPDATA")) / app_name
+    else:  # Linux and others
+        base = Path.home() / f".{app_name}"
+
+    base.mkdir(parents=True, exist_ok=True)
+    return base / "savegame.json"
+
 def save_game():
+    save_file = get_save_path()
+    print(save_file)
     with open(save_file, "w") as f:
         json.dump(game_state, f)
     print("Saved!")
 
 def load_game():
     global game_state
+    save_file = get_save_path()
     if os.path.exists(save_file):
         with open(save_file, "r") as f:
             game_state = json.load(f)
