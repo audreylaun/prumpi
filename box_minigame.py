@@ -176,6 +176,9 @@ def run_tetris_minigame(total_coins):
                 grid, lines = clear_lines(grid)
                 coins += lines * 5
 
+                if coins > 0:
+                    if coins/5 % 7 == 0:
+                        drop_speed = max(100, drop_speed - 25)
 
                 # Instead of picking random again, use the "next piece"
                 current_piece = next_piece
