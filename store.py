@@ -68,6 +68,10 @@ def run_store(num_coins, happiness, bow, gem, backpack, hat, heels, labubu, HAPP
 
     screen_mode = "home"
 
+    pygame.mixer.music.load("data/audio/shop.mp3")
+    pygame.mixer.music.play(-1)  # -1 means loop indefinitely
+    pygame.mixer.music.set_volume(0.5)  # 0.0 to 1.0
+
     running = True
     while running:
         mouse_pos = pygame.mouse.get_pos()
@@ -79,6 +83,9 @@ def run_store(num_coins, happiness, bow, gem, backpack, hat, heels, labubu, HAPP
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if screen_mode == "home":
                     if button_rect_world.collidepoint(mouse_pos):
+                        pygame.mixer.music.load("data/audio/background_music.mp3")
+                        pygame.mixer.music.play(-1)  # -1 means loop indefinitely
+                        pygame.mixer.music.set_volume(0.5)  # 0.0 to 1.0
                         return num_coins, happiness, bow, gem, backpack, hat, heels, labubu, volume_on
                     elif button_volume.collidepoint(mouse_pos):
                         if volume_on == True:
