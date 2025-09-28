@@ -10,6 +10,7 @@ from work import run_work_game
 from bedroom import run_bedroom_game
 from happiness import draw_happiness_meter
 from store import run_store
+from displays import announcement
 
 def fade_to_black(screen, clock, background, speed=5):
     """
@@ -124,6 +125,8 @@ save_file = "savegame.json"
 # GAME STATE VARIABLES
 default_state = {
     "num_coins": 0,
+
+    "game_first_open": True,
 
     # Accessories
     "bow": False,
@@ -244,6 +247,9 @@ HAPPINESS_MAX = 30
 are_you_sure = False
 saving = False
 
+page_1 = True
+page_2 = False
+
 # --- Set music ---
 pygame.mixer.music.load("data/audio/background_music.mp3")
 pygame.mixer.music.play(-1)  # -1 means loop indefinitely
@@ -270,6 +276,8 @@ while running:
         game_state["saloon_complete"] = True
     if game_state["num_dinners"] >=3 and game_state["num_dessert"] >=3 and game_state["num_twerks"] >= 50 and game_state["num_happiness"] >=30:
         game_state["salon_complete"] = True
+    if game_state["num_reads"] >=5 and game_state["web_coins"] >=50:
+        game_state["bedroom_complete"] = True
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -278,7 +286,11 @@ while running:
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             if screen_mode == "title":
                 if button_rect_begin.collidepoint(mouse_pos):
-                    screen_mode = "home"
+                    if game_state["game_first_open"]:
+                        screen_mode = "instructions 1"
+                        game_state["game_first_open"] = False
+                    else:
+                        screen_mode = "home"
 
             if screen_mode == "home":
                 if button_rect_save.collidepoint(mouse_pos):
@@ -404,6 +416,12 @@ while running:
                     pygame.mixer.music.set_volume(0.5)
                     volume_on = True
 
+        elif event.type == pygame.KEYDOWN:
+            if screen_mode == "instructions 1":
+                screen_mode = "instructions 2"
+            elif screen_mode == "instructions 2":
+                screen_mode = "home"
+
     # --- Drawing ---
     if screen_mode == "title":
         screen.blit(background, (0, 0))
@@ -413,6 +431,17 @@ while running:
         pygame.draw.rect(screen, button_color, button_rect_begin, border_radius=10)
         pygame.draw.rect(screen, (0, 0, 0), button_rect_begin, width=2, border_radius=10)
         screen.blit(button_text_begin, (button_rect_begin.x + 60, button_rect_begin.y + 5))
+
+    elif screen_mode == "instructions 1":
+        welcome_text_1 = "Hi I'm Prumpi! Welcome"
+        welcome_text_2 = "to a day in my life! "
+        welcome_text_3 = "Press any key to continue."
+        announcement(screen, background, welcome_text_1, welcome_text_2, welcome_text_3)
+    elif screen_mode == "instructions 2":
+        welcome_text_1 = "Complete quests to unlock"
+        welcome_text_2 = "new places. Let's go to work!"
+        welcome_text_3 = "Press any key to continue."
+        announcement(screen, background, welcome_text_1, welcome_text_2, welcome_text_3)
 
     elif screen_mode == "home":
         screen.blit(background, (0,0))

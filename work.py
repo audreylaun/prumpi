@@ -26,6 +26,8 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
     water_break = pygame.image.load("data/image/water_break.png")
     prumpi_water = pygame.image.load("data/image/prumpi_standing.png")
     computer_background = pygame.image.load("data/image/computer.png")
+    arrow = pygame.image.load("data/image/arrow.png")
+
 
     # Accessories
     hat_img = pygame.image.load("data/image/hat.png")
@@ -46,6 +48,7 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
     prumpi_backpack = pygame.transform.scale(prumpi_backpack, (300, 400))
     prumpi_backpack = pygame.transform.flip(prumpi_backpack, True, False)
     labubu_img = pygame.transform.scale(labubu_img, (50, 50))
+
 
     #Customers
     penguin_front = pygame.image.load("data/image/penguin_front.png")
@@ -80,6 +83,7 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
     cow_back = pygame.transform.scale(cow_back, (200,300))
 
 
+
     # --- Resize ---
     coin_img = pygame.transform.scale(coin_img, (80,80))
     title_background = pygame.transform.scale(title_background, (1000, 700))
@@ -99,6 +103,8 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
     prumpi_water = pygame.transform.scale(prumpi_water, (300,400))
     prumpi_water = pygame.transform.flip(prumpi_water, True, False)
     computer_background = pygame.transform.scale(computer_background, (1000,700))
+    arrow = pygame.transform.scale(arrow, (100, 100))
+    arrow = pygame.transform.rotate(arrow, 90)
 
 
     # --- Buttons ---
@@ -170,6 +176,8 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
     dino_pos_title = [400, 475]
     dino_pos_work = (425, 339)
     dino_speed = 2
+
+    arrow_pos = (550, 50)
 
     #Customer Variables
     customer_present = False
@@ -343,6 +351,10 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
                             if rect.collidepoint(mouse_pos):
                                 dragging_backpack = (color, img, rect.copy())  # save original rect
                                 drag_offset = (mouse_pos[0] - rect.x, mouse_pos[1] - rect.y)
+                    if work_first_open:
+                        if button_rect_log_open.collidepoint(mouse_pos):
+                            screen_mode = "log"
+                            work_first_open = False
                 if screen_mode == "water":
                     if button_rect_home.collidepoint(mouse_pos):
                         screen_mode = "work"
@@ -488,7 +500,7 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
             welcome_text_2 = "I hope I see my crush."
             welcome_text_3 = "Press any key to continue."
 
-            work_first_open = False
+            # work_first_open = False
             announcement(screen, work_background, welcome_text_1, welcome_text_2, welcome_text_3)
 
         elif screen_mode == "work":
@@ -555,6 +567,15 @@ def run_work_game(num_coins, num_customers, num_rows, hydration, bow, gem, backp
             screen.blit(button_text_coin, (coin_button_home.x + 100, coin_button_home.y + 20))
 
             screen.blit(quest_log_open, (button_rect_log_open.x, button_rect_log_open.y))
+
+            if work_first_open:
+                #blit an arrow to the quest log
+                screen.blit(arrow, arrow_pos)
+                instructions_1 = font_small.render("Click the book", True, (0, 0, 0))
+                instructions_2 = font_small.render("to view your quests.", True, (0, 0, 0))
+                screen.blit(instructions_1, (arrow_pos[0], arrow_pos[1]+100))
+                screen.blit(instructions_2, (arrow_pos[0], arrow_pos[1]+120))
+
 
         elif screen_mode == "water":
             screen.blit(water_break, (0,0))
