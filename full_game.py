@@ -193,6 +193,7 @@ volume_on_img = pygame.image.load("data/image/volume_on.png")
 volume_off_img = pygame.image.load("data/image/volume_off.png")
 coin_img = pygame.image.load("data/image/coin.png")
 lock = pygame.image.load("data/image/lock.png")
+arrow = pygame.image.load("data/image/arrow_yellow.png")
 
 # --- Rescale images ---
 background = pygame.transform.scale(background, (1000, 700))
@@ -202,6 +203,8 @@ coin_img = pygame.transform.scale(coin_img, (80, 80))
 lock = pygame.transform.scale(lock, (50,50))
 volume_on_img = pygame.transform.scale(volume_on_img, (60,60))
 volume_off_img = pygame.transform.scale(volume_off_img, (60,60))
+arrow = pygame.transform.scale(arrow, (100,100))
+arrow = pygame.transform.rotate(arrow, 90)
 
 # --- Button Rects and Text
 button_rect_miles = pygame.Rect(600, 20, 200, 60)
@@ -240,6 +243,8 @@ button_rect_no = pygame.Rect(525, 380, 50, 50)
 
 button_volume = pygame.Rect(930, 630, 60, 60)
 
+arrow_pos = (225, 85)
+
 # --- Game variables not in JSON ---
 volume_on = True
 HAPPINESS_MAX = 30
@@ -249,6 +254,7 @@ saving = False
 
 page_1 = True
 page_2 = False
+
 
 # --- Set music ---
 pygame.mixer.music.load("data/audio/background_music.mp3")
@@ -288,7 +294,6 @@ while running:
                 if button_rect_begin.collidepoint(mouse_pos):
                     if game_state["game_first_open"]:
                         screen_mode = "instructions 1"
-                        game_state["game_first_open"] = False
                     else:
                         screen_mode = "home"
 
@@ -420,6 +425,7 @@ while running:
             if screen_mode == "instructions 1":
                 screen_mode = "instructions 2"
             elif screen_mode == "instructions 2":
+                click_time = pygame.time.get_ticks()
                 screen_mode = "home"
 
     # --- Drawing ---
@@ -518,6 +524,16 @@ while running:
 
         if saving and pygame.time.get_ticks() - save_time < 2000:
             screen.blit(font.render("Saving!!!", True, button_color), (250, 20))
+
+        if game_state["game_first_open"] and pygame.time.get_ticks() - click_time < 5000:
+            screen.blit(arrow, arrow_pos)
+            instructions_1 = font.render("Save or start a new game", True, button_color)
+            instructions_2 = font.render("on the home page!", True, button_color)
+            screen.blit(instructions_1, (arrow_pos[0], arrow_pos[1] + 90))
+            screen.blit(instructions_2, (arrow_pos[0], arrow_pos[1] + 120))
+        else:
+            game_state["game_first_open"] = False
+
 
 
     pygame.display.flip()
