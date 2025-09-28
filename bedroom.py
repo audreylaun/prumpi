@@ -46,6 +46,11 @@ def run_bedroom_game(num_coins, web_coins, num_reads, bow, gem, backpack, labubu
     arrow_left = pygame.image.load("data/image/arrow_left.png")
     computer_background = pygame.image.load("data/image/computer_close.png")
     thought_bubble = pygame.image.load("data/image/thought_bubble.png")
+    popcorn_background = pygame.image.load("data/image/popcorn_background.png")
+    popcorn = pygame.image.load("data/image/popcorn.png")
+    reset_img = pygame.image.load("data/image/reset_icon.png").convert_alpha()
+
+
 
     # --- Resize ---
     coin_img = pygame.transform.scale(coin_img, (80, 80))
@@ -66,6 +71,8 @@ def run_bedroom_game(num_coins, web_coins, num_reads, bow, gem, backpack, labubu
     arrow_left = pygame.transform.scale(arrow_left, (50,50))
     computer_background = pygame.transform.scale(computer_background, (1000,700))
     thought_bubble = pygame.transform.scale(thought_bubble, (500,500))
+    popcorn_background = pygame.transform.scale(popcorn_background, (1000,700))
+    popcorn = pygame.transform.scale(popcorn, (75,75))
 
     # Accessories
     hat_img = pygame.image.load("data/image/hat.png")
@@ -101,6 +108,9 @@ def run_bedroom_game(num_coins, web_coins, num_reads, bow, gem, backpack, labubu
     button_rect_game = pygame.Rect(750, 20, 225, 60)
     button_text_game = font.render("Surf the Web", True, button_text_color)
 
+    button_rect_popcorn = pygame.Rect(750, 90, 225, 60)
+    button_text_popcorn = font.render("Eat Popcorn", True, button_text_color)
+
     button_rect_world = pygame.Rect(50, 20, 275, 50)
     button_text_world = font.render('Return to World', True, button_text_color)
 
@@ -122,6 +132,26 @@ def run_bedroom_game(num_coins, web_coins, num_reads, bow, gem, backpack, labubu
     right_rect = pygame.Rect(910, 325, 50, 50)
     book_complete = False
     mama_text = False
+    # --- Popcorn minigame state ---
+    popcorns = []
+    no_popcorn = False
+    popcorn_active = True
+    bowl_rect = pygame.Rect(350, 200, 300, 300)  # adjust to fit your background bowl
+    POPCORN_SIZE = 75
+    button_reset = pygame.Rect(930, 530, 60, 60)
+    reset_img = pygame.transform.scale(reset_img, (60, 60))
+
+    def reset_popcorn():
+        nonlocal popcorns
+        popcorns = []
+        for _ in range(10):
+            x = random.randint(bowl_rect.left, bowl_rect.right - POPCORN_SIZE)
+            y = random.randint(bowl_rect.top, bowl_rect.bottom - POPCORN_SIZE)
+            rect = pygame.Rect(x, y, POPCORN_SIZE, POPCORN_SIZE)
+            popcorns.append(rect)
+
+
+    reset_popcorn()
 
     screen_mode = "title"
 
@@ -172,6 +202,8 @@ def run_bedroom_game(num_coins, web_coins, num_reads, bow, gem, backpack, labubu
                         screen_mode = "book"
                     elif button_rect_game.collidepoint(mouse_pos):
                         screen_mode = "game"
+                    elif button_rect_popcorn.collidepoint(mouse_pos):
+                        screen_mode = "popcorn"
                 elif screen_mode == "log":
                     if button_rect_log_close.collidepoint(mouse_pos):
                         screen_mode = "bedroom"
@@ -186,6 +218,19 @@ def run_bedroom_game(num_coins, web_coins, num_reads, bow, gem, backpack, labubu
                 elif screen_mode == "game":
                     if button_rect_home.collidepoint(mouse_pos):
                         screen_mode = "bedroom"
+                elif screen_mode == "popcorn":
+                    if button_rect_home.collidepoint(mouse_pos):
+                        screen_mode = "bedroom"
+                    else:
+                        # Clicked popcorn?
+                        for rect in popcorns[:]:
+                            if rect.collidepoint(mouse_pos):
+                                popcorns.remove(rect)
+                                break
+                        # Clicked reset button?
+                        if button_reset.collidepoint(mouse_pos):
+                            reset_popcorn()
+                            popcorn_active = True
 
             elif event.type == pygame.KEYDOWN:
                 if screen_mode == "first open":
@@ -199,13 +244,9 @@ def run_bedroom_game(num_coins, web_coins, num_reads, bow, gem, backpack, labubu
                     screen_mode = current_screen
 
         #Drawing
+
         if screen_mode == "bedroom":
             screen.blit(bedroom_background, (0, 0))
-
-            if volume_on == True:
-                screen.blit(volume_on_img, (button_volume.x, button_volume.y))
-            elif volume_on == False:
-                screen.blit(volume_off_img, (button_volume.x, button_volume.y))
 
             screen.blit(prumpi_sitting, dino_pos)
 
@@ -233,6 +274,9 @@ def run_bedroom_game(num_coins, web_coins, num_reads, bow, gem, backpack, labubu
             pygame.draw.rect(screen, button_color, button_rect_game, border_radius=12)
             screen.blit(button_text_game, (button_rect_game.x, button_rect_game.y))
 
+            pygame.draw.rect(screen, button_color, button_rect_popcorn, border_radius=12)
+            screen.blit(button_text_popcorn, (button_rect_popcorn.x, button_rect_popcorn.y))
+
             draw_happiness_meter(screen, happiness, HAPPINESS_MAX)
 
             screen.blit(coin_img, (coin_button_home.x, coin_button_home.y))
@@ -255,6 +299,10 @@ def run_bedroom_game(num_coins, web_coins, num_reads, bow, gem, backpack, labubu
             else:
                 mama_text = False
             draw_happiness_meter(screen, happiness, HAPPINESS_MAX)
+            if volume_on == True:
+                screen.blit(volume_on_img, (button_volume.x, button_volume.y))
+            elif volume_on == False:
+                screen.blit(volume_off_img, (button_volume.x, button_volume.y))
 
         if screen_mode == "title":
             screen.blit(bedroom_background, (0, 0))
@@ -264,6 +312,7 @@ def run_bedroom_game(num_coins, web_coins, num_reads, bow, gem, backpack, labubu
             pygame.draw.rect(screen, button_color, button_rect_begin, border_radius=10)
             pygame.draw.rect(screen, button_color, button_rect_begin, width=2, border_radius=10)
             screen.blit(button_text_begin, (button_rect_begin.x + 60, button_rect_begin.y + 5))
+
         elif screen_mode == "log":
             screen.blit(bedroom_background, (0, 0))
 
@@ -366,7 +415,39 @@ def run_bedroom_game(num_coins, web_coins, num_reads, bow, gem, backpack, labubu
             screen.blit(button_text_coin, (coin_button_home.x + 100, coin_button_home.y + 20))
 
 
+        elif screen_mode == "popcorn":
+            screen.blit(popcorn_background, (0, 0))
 
+            # home button
+            pygame.draw.rect(screen, button_color, button_rect_home, border_radius=12)
+            screen.blit(button_text_home, (button_rect_home.x + 10, button_rect_home.y + 5))
+
+            # draw popcorn kernels
+            if popcorn_active:
+                for rect in popcorns:
+                    screen.blit(popcorn, rect.topleft)
+
+            # reset button
+            screen.blit(reset_img, (button_reset.x, button_reset.y))
+
+            # happiness meter + coins
+            draw_happiness_meter(screen, happiness, HAPPINESS_MAX)
+            screen.blit(coin_img, (coin_button_home.x, coin_button_home.y))
+            screen.blit(button_text_coin, (coin_button_home.x + 100, coin_button_home.y + 20))
+
+            # if no popcorn left, increase happiness and respawn
+            if not popcorns and popcorn_active:
+                no_popcorn = True
+                popcorn_active = False
+
+            if no_popcorn:
+                happiness +=1
+                no_popcorn = False
+
+            if volume_on == True:
+                screen.blit(volume_on_img, (button_volume.x, button_volume.y))
+            elif volume_on == False:
+                screen.blit(volume_off_img, (button_volume.x, button_volume.y))
 
         elif screen_mode == "first open":
             welcome_text_1 = "Finally home!"
@@ -397,3 +478,7 @@ def run_bedroom_game(num_coins, web_coins, num_reads, bow, gem, backpack, labubu
 
         pygame.display.flip()
         clock.tick(60)
+
+if __name__ == "__main__":
+    pygame.init()
+    num_coins, web_coins, num_reads, happiness, volume_on, bedroom_first_complete = run_bedroom_game(0, 0, 0, False, False, False, False, False, False, 0, 30, True, True, True)

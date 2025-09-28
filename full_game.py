@@ -329,6 +329,7 @@ while running:
                         button_text_coin = font.render(str(game_state["num_coins"]) + " Prumpi Coins", True, (0, 0, 0))
                         button_text_miles = font.render(f"Miles Traveled: " + str(game_state["miles_traveled"]), True,
                                                         button_color)
+                        click_time = pygame.time.get_ticks()
                         are_you_sure = False
                     elif button_rect_no.collidepoint(mouse_pos):
                         are_you_sure = False

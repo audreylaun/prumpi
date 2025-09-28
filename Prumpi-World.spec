@@ -38,6 +38,6 @@ app = BUNDLE(
     a.binaries,
     a.datas,
     name='Prumpi-World.app',
-    icon=None,
+    icon='data/icon.icns',
     bundle_identifier=None,
 )
