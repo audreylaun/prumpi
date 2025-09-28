@@ -120,6 +120,7 @@ def karaoke():
                     if restart_button.collidepoint(mouse_pos):
                         input_text = ""
                         start_time = time.time()
+                        mistakes = 0
                     elif exit_game_button.collidepoint(mouse_pos):
                         mode = "results"
 
