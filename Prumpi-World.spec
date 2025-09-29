@@ -1,5 +1,5 @@
 # -*- mode: python ; coding: utf-8 -*-
-
+import sys
 
 a = Analysis(
     ['full_game.py'],
@@ -15,6 +15,14 @@ a = Analysis(
     optimize=0,
 )
 pyz = PYZ(a.pure)
+
+# Platform-specific icon
+if sys.platform == "darwin":
+    exe_icon = "data/icon.icns"
+elif sys.platform == "win32":
+    exe_icon = "data/icon.ico"
+else:
+    exe_icon = None
 
 exe = EXE(
     pyz,
@@ -32,12 +40,16 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    icon=exe_icon,
 )
-app = BUNDLE(
-    exe,
-    a.binaries,
-    a.datas,
-    name='Prumpi-World.app',
-    icon='data/icon.icns',
-    bundle_identifier=None,
-)
+
+# macOS .app bundle (skip on Windows)
+if sys.platform == "darwin":
+    app = BUNDLE(
+        exe,
+        a.binaries,
+        a.datas,
+        name='Prumpi-World.app',
+        icon=exe_icon,
+        bundle_identifier="com.yourname.prumpiworld",
+    )
