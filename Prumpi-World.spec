@@ -1,51 +1,43 @@
-name: Build macOS Executable
+# -*- mode: python ; coding: utf-8 -*-
 
-on:
-  push:
-    branches: [master, main, installation-and-gitignore]
-  pull_request:
-    branches: [master, main]
-  release:
-    types: [published]
 
-jobs:
-  build-macos:
-    runs-on: macos-latest
+a = Analysis(
+    ['full_game.py'],
+    pathex=[],
+    binaries=[],
+    datas=[('data', 'data')],
+    hiddenimports=[],
+    hookspath=[],
+    hooksconfig={},
+    runtime_hooks=[],
+    excludes=[],
+    noarchive=False,
+    optimize=0,
+)
+pyz = PYZ(a.pure)
 
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.13"
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pyinstaller
-
-      - name: Build executable
-        run: |
-          pyinstaller Prumpi-World.spec
-
-      - name: Upload executable artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: prumpi-world-macos
-          path: |
-            dist/Prumpi-World*
-            dist/*.dmg
-
-      - name: Upload to release (if release)
-        if: github.event_name == 'release'
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: dist/Prumpi-World-macOS.dmg
-          asset_name: Prumpi-World-macOS.dmg
-          asset_content_type: application/octet-stream
-
+exe = EXE(
+    pyz,
+    a.scripts,
+    [],
+    exclude_binaries=True,
+    name='Prumpi-World',
+    debug=False,
+    bootloader_ignore_signals=False,
+    strip=False,
+    upx=True,
+    console=False,
+    disable_windowed_traceback=False,
+    argv_emulation=False,
+    target_arch=None,
+    codesign_identity=None,
+    entitlements_file=None,
+)
+app = BUNDLE(
+    exe,
+    a.binaries,
+    a.datas,
+    name='Prumpi-World.app',
+    icon='data/icon.icns',
+    bundle_identifier=None,
+)
