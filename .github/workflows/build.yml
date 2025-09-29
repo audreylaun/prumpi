@@ -1,21 +1,12 @@
-name: Build Executables
+name: Build macOS Executable
 
 on:
   release:
     types: [published]
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        include:
-          - os: macos-latest
-            artifact_name: prumpi-world-macos
-            zip_name: Prumpi-World-macOS.zip
-          - os: windows-latest
-            artifact_name: prumpi-world-windows
-            zip_name: Prumpi-World-Windows.zip
+  build-macos:
+    runs-on: macos-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -31,38 +22,26 @@ jobs:
           pip install -r requirements.txt
           pip install pyinstaller
 
-      # Build executable from spec file (no --onefile here!)
       - name: Build executable
-        run: pyinstaller Prumpi-World.spec
+        run: |
+          pyinstaller Prumpi-World.spec
 
-      # Sign app bundle on macOS
-      - name: Sign macOS app bundle (ad-hoc)
-        if: matrix.os == 'macos-latest'
+      - name: Sign app bundle (ad-hoc)
         run: |
           codesign --force --deep --sign - dist/Prumpi-World.app
 
-      # Zip macOS build
-      - name: Create zip for macOS
-        if: matrix.os == 'macos-latest'
+      - name: Create zip for release
         run: |
-          cd dist
-          zip -r "../${{ matrix.zip_name }}" Prumpi-World.app
+          cd dist && zip -r Prumpi-World-macOS.zip Prumpi-World.app
 
-      # Zip Windows build
-      - name: Create zip for Windows
-        if: matrix.os == 'windows-latest'
-        run: |
-          cd dist
-          powershell Compress-Archive -Path Prumpi-World.exe -DestinationPath "../${{ matrix.zip_name }}"
-
-      # Upload artifacts (optional)
-      - name: Upload artifact
+      - name: Upload executable artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.artifact_name }}
-          path: ${{ matrix.zip_name }}
+          name: prumpi-world-macos
+          path: |
+            dist/Prumpi-World*
+            dist/*.dmg
 
-      # Upload zip to GitHub release
       - name: Upload to release
         if: github.event_name == 'release'
         uses: actions/upload-release-asset@v1
@@ -70,6 +49,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ${{ matrix.zip_name }}
-          asset_name: ${{ matrix.zip_name }}
+          asset_path: dist/Prumpi-World-macOS.zip
+          asset_name: Prumpi-World-macOS.zip
           asset_content_type: application/zip
