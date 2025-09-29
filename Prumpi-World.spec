@@ -17,11 +17,11 @@ a = Analysis(
 
 pyz = PYZ(a.pure)
 
-# Choose icon depending on platform
+# Select the correct icon for the platform
 if sys.platform == "darwin":
     exe_icon = "data/icon.icns"
 elif sys.platform == "win32":
-    exe_icon = "data/icon.ico"   # Make sure this exists
+    exe_icon = "data/icon.ico"
 else:
     exe_icon = None
 
@@ -35,16 +35,18 @@ exe = EXE(
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    console=False,
+    console=False,       # False for GUI apps
+    windowed=True,       # hides console on Windows
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
     icon=exe_icon,
+    onefile=True,        # produce a single executable
 )
 
-# macOS app bundle only
+# macOS app bundle (only runs on macOS)
 if sys.platform == "darwin":
     app = BUNDLE(
         exe,
@@ -54,4 +56,5 @@ if sys.platform == "darwin":
         icon=exe_icon,
         bundle_identifier="com.yourname.prumpiworld",
     )
+
 
