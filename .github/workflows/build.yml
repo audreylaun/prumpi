@@ -40,14 +40,17 @@ jobs:
         run: |
           codesign --force --deep --sign - dist/Prumpi-World.app
 
-      - name: Create zip for release
+      - name: Create zip for release (macOS)
+        if: matrix.os == 'macos-latest'
         run: |
           cd dist
-          if [ "${{ matrix.os }}" = "macos-latest" ]; then
-            zip -r "../${{ matrix.zip_name }}" Prumpi-World.app
-          else
-            powershell Compress-Archive -Path Prumpi-World.exe -DestinationPath "../${{ matrix.zip_name }}"
-          fi
+          zip -r "../${{ matrix.zip_name }}" Prumpi-World.app
+
+      - name: Create zip for release (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          cd dist
+          powershell Compress-Archive -Path Prumpi-World.exe -DestinationPath "../${{ matrix.zip_name }}"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -65,3 +68,4 @@ jobs:
           asset_path: ${{ matrix.zip_name }}
           asset_name: ${{ matrix.zip_name }}
           asset_content_type: application/zip
+
