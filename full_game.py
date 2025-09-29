@@ -112,12 +112,25 @@ def save_game():
         json.dump(game_state, f)
     print("Saved!")
 
-def load_game():
+def load_game(state):
     global game_state
     save_file = get_save_path()
     if os.path.exists(save_file):
         with open(save_file, "r") as f:
-            game_state = json.load(f)
+            try:
+                loaded_state = json.load(f)
+            except Exception as e:
+                print("Corrupt save, resetting:", e)
+                reset_game(save=True)
+                return
+        # Start with defaults
+        game_state = copy.deepcopy(state)
+        # Update defaults with whatever was saved (only if keys exist)
+        for key, value in loaded_state.items():
+            if key in game_state:
+                game_state[key] = value
+            else:
+                print(f"Ignoring unknown key in save: {key}")
         print("Loaded:", game_state)
     else:
         print("No save file found, starting fresh.")
@@ -192,7 +205,7 @@ default_state = {
     "miles_traveled": 0,
     "connections": [],
     "current_world": None,
-    "last_world": None
+    "last_world": None,
 }
 
 game_state = copy.deepcopy(default_state)
@@ -279,7 +292,7 @@ pygame.mixer.music.play(-1)  # -1 means loop indefinitely
 pygame.mixer.music.set_volume(0.5)  # 0.0 to 1.0
 
 # --- Load game or start new save ---
-load_game()
+load_game(default_state)
 
 # --- Final variable settings ---
 screen_mode = "title"

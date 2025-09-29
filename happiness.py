@@ -37,8 +37,6 @@ def happiness_minigame():
     clock = pygame.time.Clock()
 
     # --- Colors ---
-    WHITE = (255, 255, 255)
-    BLACK = (0, 0, 0)
     BUTTON_COLOR = (255, 225, 125)
     BUTTON_TEXT_COLOR = (24, 100, 24)
 
