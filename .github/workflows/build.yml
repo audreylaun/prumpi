@@ -31,33 +31,38 @@ jobs:
           pip install -r requirements.txt
           pip install pyinstaller
 
-      - name: Build executable
+      - name: Build executable (onefile)
         run: |
-          pyinstaller Prumpi-World.spec
+          pyinstaller --onefile Prumpi-World.spec
 
+      # Sign app on macOS
       - name: Sign app bundle (ad-hoc)
         if: matrix.os == 'macos-latest'
         run: |
           codesign --force --deep --sign - dist/Prumpi-World.app
 
+      # Create zip for macOS
       - name: Create zip for release (macOS)
         if: matrix.os == 'macos-latest'
         run: |
           cd dist
           zip -r "../${{ matrix.zip_name }}" Prumpi-World.app
 
+      # Create zip for Windows
       - name: Create zip for release (Windows)
         if: matrix.os == 'windows-latest'
         run: |
           cd dist
           powershell Compress-Archive -Path Prumpi-World.exe -DestinationPath "../${{ matrix.zip_name }}"
 
+      # Upload artifact
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact_name }}
           path: ${{ matrix.zip_name }}
 
+      # Upload to GitHub release
       - name: Upload to release
         if: github.event_name == 'release'
         uses: actions/upload-release-asset@v1
@@ -68,4 +73,5 @@ jobs:
           asset_path: ${{ matrix.zip_name }}
           asset_name: ${{ matrix.zip_name }}
           asset_content_type: application/zip
+
 
