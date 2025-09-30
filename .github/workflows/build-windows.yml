@@ -32,7 +32,7 @@ jobs:
 
       - name: Create zip for release
         run: |
-          powershell Compress-Archive -Path build\Prumpi-World\* -DestinationPath build\Prumpi-World-Windows.zip
+          powershell Compress-Archive -Path build\Prumpi-World -DestinationPath build\Prumpi-World-Windows.zip
 
       - name: Upload executable artifact
         uses: actions/upload-artifact@v4
