@@ -34,15 +34,15 @@ jobs:
         run: |
           dir dist -Recurse
           
-      - name: Create zip for release
+            - name: Create zip for release
         run: |
-          powershell Compress-Archive -Path dist\Prumpi-World\* -DestinationPath dist\Prumpi-World-Windows.zip
+          powershell Compress-Archive -Path build\Prumpi-World\* -DestinationPath build\Prumpi-World-Windows.zip
 
       - name: Upload executable artifact
         uses: actions/upload-artifact@v4
         with:
           name: prumpi-world-windows
-          path: dist\Prumpi-World-Windows.zip
+          path: build\Prumpi-World-Windows.zip
 
       - name: Upload to release
         if: github.event_name == 'release'
@@ -51,6 +51,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: dist\Prumpi-World-Windows.zip
+          asset_path: build\Prumpi-World-Windows.zip
           asset_name: Prumpi-World-Windows.zip
           asset_content_type: application/zip
