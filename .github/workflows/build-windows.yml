@@ -27,14 +27,10 @@ jobs:
         run: |
           pyinstaller Prumpi-World.spec
 
-      - name: List all files recursively after build
-        run: dir -Recurse
+      - name: List build output for debugging
+        run: dir build\Prumpi-World
 
-      - name: List files in dist
-        run: |
-          dir dist -Recurse
-          
-            - name: Create zip for release
+      - name: Create zip for release
         run: |
           powershell Compress-Archive -Path build\Prumpi-World\* -DestinationPath build\Prumpi-World-Windows.zip
 
