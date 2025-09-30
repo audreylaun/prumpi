@@ -310,7 +310,7 @@ while running:
         game_state["work_complete"] = True
     if game_state["num_aces"] >= 5 and game_state["num_spitballs"] >= 20 and game_state["num_beers"] >= 25:
         game_state["saloon_complete"] = True
-    if game_state["num_dinners"] >=3 and game_state["num_dessert"] >=3 and game_state["num_twerks"] >= 50 and game_state["num_happiness"] >=30:
+    if game_state["num_dinners"] >=3 and game_state["num_desserts"] >=3 and game_state["num_twerks"] >= 50 and game_state["num_happiness"] >=30:
         game_state["salon_complete"] = True
     if game_state["num_reads"] >=5 and game_state["web_coins"] >=50:
         game_state["bedroom_complete"] = True

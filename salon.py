@@ -236,14 +236,11 @@ def run_salon_game(num_coins, num_dinners, num_desserts, num_twerks, num_happine
         mouse_pos = pygame.mouse.get_pos()
 
         # Quest variables
-        # if num_manicures < 10:
-        #     quest1 = False
-        # else:
-        #     quest1 = True
-        if num_dinners < 3 and num_desserts < 3:
-            quest1 = False
-        else:
+
+        if num_dinners >= 3 and num_desserts >= 3:
             quest1 = True
+        else:
+            quest1 = False
         if num_twerks < 50:
             quest2 = False
         else:
