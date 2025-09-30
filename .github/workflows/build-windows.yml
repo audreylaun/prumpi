@@ -25,7 +25,7 @@ jobs:
 
       - name: Build executable
         run: |
-          pyinstaller Prumpi-World.spec
+          pyinstaller Prumpi-World-Windows.spec
 
       - name: List build output for debugging
         run: dir build\Prumpi-World
