@@ -27,6 +27,9 @@ jobs:
         run: |
           pyinstaller Prumpi-World.spec
 
+      - name: List all files recursively after build
+        run: dir -Recurse
+
       - name: List files in dist
         run: |
           dir dist -Recurse
